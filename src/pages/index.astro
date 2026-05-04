@@ -1,53 +1,57 @@
 ---
-// index.astro - Dashboard with Deep Details
+// index.astro - Final Professional Version
 ---
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContractTrack Pro - Deep Data</title>
+    <title>ContractTrack Pro</title>
     <style>
-        :root { --gold: #d4af37; --bg: #121212; --card: #1e1e1e; --border: #2d2d2d; --success: #22c55e; }
+        :root { --gold: #d4af37; --bg: #000000; --card: #151515; --border: #222; --success: #22c55e; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; }
-        .container { max-width: 850px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
         
+        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .logo { background: var(--gold); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 900; }
+
         .input-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
-        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-family: monospace; }
         .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
-        .stat-card small { color: var(--gold); font-size: 10px; text-transform: uppercase; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+        .s-card small { color: #888; font-size: 10px; text-transform: uppercase; }
 
-        /* Main List Card */
-        .record-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; overflow: hidden; }
-        .card-main { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .card-main:active { background: #252525; }
+        /* Modern Card List */
+        .item-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; overflow: hidden; }
+        .item-main { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .item-main:active { background: #1a1a1a; }
         
-        /* Deep Details Panel (Hidden by default) */
-        .details-panel { display: none; padding: 15px; background: #181818; border-top: 1px solid var(--border); font-size: 13px; }
-        .detail-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #333; }
-        .detail-row b { color: var(--gold); }
+        .deep-details { display: none; padding: 15px; background: #0c0c0c; border-top: 1px solid #222; font-size: 13px; }
+        .d-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
+        .d-row b { color: var(--gold); }
 
-        .today-tag { background: var(--success); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .loader { display: none; text-align: center; color: var(--gold); padding: 10px; font-weight: bold; }
+        .today-badge { background: var(--success); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; }
+        .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; }
+        .section-tag { color: var(--gold); font-size: 12px; font-weight: bold; margin: 20px 0 10px; text-transform: uppercase; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 style="color:var(--gold);"><span style="background:var(--gold);color:black;padding:0 8px;border-radius:4px;margin-right:8px;">CT</span> ContractTrack Pro</h2>
+        <div class="header"><div class="logo">CT</div><h2 style="margin:0;">ContractTrack Pro</h2></div>
 
         <div class="input-card">
-            <textarea id="contractsInput" rows="4" placeholder="Paste Numbers (One per line)"></textarea>
-            <button id="fetchBtn" class="btn">FETCH ALL DATA</button>
+            <textarea id="contractsInput" rows="5" placeholder="Paste Numbers (One per line)"></textarea>
+            <button id="fetchBtn" class="btn">FETCH ALL RECEIPTS</button>
         </div>
 
-        <div id="loader" class="loader">FETCHING DEEP RECORDS...</div>
+        <div id="loader" class="loader">SYNCING DEEP DATA...</div>
 
-        <div class="summary-grid">
-            <div class="stat-card"><small>Aaj ke Records</small><div id="tCount">0</div></div>
-            <div class="stat-card"><small>Aaj ka Total</small><div id="tAmt" style="color:var(--success);">₹0</div></div>
+        <div class="stats">
+            <div class="s-card"><small>Aaj ke Records</small><div id="tCount">0</div></div>
+            <div class="s-card"><small>Aaj ka Total</small><div id="tAmt" style="color:var(--success);">₹0</div></div>
         </div>
 
+        <div class="section-tag">Processing Results</div>
         <div id="results"></div>
     </div>
 
@@ -57,9 +61,9 @@
         const resDiv = document.getElementById('results');
 
         btn.onclick = async () => {
-            const raw = input.value.trim();
-            if(!raw) return;
-            const list = raw.split('\n').map(n => n.trim()).filter(n => n).join(',');
+            const val = input.value.trim();
+            if(!val) return;
+            const list = val.split('\n').map(n => n.trim()).filter(n => n).join(',');
             
             document.getElementById('loader').style.display = 'block';
             resDiv.innerHTML = '';
@@ -71,30 +75,29 @@
                 
                 let tCount = 0, tAmt = 0;
 
-                data.forEach((item, index) => {
+                data.forEach((item, i) => {
                     const isToday = item.date === today;
                     if(isToday) { tCount++; tAmt += parseFloat(item.amount.toString().replace(/,/g, '')) || 0; }
 
                     const card = `
-                        <div class="record-card">
-                            <div class="card-main" onclick="document.getElementById('det-${index}').style.display = document.getElementById('det-${index}').style.display === 'block' ? 'none' : 'block'">
+                        <div class="item-card">
+                            <div class="item-main" onclick="let d = document.getElementById('det-${i}'); d.style.display = d.style.display === 'block' ? 'none' : 'block'">
                                 <div>
-                                    <div style="font-weight:bold;">${item.name}</div>
-                                    <small style="color:#888;">${item.contract} • ${isToday ? '<span class="today-tag">TODAY</span>' : item.date}</small>
+                                    <div style="font-weight:bold; font-size: 15px;">${item.name}</div>
+                                    <small style="color:#666;">${item.contract} • ${isToday ? '<span class="today-badge">TODAY</span>' : item.date}</small>
                                 </div>
                                 <div style="text-align:right;">
                                     <div style="color:var(--gold); font-weight:bold;">₹${item.amount}</div>
-                                    <small style="font-size:10px; color:#666;">View Details ▾</small>
+                                    <small style="font-size:10px; color:#444;">Tap for details ▾</small>
                                 </div>
                             </div>
-                            <div id="det-${index}" class="details-panel">
-                                <div class="detail-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
-                                <div class="detail-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
-                                <div class="detail-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
-                                <div class="detail-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">₹${item.overdue}</b></div>
-                                <div class="detail-row"><span>Paid EMI:</span> <b>${item.paid_emi}</b></div>
-                                <div class="detail-row"><span>Receipt No:</span> <b>${item.receipt_no}</b></div>
-                                <div class="detail-row"><span>Type:</span> <b>${item.instr}</b></div>
+                            <div id="det-${i}" class="deep-details">
+                                <div class="d-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
+                                <div class="d-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
+                                <div class="d-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
+                                <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">₹${item.overdue}</b></div>
+                                <div class="d-row"><span>Paid EMI:</span> <b>${item.paid_emi}</b></div>
+                                <div class="d-row"><span>Receipt No:</span> <b>${item.receipt_no}</b></div>
                             </div>
                         </div>
                     `;
