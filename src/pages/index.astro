@@ -1,208 +1,110 @@
 ---
-// index.astro - Final Professional Dashboard
+// index.astro - Dashboard with Deep Details
 ---
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContractTrack Pro - Smart Dashboard</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContractTrack Pro - Deep Data</title>
     <style>
-        :root { 
-            --gold: #d4af37; 
-            --dark-bg: #121212; 
-            --card-bg: #1e1e1e; 
-            --border: #2d2d2d; 
-            --success: #22c55e; 
-            --text-main: #ffffff;
-        }
-        body { 
-            font-family: 'Inter', system-ui, sans-serif; 
-            background-color: var(--dark-bg); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 15px; 
-        }
+        :root { --gold: #d4af37; --bg: #121212; --card: #1e1e1e; --border: #2d2d2d; --success: #22c55e; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; }
         .container { max-width: 850px; margin: 0 auto; }
         
-        /* Header */
-        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .logo { background: var(--gold); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: 900; }
+        .input-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
-        /* Input Card */
-        .input-card { 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            margin-bottom: 25px; 
-        }
-        label { color: var(--gold); font-size: 11px; font-weight: 800; display: block; margin-bottom: 8px; text-transform: uppercase; }
-        textarea { 
-            width: 100%; 
-            background: #000; 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            padding: 12px; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-family: monospace;
-            font-size: 14px;
-        }
-        .btn { 
-            width: 100%; 
-            background: var(--gold); 
-            color: #000; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 8px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            margin-top: 12px; 
-            text-transform: uppercase;
-        }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+        .stat-card small { color: var(--gold); font-size: 10px; text-transform: uppercase; }
 
-        /* Today's Stats */
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-        .stat-card small { color: #888; font-size: 10px; text-transform: uppercase; display: block; }
-        .stat-card div { font-size: 22px; font-weight: 800; margin-top: 5px; }
-
-        /* Table Design */
-        .table-section { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            margin-bottom: 30px; 
-            overflow: hidden;
-        }
-        .section-header { 
-            padding: 15px; 
-            background: #252525; 
-            border-bottom: 1px solid var(--border); 
-            font-weight: 800; 
-            color: var(--gold); 
-            font-size: 14px;
-        }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 650px; }
-        th { text-align: left; padding: 12px; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-        td { padding: 14px 12px; border-bottom: 1px solid #252525; font-size: 13px; }
+        /* Main List Card */
+        .record-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; overflow: hidden; }
+        .card-main { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .card-main:active { background: #252525; }
         
-        .today-row { background: rgba(34, 197, 94, 0.05); }
-        .today-badge { background: var(--success); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; }
-        .loading { display: none; color: var(--gold); text-align: center; padding: 15px; font-weight: bold; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        /* Deep Details Panel (Hidden by default) */
+        .details-panel { display: none; padding: 15px; background: #181818; border-top: 1px solid var(--border); font-size: 13px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #333; }
+        .detail-row b { color: var(--gold); }
+
+        .today-tag { background: var(--success); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .loader { display: none; text-align: center; color: var(--gold); padding: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">CT</div>
-            <h2 style="margin:0; font-size: 1.5rem;">ContractTrack Pro</h2>
-        </div>
+        <h2 style="color:var(--gold);"><span style="background:var(--gold);color:black;padding:0 8px;border-radius:4px;margin-right:8px;">CT</span> ContractTrack Pro</h2>
 
         <div class="input-card">
-            <label>Contract Numbers (Ek line mein ek daalein)</label>
-            <textarea id="contractsInput" rows="6" placeholder="9420000&#10;7795753&#10;8703919"></textarea>
-            <button id="fetchBtn" class="btn">FETCH ALL RECEIPTS</button>
+            <textarea id="contractsInput" rows="4" placeholder="Paste Numbers (One per line)"></textarea>
+            <button id="fetchBtn" class="btn">FETCH ALL DATA</button>
         </div>
 
-        <div id="loader" class="loading">SABHI RECORDS FETCH HO RAHE HAIN...</div>
+        <div id="loader" class="loader">FETCHING DEEP RECORDS...</div>
 
         <div class="summary-grid">
             <div class="stat-card"><small>Aaj ke Records</small><div id="tCount">0</div></div>
-            <div class="stat-card"><small>Aaj ka Total Amount</small><div id="tAmt" style="color:var(--success);">₹0</div></div>
+            <div class="stat-card"><small>Aaj ka Total</small><div id="tAmt" style="color:var(--success);">₹0</div></div>
         </div>
 
-        <div class="table-section" id="todaySection" style="display:none;">
-            <div class="section-header">TODAY'S PAID ACCOUNTS</div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Contract</th><th>Customer Name</th><th>Receipt No</th><th>Amount</th><th>Status</th></tr>
-                    </thead>
-                    <tbody id="todayResults"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="table-section">
-            <div class="section-header">ALL RECORDS (FULL LIST)</div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Contract</th><th>Customer Name</th><th>Date</th><th>Amount</th><th>Type</th></tr>
-                    </thead>
-                    <tbody id="allResults"></tbody>
-                </table>
-            </div>
-        </div>
+        <div id="results"></div>
     </div>
 
     <script>
-        const fetchBtn = document.getElementById('fetchBtn');
-        const inputField = document.getElementById('contractsInput');
-        const loader = document.getElementById('loader');
+        const btn = document.getElementById('fetchBtn');
+        const input = document.getElementById('contractsInput');
+        const resDiv = document.getElementById('results');
 
-        fetchBtn.onclick = async () => {
-            const text = inputField.value.trim();
-            if(!text) return alert("Numbers daalna zaroori hai!");
-
-            // Line breaks detect karke comma mein badalna
-            const cleanList = text.split('\n').map(n => n.trim()).filter(n => n).join(',');
+        btn.onclick = async () => {
+            const raw = input.value.trim();
+            if(!raw) return;
+            const list = raw.split('\n').map(n => n.trim()).filter(n => n).join(',');
             
-            loader.style.display = 'block';
-            fetchBtn.disabled = true;
-            fetchBtn.innerText = "PROCESSING...";
+            document.getElementById('loader').style.display = 'block';
+            resDiv.innerHTML = '';
 
             try {
-                const response = await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${cleanList}`);
-                const data = await response.json();
-                
+                const r = await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${list}`);
+                const data = await r.json();
                 const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase().replace(/ /g, '-');
                 
-                let allRows = '', todayRows = '', tCount = 0, tAmt = 0;
+                let tCount = 0, tAmt = 0;
 
-                data.forEach(item => {
+                data.forEach((item, index) => {
                     const isToday = item.date === today;
-                    const amountValue = parseFloat(item.amount.toString().replace(/,/g, '')) || 0;
+                    if(isToday) { tCount++; tAmt += parseFloat(item.amount.toString().replace(/,/g, '')) || 0; }
 
-                    const rowHtml = `
-                        <tr class="${isToday ? 'today-row' : ''}">
-                            <td>${item.contract}</td>
-                            <td style="font-weight:700;">${item.name}</td>
-                            <td>${isToday ? '<span class="today-badge">TODAY</span>' : item.date}</td>
-                            <td style="color:var(--gold); font-weight:800;">₹${item.amount}</td>
-                            <td style="font-size:11px; color:#777;">${item.instr || 'N/A'}</td>
-                        </tr>
+                    const card = `
+                        <div class="record-card">
+                            <div class="card-main" onclick="document.getElementById('det-${index}').style.display = document.getElementById('det-${index}').style.display === 'block' ? 'none' : 'block'">
+                                <div>
+                                    <div style="font-weight:bold;">${item.name}</div>
+                                    <small style="color:#888;">${item.contract} • ${isToday ? '<span class="today-tag">TODAY</span>' : item.date}</small>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="color:var(--gold); font-weight:bold;">₹${item.amount}</div>
+                                    <small style="font-size:10px; color:#666;">View Details ▾</small>
+                                </div>
+                            </div>
+                            <div id="det-${index}" class="details-panel">
+                                <div class="detail-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
+                                <div class="detail-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
+                                <div class="detail-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
+                                <div class="detail-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">₹${item.overdue}</b></div>
+                                <div class="detail-row"><span>Paid EMI:</span> <b>${item.paid_emi}</b></div>
+                                <div class="detail-row"><span>Receipt No:</span> <b>${item.receipt_no}</b></div>
+                                <div class="detail-row"><span>Type:</span> <b>${item.instr}</b></div>
+                            </div>
+                        </div>
                     `;
-
-                    allRows += rowHtml;
-
-                    if(isToday) {
-                        tCount++;
-                        tAmt += amountValue;
-                        todayRows += rowHtml;
-                    }
+                    resDiv.innerHTML += card;
                 });
 
-                document.getElementById('allResults').innerHTML = allRows || '<tr><td colspan="5" style="text-align:center;">No data found.</td></tr>';
-                document.getElementById('todayResults').innerHTML = todayRows;
-                
-                // Today section show/hide
-                document.getElementById('todaySection').style.display = todayRows ? 'block' : 'none';
-                
-                // Summary updates
                 document.getElementById('tCount').innerText = tCount;
                 document.getElementById('tAmt').innerText = "₹" + tAmt.toLocaleString('en-IN');
-
-            } catch (err) {
-                alert("API Response mein error hai. Hugging Face check karein.");
             } finally {
-                loader.style.display = 'none';
-                fetchBtn.disabled = false;
-                fetchBtn.innerText = "FETCH ALL RECEIPTS";
+                document.getElementById('loader').style.display = 'none';
             }
         }
     </script>
