@@ -1,0 +1,21 @@
+---
+// Backend se data fetch ho raha hai
+const response = await fetch('https://gauravkumar80500-loandataapi.hf.space/scrape');
+const data = await response.json();
+---
+<html>
+  <head><title>Loan Dashboard</title></head>
+  <body>
+    <h1>Loan Receipts</h1>
+    <table border="1">
+      <tr><th>Contract</th><th>Amount</th><th>Date</th></tr>
+      {data.map((item) => (
+        <tr>
+          <td>{item.contract}</td>
+          <td>{item.amount}</td>
+          <td>{item.date}</td>
+        </tr>
+      ))}
+    </table>
+  </body>
+</html>
