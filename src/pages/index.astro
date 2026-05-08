@@ -1,5 +1,5 @@
 ---
-// index.astro - Gold Border Expand/Collapse Cards
+// index.astro - 100% Guaranteed Gold Border Cards
 ---
 <html lang="hi">
 <head>
@@ -13,36 +13,25 @@
         .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .logo { background: var(--gold); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 900; }
 
-        .input-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--gold); margin-bottom: 20px; }
+        .input-card { background: var(--card); padding: 15px; border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 20px; }
         textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-family: monospace; }
         textarea:focus { outline: none; border-color: var(--gold); }
         .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
 
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 1px solid var(--gold); text-align: center; }
+        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 2px solid var(--gold); text-align: center; }
         .s-card small { color: var(--gold); font-size: 10px; text-transform: uppercase; font-weight: bold; }
 
-        /* Premium Gold Border Card Design */
-        .item-card { 
-            background: var(--card); 
-            border-radius: 12px; 
-            border: 2px solid var(--gold); /* Yahan proper Gold Border lagayi hai */
-            margin-bottom: 15px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15); /* Halki si gold shadow */
-        }
         .item-main { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .item-main:active { background: #1a1a1a; }
         
-        .deep-details { padding: 15px; background: #080808; border-top: 1px dashed var(--gold); font-size: 13px; }
+        .deep-details { padding: 15px; background: #080808; border-top: 1px dashed #d4af37; font-size: 13px; }
         .d-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
         .d-row:last-child { border-bottom: none; }
         .d-row b { color: var(--gold); }
 
         .today-badge { background: var(--success); color: #000; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; }
         .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; letter-spacing: 1px; }
-        
-        /* Arrow Icon styling */
         .toggle-icon { font-size: 12px; color: var(--gold); margin-left: 5px; }
     </style>
 </head>
@@ -70,13 +59,11 @@
         const input = document.getElementById('contractsInput');
         const resDiv = document.getElementById('results');
 
-        // Null value hatane ka function
         const cleanVal = (val) => {
             if (!val || String(val).toLowerCase() === 'null') return 'N/A';
             return val;
         };
 
-        // Expand / Collapse Function
         window.toggleCard = function(index) {
             const detailsDiv = document.getElementById('det-' + index);
             const iconSpan = document.getElementById('icon-' + index);
@@ -112,15 +99,16 @@
                     const emiAmountText = item.emi_amount !== 'N/A' ? `₹${item.emi_amount}` : 'N/A';
                     const overdueText = cleanVal(item.overdue) !== 'N/A' ? `₹${item.overdue}` : '0';
 
+                    // Yahan dekhiye: style="border: 2px solid #d4af37;" direct lagaya hai
                     const card = `
-                        <div class="item-card">
+                        <div style="background: #151515; border-radius: 12px; border: 2px solid #d4af37; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15);">
                             <div class="item-main" onclick="toggleCard(${i})">
                                 <div>
                                     <div style="font-weight:bold; font-size: 16px;">${item.name}</div>
                                     <div style="color:#888; font-size: 12px; margin-top: 4px;">${item.contract} • ${isToday ? '<span class="today-badge">TODAY</span>' : item.date}</div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="color:var(--gold); font-weight:bold; font-size: 18px;">₹${item.amount}</div>
+                                    <div style="color:#d4af37; font-weight:bold; font-size: 18px;">₹${item.amount}</div>
                                     <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
                                         Tap to expand <span id="icon-${i}" class="toggle-icon">▼</span>
                                     </div>
