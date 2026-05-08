@@ -1,5 +1,5 @@
 ---
-// index.astro - 100% Guaranteed Gold Border Cards
+// index.astro - Final Design with Co-App Mobile & Gold Borders
 ---
 <html lang="hi">
 <head>
@@ -59,11 +59,6 @@
         const input = document.getElementById('contractsInput');
         const resDiv = document.getElementById('results');
 
-        const cleanVal = (val) => {
-            if (!val || String(val).toLowerCase() === 'null') return 'N/A';
-            return val;
-        };
-
         window.toggleCard = function(index) {
             const detailsDiv = document.getElementById('det-' + index);
             const iconSpan = document.getElementById('icon-' + index);
@@ -97,9 +92,8 @@
                     if(isToday) { tCount++; tAmt += parseFloat(item.amount.toString().replace(/,/g, '')) || 0; }
 
                     const emiAmountText = item.emi_amount !== 'N/A' ? `₹${item.emi_amount}` : 'N/A';
-                    const overdueText = cleanVal(item.overdue) !== 'N/A' ? `₹${item.overdue}` : '0';
+                    const overdueText = item.overdue !== 'N/A' ? `₹${item.overdue}` : '0';
 
-                    // Yahan dekhiye: style="border: 2px solid #d4af37;" direct lagaya hai
                     const card = `
                         <div style="background: #151515; border-radius: 12px; border: 2px solid #d4af37; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15);">
                             <div class="item-main" onclick="toggleCard(${i})">
@@ -110,17 +104,18 @@
                                 <div style="text-align:right;">
                                     <div style="color:#d4af37; font-weight:bold; font-size: 18px;">₹${item.amount}</div>
                                     <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
-                                        Tap to expand <span id="icon-${i}" class="toggle-icon">▼</span>
+                                        Details <span id="icon-${i}" class="toggle-icon">▼</span>
                                     </div>
                                 </div>
                             </div>
                             <div id="det-${i}" class="deep-details" style="display: none;">
-                                <div class="d-row"><span>Mobile:</span> <b>${item.mobile}</b></div>
+                                <div class="d-row"><span>Cust Mobile:</span> <b>${item.mobile}</b></div>
                                 <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
                                 <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
                                 <div class="d-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
                                 <div class="d-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
                                 <div class="d-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
+                                <div class="d-row"><span>Co-App Mobile:</span> <b>${item.co_mobile}</b></div>
                                 <div class="d-row"><span>Receipt No:</span> <b style="color:#aaa;">${item.receipt_no}</b></div>
                                 <div class="d-row"><span>Type:</span> <b style="color:#aaa;">${item.instr}</b></div>
                             </div>
