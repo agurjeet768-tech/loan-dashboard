@@ -1,12 +1,12 @@
 ---
-// index.astro - Final Professional Version
+// index.astro - Final Vercel Dashboard with EMI & Mobile
 ---
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ContractTrack Pro</title>
     <style>
-        :root { --gold: #d4af37; --bg: #000000; --card: #151515; --border: #222; --success: #22c55e; }
+        :root { --gold: #d4af37; --bg: #000; --card: #151515; --border: #222; --success: #22c55e; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; }
         .container { max-width: 800px; margin: 0 auto; }
         
@@ -21,10 +21,8 @@
         .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
         .s-card small { color: #888; font-size: 10px; text-transform: uppercase; }
 
-        /* Modern Card List */
         .item-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; overflow: hidden; }
         .item-main { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .item-main:active { background: #1a1a1a; }
         
         .deep-details { display: none; padding: 15px; background: #0c0c0c; border-top: 1px solid #222; font-size: 13px; }
         .d-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
@@ -32,7 +30,6 @@
 
         .today-badge { background: var(--success); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; }
         .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; }
-        .section-tag { color: var(--gold); font-size: 12px; font-weight: bold; margin: 20px 0 10px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -40,18 +37,17 @@
         <div class="header"><div class="logo">CT</div><h2 style="margin:0;">ContractTrack Pro</h2></div>
 
         <div class="input-card">
-            <textarea id="contractsInput" rows="5" placeholder="Paste Numbers (One per line)"></textarea>
+            <textarea id="contractsInput" rows="5" placeholder="Enter Contracts (One per line)"></textarea>
             <button id="fetchBtn" class="btn">FETCH ALL RECEIPTS</button>
         </div>
 
-        <div id="loader" class="loader">SYNCING DEEP DATA...</div>
+        <div id="loader" class="loader">FETCHING DATA...</div>
 
         <div class="stats">
             <div class="s-card"><small>Aaj ke Records</small><div id="tCount">0</div></div>
             <div class="s-card"><small>Aaj ka Total</small><div id="tAmt" style="color:var(--success);">₹0</div></div>
         </div>
 
-        <div class="section-tag">Processing Results</div>
         <div id="results"></div>
     </div>
 
@@ -59,6 +55,11 @@
         const btn = document.getElementById('fetchBtn');
         const input = document.getElementById('contractsInput');
         const resDiv = document.getElementById('results');
+
+        const cleanVal = (val) => {
+            if (!val || String(val).toLowerCase() === 'null') return 'N/A';
+            return val;
+        };
 
         btn.onclick = async () => {
             const val = input.value.trim();
@@ -79,11 +80,14 @@
                     const isToday = item.date === today;
                     if(isToday) { tCount++; tAmt += parseFloat(item.amount.toString().replace(/,/g, '')) || 0; }
 
+                    const emiAmountText = item.emi_amount !== 'N/A' ? `₹${item.emi_amount}` : 'N/A';
+                    const overdueText = cleanVal(item.overdue) !== 'N/A' ? `₹${item.overdue}` : '0';
+
                     const card = `
                         <div class="item-card">
                             <div class="item-main" onclick="let d = document.getElementById('det-${i}'); d.style.display = d.style.display === 'block' ? 'none' : 'block'">
                                 <div>
-                                    <div style="font-weight:bold; font-size: 15px;">${item.name}</div>
+                                    <div style="font-weight:bold;">${item.name}</div>
                                     <small style="color:#666;">${item.contract} • ${isToday ? '<span class="today-badge">TODAY</span>' : item.date}</small>
                                 </div>
                                 <div style="text-align:right;">
@@ -92,12 +96,13 @@
                                 </div>
                             </div>
                             <div id="det-${i}" class="deep-details">
+                                <div class="d-row"><span>Mobile:</span> <b>${item.mobile}</b></div>
+                                <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
+                                <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
                                 <div class="d-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
                                 <div class="d-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
                                 <div class="d-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
-                                <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">₹${item.overdue}</b></div>
-                                <div class="d-row"><span>Paid EMI:</span> <b>${item.paid_emi}</b></div>
-                                <div class="d-row"><span>Receipt No:</span> <b>${item.receipt_no}</b></div>
+                                <div class="d-row"><span>Type:</span> <b>${item.instr}</b></div>
                             </div>
                         </div>
                     `;
@@ -106,6 +111,8 @@
 
                 document.getElementById('tCount').innerText = tCount;
                 document.getElementById('tAmt').innerText = "₹" + tAmt.toLocaleString('en-IN');
+            } catch (err) {
+                alert("Data fetch karne mein error aayi, please dobara try karein.");
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
