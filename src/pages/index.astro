@@ -1,357 +1,303 @@
 ---
-// index.astro - ContractTrack Pro v3.0
+// index.astro - ContractTrack Pro v4.0
 ---
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ContractTrack Pro</title>
     <style>
         :root {
             --gold: #d4af37;
-            --gold-dim: #a88a20;
-            --gold-glow: rgba(212,175,55,0.18);
             --bg: #000;
-            --card: #111;
-            --card2: #0a0a0a;
-            --border: #1e1e1e;
+            --card: #0f0f0f;
+            --card2: #080808;
+            --border: #1c1c1c;
             --success: #22c55e;
             --danger: #ef4444;
             --blue: #60a5fa;
-            --text: #e5e5e5;
-            --muted: #555;
+            --muted: #444;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
-            color: var(--text);
+            color: #e5e5e5;
             min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Top Bar ── */
+        /* ── TOP BAR ── */
         .topbar {
-            background: #0a0a0a;
+            position: sticky; top: 0; z-index: 99;
+            background: #050505;
             border-bottom: 1px solid #1a1a1a;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 13px 16px;
+            display: flex; align-items: center; gap: 11px;
         }
         .logo {
+            width: 34px; height: 34px;
             background: var(--gold);
-            color: #000;
-            width: 36px; height: 36px;
             border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 14px; flex-shrink: 0;
+            font-weight: 900; font-size: 13px; color: #000; flex-shrink: 0;
         }
-        .topbar-title { font-size: 17px; font-weight: 700; color: #fff; }
-        .topbar-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+        .tb-title { font-size: 16px; font-weight: 700; color: #fff; }
+        .tb-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; letter-spacing: 0.3px; }
 
-        /* ── Main Content ── */
-        .main { max-width: 680px; margin: 0 auto; padding: 16px; }
+        /* ── MAIN ── */
+        .main { max-width: 640px; margin: 0 auto; padding: 14px 12px 30px; }
 
-        /* ── Input Section ── */
-        .input-wrap {
+        /* ── INPUT CARD ── */
+        .inp-wrap {
             background: var(--card);
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border: 1px solid #222;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
-        .input-label {
-            font-size: 11px;
-            color: var(--gold);
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
+        .inp-lbl {
+            font-size: 10px; color: var(--gold);
+            font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; margin-bottom: 8px; display: block;
         }
         textarea {
             width: 100%;
             background: #000;
-            border: 1px solid #252525;
+            border: 1px solid #1e1e1e;
             color: #fff;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 11px 12px;
+            border-radius: 9px;
             font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            resize: vertical;
-            min-height: 100px;
+            font-size: 13px; line-height: 1.7;
+            resize: none; height: 100px;
             transition: border-color 0.2s;
         }
         textarea:focus { outline: none; border-color: var(--gold); }
-        textarea::placeholder { color: #333; }
+        textarea::placeholder { color: #282828; }
 
         .fetch-btn {
-            width: 100%;
-            margin-top: 12px;
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 14px;
+            width: 100%; margin-top: 11px;
+            background: var(--gold); color: #000;
+            border: none; padding: 14px;
             border-radius: 10px;
-            font-size: 14px;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: opacity 0.15s, transform 0.1s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 13px; font-weight: 900;
+            letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            transition: opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .fetch-btn:active { opacity: 0.8; transform: scale(0.99); }
-        .fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .fetch-btn:active { opacity: 0.75; }
+        .fetch-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-        /* ── Stats ── */
+        /* ── STATS ── */
         .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-bottom: 14px;
         }
-        .stat-card {
-            background: var(--card);
-            border: 1px solid #1e1e1e;
-            border-radius: 14px;
-            padding: 14px 16px;
-            text-align: center;
+        .stat {
+            background: var(--card); border: 1px solid #1e1e1e;
+            border-radius: 12px; padding: 13px 14px; text-align: center;
         }
-        .stat-label {
-            font-size: 10px;
-            color: var(--gold);
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .stat-val {
-            font-size: 26px;
-            font-weight: 800;
-            margin-top: 4px;
-            color: #fff;
-        }
+        .stat-lbl { font-size: 10px; color: var(--gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .stat-val { font-size: 24px; font-weight: 800; color: #fff; margin-top: 4px; }
 
-        /* ── Loader ── */
-        .loader {
-            display: none;
-            text-align: center;
-            padding: 32px 0;
-        }
-        .loader-ring {
-            width: 40px; height: 40px;
+        /* ── LOADER ── */
+        .loader { display: none; text-align: center; padding: 28px 0; }
+        .spin {
+            width: 36px; height: 36px;
             border: 3px solid #1a1a1a;
             border-top-color: var(--gold);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
+            animation: spin 0.75s linear infinite;
+            margin: 0 auto 10px;
         }
-        .loader-text { font-size: 12px; color: var(--muted); letter-spacing: 2px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .load-txt { font-size: 11px; color: var(--muted); letter-spacing: 2px; }
 
-        /* ── Section Label ── */
-        .section-label {
-            font-size: 11px;
-            color: var(--muted);
-            font-weight: 700;
-            letter-spacing: 2px;
+        /* ── SECTION LABEL ── */
+        .sec-lbl {
+            font-size: 10px; color: var(--muted);
+            font-weight: 700; letter-spacing: 2px;
             text-transform: uppercase;
-            margin: 4px 0 10px;
-            display: none;
+            margin: 4px 2px 10px; display: none;
         }
 
-        /* ── Contract Card ── */
+        /* ════════════════════════════
+           ── CONTRACT CARD ──
+        ════════════════════════════ */
         .c-card {
             background: var(--card);
-            border: 1px solid #1e1e1e;
-            border-radius: 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
             margin-bottom: 12px;
             overflow: hidden;
             transition: border-color 0.2s;
         }
-        .c-card.today-card { border-color: rgba(212,175,55,0.35); }
+        .c-card.is-today { border-color: rgba(212,175,55,0.3); }
 
-        /* Card Header */
-        .c-header {
-            padding: 14px 16px;
+        /* ── MAIN VISIBLE AREA (tap to expand) ── */
+        .c-main {
+            padding: 15px 15px 0 15px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .c-main:active { background: #131313; }
+
+        /* Row 1: Name + Amount */
+        .row1 {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            cursor: pointer;
             gap: 10px;
-            -webkit-tap-highlight-color: transparent;
+            margin-bottom: 11px;
         }
-        .c-header:active { background: #161616; }
+        .c-name {
+            font-size: 16px; font-weight: 700;
+            color: #fff; line-height: 1.2;
+            flex: 1; min-width: 0;
+        }
+        .c-amount {
+            font-size: 20px; font-weight: 900;
+            color: var(--gold); flex-shrink: 0;
+            line-height: 1;
+        }
 
-        .c-name { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
-        .c-meta {
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 3px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
+        /* Row 2: 4 info pills */
+        .info-pills {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-bottom: 13px;
         }
-        .c-right { text-align: right; flex-shrink: 0; }
-        .c-amount { font-size: 20px; font-weight: 800; color: var(--gold); }
-        .c-date   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .pill {
+            background: #000;
+            border: 1px solid #1a1a1a;
+            border-radius: 9px;
+            padding: 8px 10px;
+        }
+        .pill-lbl {
+            font-size: 9px; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 3px;
+        }
+        .pill-val {
+            font-size: 13px; font-weight: 600;
+            color: #ddd; line-height: 1.2;
+        }
+        .pill-val.gold  { color: var(--gold); }
+        .pill-val.green { color: var(--success); }
+        .pill-val.orange{ color: #fb923c; }
 
         /* Badges */
         .badge {
-            display: inline-flex; align-items: center;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
+            display: inline-block; padding: 2px 7px;
+            border-radius: 20px; font-size: 10px; font-weight: 700;
         }
-        .badge-today { background: var(--success); color: #000; }
-        .badge-cash  { background: #2d1a00; color: #fb923c; border: 1px solid #3d2200; }
-        .badge-bank  { background: #001a3d; color: var(--blue); border: 1px solid #002255; }
+        .b-today { background: var(--success); color: #000; }
+        .b-cash  { background: #2d1800; color: #fb923c; border: 1px solid #3d2200; }
+        .b-bank  { background: #001836; color: var(--blue);  border: 1px solid #002255; }
 
-        /* Quick Info Row */
-        .c-quick {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            border-top: 1px solid var(--border);
-        }
-        .q-item {
-            padding: 10px 16px;
-            border-right: 1px solid var(--border);
-        }
-        .q-item:last-child { border-right: none; }
-        .q-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .q-val   { font-size: 13px; font-weight: 600; color: #ddd; margin-top: 2px; word-break: break-all; }
-        .q-val.green { color: var(--success); }
-
-        /* Toggle Row */
+        /* ── EXPAND TOGGLE ── */
         .c-toggle {
-            padding: 9px 16px;
             border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            color: var(--gold);
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            padding: 9px 15px;
+            display: flex; align-items: center;
+            justify-content: center; gap: 5px;
+            cursor: pointer; font-size: 10px;
+            color: var(--gold); font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
             -webkit-tap-highlight-color: transparent;
         }
-        .c-toggle:active { background: #161616; }
-        .toggle-arrow { transition: transform 0.25s; font-size: 10px; }
-        .toggle-arrow.open { transform: rotate(180deg); }
+        .c-toggle:active { background: #131313; }
+        .t-arrow { transition: transform 0.25s ease; font-size: 9px; }
+        .t-arrow.open { transform: rotate(180deg); }
 
-        /* Details Panel */
+        /* ── EXPANDED DETAILS ── */
         .c-details {
             display: none;
-            border-top: 1px dashed rgba(212,175,55,0.25);
+            border-top: 1px solid var(--border);
             background: var(--card2);
         }
         .d-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 11px 16px;
-            border-bottom: 1px solid #0f0f0f;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 11px 15px;
+            border-bottom: 1px solid #0d0d0d;
         }
         .d-row:last-child { border-bottom: none; }
-        .d-key  { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-        .d-val  { font-size: 13px; font-weight: 700; color: var(--gold); text-align: right; max-width: 55%; word-break: break-all; }
+        .d-key { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+        .d-val { font-size: 13px; font-weight: 700; color: var(--gold); text-align: right; max-width: 58%; word-break: break-word; }
         .d-val.red   { color: var(--danger); }
-        .d-val.white { color: #ccc; font-weight: 400; }
+        .d-val.white { color: #aaa; font-weight: 400; }
         .d-val.green { color: var(--success); }
 
-        /* Error */
-        .err-box {
-            background: #1a0000;
-            border: 1px solid #400;
-            color: #f87171;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-bottom: 12px;
+        /* ── ERROR ── */
+        .err {
+            background: #180000; border: 1px solid #3a0000;
+            color: #f87171; padding: 12px 14px;
+            border-radius: 12px; font-size: 13px; margin-bottom: 12px;
         }
-
-        /* Empty State */
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--muted);
-        }
-        .empty-icon { font-size: 40px; margin-bottom: 12px; }
-        .empty-text { font-size: 14px; }
     </style>
 </head>
 <body>
 
-<!-- Top Bar -->
+<!-- TOP BAR -->
 <div class="topbar">
     <div class="logo">CT</div>
     <div>
-        <div class="topbar-title">ContractTrack Pro</div>
-        <div class="topbar-sub">Mahindra Finance Receipt Tracker</div>
+        <div class="tb-title">ContractTrack Pro</div>
+        <div class="tb-sub">Mahindra Finance · Receipt Tracker</div>
     </div>
 </div>
 
 <div class="main">
 
-    <!-- Input -->
-    <div class="input-wrap">
-        <span class="input-label">Contract Numbers</span>
-        <textarea id="inp" placeholder="Contract numbers yahan paste karo&#10;Ek line mein ek number&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
+    <!-- INPUT -->
+    <div class="inp-wrap">
+        <span class="inp-lbl">Contract Numbers</span>
+        <textarea id="inp" placeholder="Ek line mein ek number&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
         <button class="fetch-btn" id="fetchBtn">
-            <span id="btnIcon">⚡</span>
-            <span id="btnText">FETCH ALL RECEIPTS</span>
+            <span id="bIcon">⚡</span>
+            <span id="bText">FETCH ALL RECEIPTS</span>
         </button>
     </div>
 
-    <!-- Stats -->
+    <!-- STATS -->
     <div class="stats">
-        <div class="stat-card">
-            <div class="stat-label">Aaj ke Records</div>
+        <div class="stat">
+            <div class="stat-lbl">Aaj ke Records</div>
             <div class="stat-val" id="tCount">—</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Aaj ka Total</div>
+        <div class="stat">
+            <div class="stat-lbl">Aaj ka Total</div>
             <div class="stat-val" style="color:var(--success);" id="tAmt">—</div>
         </div>
     </div>
 
-    <!-- Loader -->
+    <!-- LOADER -->
     <div class="loader" id="loader">
-        <div class="loader-ring"></div>
-        <div class="loader-text">DATA SYNC HO RAHA HAI...</div>
+        <div class="spin"></div>
+        <div class="load-txt">DATA SYNC HO RAHA HAI...</div>
     </div>
 
-    <!-- Error -->
     <div id="errBox"></div>
 
-    <!-- Results -->
-    <div class="section-label" id="secLabel">RESULTS</div>
+    <div class="sec-lbl" id="secLbl">— RESULTS —</div>
     <div id="results"></div>
 
 </div>
 
 <script>
-const btn     = document.getElementById('fetchBtn');
-const inp     = document.getElementById('inp');
-const resDiv  = document.getElementById('results');
-const errBox  = document.getElementById('errBox');
-const loader  = document.getElementById('loader');
-const secLbl  = document.getElementById('secLabel');
+const btn    = document.getElementById('fetchBtn');
+const inp    = document.getElementById('inp');
+const res    = document.getElementById('results');
+const errBox = document.getElementById('errBox');
+const loader = document.getElementById('loader');
+const secLbl = document.getElementById('secLbl');
 
-// Today string: "08-MAY-2026"
 function todayStr() {
     return new Date().toLocaleDateString('en-GB', {
         day:'2-digit', month:'short', year:'numeric'
@@ -359,46 +305,47 @@ function todayStr() {
 }
 
 function safe(v) {
-    const bad = [null, undefined, 'N/A','null','None','none','undefined',''];
-    return bad.includes(v) || (typeof v === 'string' && !v.trim()) ? '—' : v;
+    if (v === null || v === undefined) return '—';
+    const s = String(v).trim();
+    return ['','n/a','null','none','undefined','0000000000'].includes(s.toLowerCase()) ? '—' : s;
 }
 
-function fmtAmt(v) {
+function fmt(v) {
     const n = parseFloat(String(v||'0').replace(/,/g,''));
     return isNaN(n) ? '0' : n.toLocaleString('en-IN');
 }
 
-function modeBadge(mode) {
-    if (!mode || mode === 'N/A') return '';
-    if (mode === 'CASH') return `<span class="badge badge-cash">💵 CASH</span>`;
-    return `<span class="badge badge-bank">🏦 BANK</span>`;
+function modeInfo(mode) {
+    if (!mode || mode === 'N/A') return { badge: '', label: '—' };
+    if (mode === 'CASH')
+        return { badge: '<span class="badge b-cash">💵 CASH</span>', label: '💵 CASH' };
+    return { badge: '<span class="badge b-bank">🏦 BANK</span>', label: '🏦 BANK TRANSFER' };
 }
 
-function toggleCard(i) {
-    const det   = document.getElementById('det-'+i);
-    const arrow = document.getElementById('arr-'+i);
-    const lbl   = document.getElementById('tlbl-'+i);
-    const open  = det.style.display === 'block';
-    det.style.display = open ? 'none' : 'block';
-    arrow.classList.toggle('open', !open);
-    lbl.textContent   = open ? 'MORE DETAILS' : 'CLOSE DETAILS';
-}
+window.toggle = function(i) {
+    const d  = document.getElementById('det-'+i);
+    const ar = document.getElementById('ar-'+i);
+    const lb = document.getElementById('lb-'+i);
+    const open = d.style.display === 'block';
+    d.style.display = open ? 'none' : 'block';
+    ar.classList.toggle('open', !open);
+    lb.textContent  = open ? 'DETAILS DEKHEIN' : 'BAND KAREIN';
+};
 
-function setLoading(on) {
-    loader.style.display  = on ? 'block' : 'none';
-    btn.disabled          = on;
-    document.getElementById('btnIcon').textContent = on ? '⏳' : '⚡';
-    document.getElementById('btnText').textContent = on ? 'FETCHING...' : 'FETCH ALL RECEIPTS';
+function setLoad(on) {
+    loader.style.display = on ? 'block' : 'none';
+    btn.disabled = on;
+    document.getElementById('bIcon').textContent = on ? '⏳' : '⚡';
+    document.getElementById('bText').textContent = on ? 'FETCHING...' : 'FETCH ALL RECEIPTS';
 }
 
 btn.onclick = async () => {
     const val = inp.value.trim();
     if (!val) return;
-
     const list = val.split('\n').map(s=>s.trim()).filter(Boolean).join(',');
 
-    setLoading(true);
-    resDiv.innerHTML = '';
+    setLoad(true);
+    res.innerHTML = '';
     errBox.innerHTML = '';
     secLbl.style.display = 'none';
     document.getElementById('tCount').textContent = '—';
@@ -408,83 +355,83 @@ btn.onclick = async () => {
         const r = await fetch(
             `https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${encodeURIComponent(list)}`
         );
-        if (!r.ok) throw new Error(`Server error: ${r.status}`);
+        if (!r.ok) throw new Error(`Server ${r.status}`);
         const data = await r.json();
 
         if (!Array.isArray(data) || !data.length) {
-            errBox.innerHTML = `<div class="err-box">⚠️ Koi data nahi mila. Contract numbers check karo.</div>`;
-            setLoading(false);
+            errBox.innerHTML = `<div class="err">⚠️ Koi data nahi mila. Numbers check karo.</div>`;
             return;
         }
 
         const today = todayStr();
-        let tCount = 0, tAmt = 0;
+        let tCnt = 0, tAmt = 0;
         secLbl.style.display = 'block';
 
         data.forEach((item, i) => {
             const isToday = item.date && item.date.toUpperCase() === today;
-            const amtNum  = parseFloat(String(item.amount||'0').replace(/,/g,'')) || 0;
-            if (isToday) { tCount++; tAmt += amtNum; }
+            const amtN = parseFloat(String(item.amount||'0').replace(/,/g,'')) || 0;
+            if (isToday) { tCnt++; tAmt += amtN; }
 
-            const emiTxt     = item.emi_amount && item.emi_amount !== 'N/A'
-                               ? `₹${fmtAmt(item.emi_amount)}` : '—';
-            const overdueTxt = item.overdue && item.overdue !== 'N/A' && item.overdue !== '0'
-                               ? `₹${fmtAmt(item.overdue)}` : '₹0';
+            const mode = modeInfo(item.payment_mode);
+            const emiTxt = item.emi_amount && item.emi_amount !== 'N/A'
+                           ? `₹${fmt(item.emi_amount)}` : '—';
+            const overTxt = item.overdue && item.overdue !== 'N/A' && item.overdue !== '0'
+                            ? `₹${fmt(item.overdue)}` : '₹0';
 
-            resDiv.innerHTML += `
-            <div class="c-card${isToday ? ' today-card' : ''}">
+            res.innerHTML += `
+            <div class="c-card${isToday ? ' is-today' : ''}">
 
-                <!-- Header -->
-                <div class="c-header" onclick="toggleCard(${i})">
-                    <div style="flex:1; min-width:0;">
-                        <div class="c-name">${safe(item.name)}</div>
-                        <div class="c-meta">
-                            <span style="color:#444;">#${item.contract}</span>
-                            ${modeBadge(item.payment_mode)}
-                            ${isToday ? '<span class="badge badge-today">TODAY</span>' : ''}
+                <!-- ══ MAIN CARD (always visible) ══ -->
+                <div class="c-main" onclick="toggle(${i})">
+
+                    <!-- Name + Amount -->
+                    <div class="row1">
+                        <div>
+                            <div class="c-name">${safe(item.name)}</div>
+                            <div style="font-size:11px; color:#333; margin-top:4px; display:flex; align-items:center; gap:6px;">
+                                <span>#${item.contract}</span>
+                                ${isToday ? '<span class="badge b-today">TODAY</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="c-amount">₹${fmt(item.amount)}</div>
+                    </div>
+
+                    <!-- 4 Pills: Contract No · Date · EMI · Payment -->
+                    <div class="info-pills">
+                        <div class="pill">
+                            <div class="pill-lbl">📅 Date Received</div>
+                            <div class="pill-val gold">${safe(item.date)}</div>
+                        </div>
+                        <div class="pill">
+                            <div class="pill-lbl">💰 EMI Amount</div>
+                            <div class="pill-val green">${emiTxt}</div>
+                        </div>
+                        <div class="pill">
+                            <div class="pill-lbl">📱 Mobile</div>
+                            <div class="pill-val">${safe(item.mobile)}</div>
+                        </div>
+                        <div class="pill">
+                            <div class="pill-lbl">💳 Payment</div>
+                            <div class="pill-val orange">${item.payment_mode === 'CASH' ? '💵 CASH' : item.payment_mode === 'BANK TRANSFER' ? '🏦 BANK' : '—'}</div>
                         </div>
                     </div>
-                    <div class="c-right">
-                        <div class="c-amount">₹${fmtAmt(item.amount)}</div>
-                        <div class="c-date">${safe(item.date)}</div>
-                    </div>
                 </div>
 
-                <!-- Quick Info: always visible -->
-                <div class="c-quick">
-                    <div class="q-item">
-                        <div class="q-label">📱 Mobile</div>
-                        <div class="q-val green">${safe(item.mobile)}</div>
-                    </div>
-                    <div class="q-item">
-                        <div class="q-label">💳 EMI Amount</div>
-                        <div class="q-val">${emiTxt}</div>
-                    </div>
+                <!-- ══ TOGGLE BUTTON ══ -->
+                <div class="c-toggle" onclick="toggle(${i})">
+                    <span id="lb-${i}">DETAILS DEKHEIN</span>
+                    <span id="ar-${i}" class="t-arrow">▼</span>
                 </div>
 
-                <!-- Toggle Button -->
-                <div class="c-toggle" onclick="toggleCard(${i})">
-                    <span id="tlbl-${i}">MORE DETAILS</span>
-                    <span id="arr-${i}" class="toggle-arrow">▼</span>
-                </div>
-
-                <!-- Expandable Details -->
+                <!-- ══ EXPANDED DETAILS ══ -->
                 <div id="det-${i}" class="c-details">
-                    <div class="d-row">
-                        <span class="d-key">📅 Date Received</span>
-                        <span class="d-val">${safe(item.date)}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">💳 Payment Mode</span>
-                        <span class="d-val">${safe(item.payment_mode)}</span>
-                    </div>
                     <div class="d-row">
                         <span class="d-key">🧾 Receipt No</span>
                         <span class="d-val white">${safe(item.receipt_no)}</span>
                     </div>
                     <div class="d-row">
                         <span class="d-key">⚠️ Over Dues</span>
-                        <span class="d-val red">${overdueTxt}</span>
+                        <span class="d-val red">${overTxt}</span>
                     </div>
                     <div class="d-row">
                         <span class="d-key">🛡️ Guarantor</span>
@@ -503,17 +450,18 @@ btn.onclick = async () => {
                         <span class="d-val white">${safe(item.co_mobile)}</span>
                     </div>
                 </div>
+
             </div>`;
         });
 
-        document.getElementById('tCount').textContent = tCount;
-        document.getElementById('tAmt').textContent   = tCount > 0
+        document.getElementById('tCount').textContent = tCnt;
+        document.getElementById('tAmt').textContent   = tCnt > 0
             ? '₹' + tAmt.toLocaleString('en-IN') : '₹0';
 
     } catch(e) {
-        errBox.innerHTML = `<div class="err-box">❌ Error: ${e.message}</div>`;
+        errBox.innerHTML = `<div class="err">❌ Error: ${e.message}</div>`;
     } finally {
-        setLoading(false);
+        setLoad(false);
     }
 };
 </script>
