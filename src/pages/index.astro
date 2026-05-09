@@ -1,468 +1,356 @@
 ---
-// index.astro - ContractTrack Pro v4.0
+// index.astro - ContractTrack Pro v5.0
 ---
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ContractTrack Pro</title>
-    <style>
-        :root {
-            --gold: #d4af37;
-            --bg: #000;
-            --card: #0f0f0f;
-            --card2: #080808;
-            --border: #1c1c1c;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --blue: #60a5fa;
-            --muted: #444;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ContractTrack Pro</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#d4af37;--gold2:rgba(212,175,55,0.15);--gold3:rgba(212,175,55,0.35);
+  --bg:#000;--c1:#0e0e0e;--c2:#080808;--border:#1e1e1e;
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;--muted:#4a4a4a;--txt:#e8e8e8;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: #e5e5e5;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:50;background:#050505;border-bottom:1px solid #181818;padding:12px 16px;display:flex;align-items:center;gap:11px}
+.logo{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;flex-shrink:0;letter-spacing:-0.5px}
+.tb-t{font-size:16px;font-weight:700;color:#fff;line-height:1.2}
+.tb-s{font-size:10px;color:var(--muted);margin-top:1px}
 
-        /* ── TOP BAR ── */
-        .topbar {
-            position: sticky; top: 0; z-index: 99;
-            background: #050505;
-            border-bottom: 1px solid #1a1a1a;
-            padding: 13px 16px;
-            display: flex; align-items: center; gap: 11px;
-        }
-        .logo {
-            width: 34px; height: 34px;
-            background: var(--gold);
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 13px; color: #000; flex-shrink: 0;
-        }
-        .tb-title { font-size: 16px; font-weight: 700; color: #fff; }
-        .tb-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; letter-spacing: 0.3px; }
+/* ── WRAP ── */
+.wrap{max-width:600px;margin:0 auto;padding:14px 12px 40px}
 
-        /* ── MAIN ── */
-        .main { max-width: 640px; margin: 0 auto; padding: 14px 12px 30px; }
+/* ── INPUT BOX ── */
+.inp-box{background:var(--c1);border:1px solid #222;border-radius:16px;padding:15px;margin-bottom:13px}
+.inp-lbl{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+textarea{
+  width:100%;background:#000;border:1px solid #202020;color:#fff;
+  padding:11px 12px;border-radius:10px;font-family:'Courier New',monospace;
+  font-size:13px;line-height:1.8;resize:none;height:96px;
+  transition:border-color .2s;
+}
+textarea:focus{outline:none;border-color:var(--gold)}
+textarea::placeholder{color:#252525}
+.go-btn{
+  width:100%;margin-top:11px;background:var(--gold);color:#000;
+  border:none;padding:14px;border-radius:11px;font-size:13px;
+  font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:opacity .15s,transform .1s;-webkit-tap-highlight-color:transparent;
+}
+.go-btn:active{opacity:.78;transform:scale(.99)}
+.go-btn:disabled{opacity:.4;cursor:not-allowed}
 
-        /* ── INPUT CARD ── */
-        .inp-wrap {
-            background: var(--card);
-            border: 1px solid #222;
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 14px;
-        }
-        .inp-lbl {
-            font-size: 10px; color: var(--gold);
-            font-weight: 700; letter-spacing: 1.5px;
-            text-transform: uppercase; margin-bottom: 8px; display: block;
-        }
-        textarea {
-            width: 100%;
-            background: #000;
-            border: 1px solid #1e1e1e;
-            color: #fff;
-            padding: 11px 12px;
-            border-radius: 9px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px; line-height: 1.7;
-            resize: none; height: 100px;
-            transition: border-color 0.2s;
-        }
-        textarea:focus { outline: none; border-color: var(--gold); }
-        textarea::placeholder { color: #282828; }
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--c1);border:1px solid #1e1e1e;border-radius:13px;padding:13px 14px;text-align:center}
+.stat-l{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
+.stat-v{font-size:26px;font-weight:800;color:#fff;margin-top:5px;line-height:1}
 
-        .fetch-btn {
-            width: 100%; margin-top: 11px;
-            background: var(--gold); color: #000;
-            border: none; padding: 14px;
-            border-radius: 10px;
-            font-size: 13px; font-weight: 900;
-            letter-spacing: 2px; text-transform: uppercase;
-            cursor: pointer; display: flex;
-            align-items: center; justify-content: center; gap: 8px;
-            transition: opacity 0.15s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .fetch-btn:active { opacity: 0.75; }
-        .fetch-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+/* ── LOADER ── */
+.loader{display:none;text-align:center;padding:30px 0}
+.ring{width:38px;height:38px;border:3px solid #1a1a1a;border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-t{font-size:10px;color:var(--muted);letter-spacing:2.5px}
 
-        /* ── STATS ── */
-        .stats {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; margin-bottom: 14px;
-        }
-        .stat {
-            background: var(--card); border: 1px solid #1e1e1e;
-            border-radius: 12px; padding: 13px 14px; text-align: center;
-        }
-        .stat-lbl { font-size: 10px; color: var(--gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-        .stat-val { font-size: 24px; font-weight: 800; color: #fff; margin-top: 4px; }
+/* ── SECTION LABEL ── */
+.sec-l{display:none;font-size:10px;color:#2a2a2a;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-align:center;margin:6px 0 12px}
 
-        /* ── LOADER ── */
-        .loader { display: none; text-align: center; padding: 28px 0; }
-        .spin {
-            width: 36px; height: 36px;
-            border: 3px solid #1a1a1a;
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.75s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .load-txt { font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+/* ══════════════════════════════════
+   ── CARD ──
+══════════════════════════════════ */
+.card{
+  background:var(--c1);
+  border:1.5px solid var(--gold3);       /* gold border always */
+  border-radius:18px;
+  margin-bottom:14px;
+  overflow:hidden;
+  box-shadow:0 2px 20px rgba(212,175,55,.06);
+}
 
-        /* ── SECTION LABEL ── */
-        .sec-lbl {
-            font-size: 10px; color: var(--muted);
-            font-weight: 700; letter-spacing: 2px;
-            text-transform: uppercase;
-            margin: 4px 2px 10px; display: none;
-        }
+/* ── Card Top: Name row ── */
+.card-top{
+  padding:14px 15px 0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.card-top:active{background:#131313}
 
-        /* ════════════════════════════
-           ── CONTRACT CARD ──
-        ════════════════════════════ */
-        .c-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            transition: border-color 0.2s;
-        }
-        .c-card.is-today { border-color: rgba(212,175,55,0.3); }
+.name-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cname{font-size:16px;font-weight:800;color:#fff;line-height:1.25;flex:1;min-width:0;letter-spacing:.2px}
+.camount{font-size:21px;font-weight:900;color:var(--gold);flex-shrink:0;line-height:1}
 
-        /* ── MAIN VISIBLE AREA (tap to expand) ── */
-        .c-main {
-            padding: 15px 15px 0 15px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        .c-main:active { background: #131313; }
+.meta-row{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap}
+.cnum{font-size:11px;color:#333;font-weight:600}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;line-height:1.4}
+.b-today{background:var(--green);color:#000}
+.b-cash{background:#2a1400;color:#fb923c;border:1px solid #3d2000}
+.b-bank{background:#001533;color:var(--blue);border:1px solid #002255}
 
-        /* Row 1: Name + Amount */
-        .row1 {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 11px;
-        }
-        .c-name {
-            font-size: 16px; font-weight: 700;
-            color: #fff; line-height: 1.2;
-            flex: 1; min-width: 0;
-        }
-        .c-amount {
-            font-size: 20px; font-weight: 900;
-            color: var(--gold); flex-shrink: 0;
-            line-height: 1;
-        }
+/* ── 4 Info Tiles ── */
+.tiles{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;padding:12px 15px 14px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.tile{
+  background:#000;border:1px solid #191919;
+  border-radius:11px;padding:9px 11px;
+}
+.tile-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.tile-v{font-size:13px;font-weight:700;line-height:1.3;word-break:break-word}
+.tv-gold{color:var(--gold)}
+.tv-green{color:var(--green)}
+.tv-blue{color:var(--blue)}
+.tv-orange{color:#fb923c}
 
-        /* Row 2: 4 info pills */
-        .info-pills {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            padding-bottom: 13px;
-        }
-        .pill {
-            background: #000;
-            border: 1px solid #1a1a1a;
-            border-radius: 9px;
-            padding: 8px 10px;
-        }
-        .pill-lbl {
-            font-size: 9px; color: var(--muted);
-            text-transform: uppercase; letter-spacing: 0.8px;
-            margin-bottom: 3px;
-        }
-        .pill-val {
-            font-size: 13px; font-weight: 600;
-            color: #ddd; line-height: 1.2;
-        }
-        .pill-val.gold  { color: var(--gold); }
-        .pill-val.green { color: var(--success); }
-        .pill-val.orange{ color: #fb923c; }
+/* ── Expand Toggle ── */
+.expand-row{
+  border-top:1px solid #181818;
+  padding:9px 15px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  font-size:10px;color:var(--gold);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+}
+.expand-row:active{background:#111}
+.arrow{display:inline-block;transition:transform .25s ease;font-size:9px}
+.arrow.up{transform:rotate(180deg)}
 
-        /* Badges */
-        .badge {
-            display: inline-block; padding: 2px 7px;
-            border-radius: 20px; font-size: 10px; font-weight: 700;
-        }
-        .b-today { background: var(--success); color: #000; }
-        .b-cash  { background: #2d1800; color: #fb923c; border: 1px solid #3d2200; }
-        .b-bank  { background: #001836; color: var(--blue);  border: 1px solid #002255; }
+/* ── Expanded Details ── */
+.details{display:none;border-top:1px dashed rgba(212,175,55,.2);background:var(--c2)}
+.drow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 15px;border-bottom:1px solid #0d0d0d;
+}
+.drow:last-child{border-bottom:none}
+.dk{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dv{font-size:13px;font-weight:700;color:var(--gold);text-align:right;max-width:56%;word-break:break-word}
+.dv-w{color:#888;font-weight:500}
+.dv-r{color:var(--red)}
+.dv-g{color:var(--green)}
 
-        /* ── EXPAND TOGGLE ── */
-        .c-toggle {
-            border-top: 1px solid var(--border);
-            padding: 9px 15px;
-            display: flex; align-items: center;
-            justify-content: center; gap: 5px;
-            cursor: pointer; font-size: 10px;
-            color: var(--gold); font-weight: 700;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .c-toggle:active { background: #131313; }
-        .t-arrow { transition: transform 0.25s ease; font-size: 9px; }
-        .t-arrow.open { transform: rotate(180deg); }
-
-        /* ── EXPANDED DETAILS ── */
-        .c-details {
-            display: none;
-            border-top: 1px solid var(--border);
-            background: var(--card2);
-        }
-        .d-row {
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 11px 15px;
-            border-bottom: 1px solid #0d0d0d;
-        }
-        .d-row:last-child { border-bottom: none; }
-        .d-key { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
-        .d-val { font-size: 13px; font-weight: 700; color: var(--gold); text-align: right; max-width: 58%; word-break: break-word; }
-        .d-val.red   { color: var(--danger); }
-        .d-val.white { color: #aaa; font-weight: 400; }
-        .d-val.green { color: var(--success); }
-
-        /* ── ERROR ── */
-        .err {
-            background: #180000; border: 1px solid #3a0000;
-            color: #f87171; padding: 12px 14px;
-            border-radius: 12px; font-size: 13px; margin-bottom: 12px;
-        }
-    </style>
+/* ── Error ── */
+.err{background:#140000;border:1px solid #380000;color:#f87171;padding:12px 15px;border-radius:12px;font-size:13px;margin-bottom:12px}
+</style>
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <div class="topbar">
-    <div class="logo">CT</div>
-    <div>
-        <div class="tb-title">ContractTrack Pro</div>
-        <div class="tb-sub">Mahindra Finance · Receipt Tracker</div>
-    </div>
+  <div class="logo">CT</div>
+  <div>
+    <div class="tb-t">ContractTrack Pro</div>
+    <div class="tb-s">Mahindra Finance · Receipt Tracker</div>
+  </div>
 </div>
 
-<div class="main">
+<div class="wrap">
 
-    <!-- INPUT -->
-    <div class="inp-wrap">
-        <span class="inp-lbl">Contract Numbers</span>
-        <textarea id="inp" placeholder="Ek line mein ek number&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
-        <button class="fetch-btn" id="fetchBtn">
-            <span id="bIcon">⚡</span>
-            <span id="bText">FETCH ALL RECEIPTS</span>
-        </button>
+  <!-- INPUT -->
+  <div class="inp-box">
+    <span class="inp-lbl">Contract Numbers</span>
+    <textarea id="inp" placeholder="Ek line mein ek number paste karo&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
+    <button class="go-btn" id="btn">
+      <span id="bic">⚡</span>
+      <span id="btx">FETCH ALL RECEIPTS</span>
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-l">Aaj ke Records</div>
+      <div class="stat-v" id="tC">—</div>
     </div>
-
-    <!-- STATS -->
-    <div class="stats">
-        <div class="stat">
-            <div class="stat-lbl">Aaj ke Records</div>
-            <div class="stat-val" id="tCount">—</div>
-        </div>
-        <div class="stat">
-            <div class="stat-lbl">Aaj ka Total</div>
-            <div class="stat-val" style="color:var(--success);" id="tAmt">—</div>
-        </div>
+    <div class="stat">
+      <div class="stat-l">Aaj ka Total</div>
+      <div class="stat-v" style="color:var(--green)" id="tA">—</div>
     </div>
+  </div>
 
-    <!-- LOADER -->
-    <div class="loader" id="loader">
-        <div class="spin"></div>
-        <div class="load-txt">DATA SYNC HO RAHA HAI...</div>
-    </div>
+  <!-- LOADER -->
+  <div class="loader" id="ldr">
+    <div class="ring"></div>
+    <div class="load-t">DATA SYNC HO RAHA HAI...</div>
+  </div>
 
-    <div id="errBox"></div>
-
-    <div class="sec-lbl" id="secLbl">— RESULTS —</div>
-    <div id="results"></div>
+  <div id="err"></div>
+  <div class="sec-l" id="secl">— RESULTS —</div>
+  <div id="res"></div>
 
 </div>
 
 <script>
-const btn    = document.getElementById('fetchBtn');
-const inp    = document.getElementById('inp');
-const res    = document.getElementById('results');
-const errBox = document.getElementById('errBox');
-const loader = document.getElementById('loader');
-const secLbl = document.getElementById('secLbl');
+const $btn=document.getElementById('btn');
+const $inp=document.getElementById('inp');
+const $res=document.getElementById('res');
+const $err=document.getElementById('err');
+const $ldr=document.getElementById('ldr');
+const $sec=document.getElementById('secl');
+const $tC =document.getElementById('tC');
+const $tA =document.getElementById('tA');
 
-function todayStr() {
-    return new Date().toLocaleDateString('en-GB', {
-        day:'2-digit', month:'short', year:'numeric'
-    }).toUpperCase().replace(/ /g,'-');
+function today(){
+  return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+    .toUpperCase().replace(/ /g,'-');
+}
+function safe(v){
+  if(v===null||v===undefined)return'—';
+  const s=String(v).trim();
+  return['','n/a','null','none','undefined','0'].includes(s.toLowerCase())?'—':s;
+}
+function fmt(v){
+  const n=parseFloat(String(v||0).replace(/,/g,''));
+  return isNaN(n)?'0':n.toLocaleString('en-IN');
+}
+function payBadge(instr){
+  if(!instr||instr==='N/A'||instr==='—')return'';
+  const s=String(instr).toUpperCase();
+  if(s.includes('CASH'))return'<span class="badge b-cash">💵 CASH</span>';
+  return'<span class="badge b-bank">🏦 BANK</span>';
+}
+function payLabel(instr){
+  if(!instr||instr==='N/A')return'—';
+  const s=String(instr).toUpperCase();
+  if(s.includes('CASH'))return'💵 CASH';
+  if(s.includes('BANK')||s.includes('TRANSFER'))return'🏦 BANK';
+  return instr;
 }
 
-function safe(v) {
-    if (v === null || v === undefined) return '—';
-    const s = String(v).trim();
-    return ['','n/a','null','none','undefined','0000000000'].includes(s.toLowerCase()) ? '—' : s;
-}
-
-function fmt(v) {
-    const n = parseFloat(String(v||'0').replace(/,/g,''));
-    return isNaN(n) ? '0' : n.toLocaleString('en-IN');
-}
-
-function modeInfo(mode) {
-    if (!mode || mode === 'N/A') return { badge: '', label: '—' };
-    if (mode === 'CASH')
-        return { badge: '<span class="badge b-cash">💵 CASH</span>', label: '💵 CASH' };
-    return { badge: '<span class="badge b-bank">🏦 BANK</span>', label: '🏦 BANK TRANSFER' };
-}
-
-window.toggle = function(i) {
-    const d  = document.getElementById('det-'+i);
-    const ar = document.getElementById('ar-'+i);
-    const lb = document.getElementById('lb-'+i);
-    const open = d.style.display === 'block';
-    d.style.display = open ? 'none' : 'block';
-    ar.classList.toggle('open', !open);
-    lb.textContent  = open ? 'DETAILS DEKHEIN' : 'BAND KAREIN';
+window.toggle=function(i){
+  const d=document.getElementById('d'+i);
+  const a=document.getElementById('a'+i);
+  const l=document.getElementById('l'+i);
+  const open=d.style.display==='block';
+  d.style.display=open?'none':'block';
+  a.className='arrow'+(open?'':' up');
+  l.textContent=open?'DETAILS DEKHEIN':'BAND KAREIN';
 };
 
-function setLoad(on) {
-    loader.style.display = on ? 'block' : 'none';
-    btn.disabled = on;
-    document.getElementById('bIcon').textContent = on ? '⏳' : '⚡';
-    document.getElementById('bText').textContent = on ? 'FETCHING...' : 'FETCH ALL RECEIPTS';
+function setLoad(on){
+  $ldr.style.display=on?'block':'none';
+  $btn.disabled=on;
+  document.getElementById('bic').textContent=on?'⏳':'⚡';
+  document.getElementById('btx').textContent=on?'FETCHING...':'FETCH ALL RECEIPTS';
 }
 
-btn.onclick = async () => {
-    const val = inp.value.trim();
-    if (!val) return;
-    const list = val.split('\n').map(s=>s.trim()).filter(Boolean).join(',');
+$btn.onclick=async()=>{
+  const val=$inp.value.trim();
+  if(!val)return;
+  const list=val.split('\n').map(s=>s.trim()).filter(Boolean).join(',');
+  setLoad(true);
+  $res.innerHTML='';$err.innerHTML='';
+  $sec.style.display='none';$tC.textContent='—';$tA.textContent='—';
 
-    setLoad(true);
-    res.innerHTML = '';
-    errBox.innerHTML = '';
-    secLbl.style.display = 'none';
-    document.getElementById('tCount').textContent = '—';
-    document.getElementById('tAmt').textContent   = '—';
+  try{
+    const r=await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${encodeURIComponent(list)}`);
+    if(!r.ok)throw new Error('Server error: '+r.status);
+    const data=await r.json();
 
-    try {
-        const r = await fetch(
-            `https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${encodeURIComponent(list)}`
-        );
-        if (!r.ok) throw new Error(`Server ${r.status}`);
-        const data = await r.json();
-
-        if (!Array.isArray(data) || !data.length) {
-            errBox.innerHTML = `<div class="err">⚠️ Koi data nahi mila. Numbers check karo.</div>`;
-            return;
-        }
-
-        const today = todayStr();
-        let tCnt = 0, tAmt = 0;
-        secLbl.style.display = 'block';
-
-        data.forEach((item, i) => {
-            const isToday = item.date && item.date.toUpperCase() === today;
-            const amtN = parseFloat(String(item.amount||'0').replace(/,/g,'')) || 0;
-            if (isToday) { tCnt++; tAmt += amtN; }
-
-            const mode = modeInfo(item.payment_mode);
-            const emiTxt = item.emi_amount && item.emi_amount !== 'N/A'
-                           ? `₹${fmt(item.emi_amount)}` : '—';
-            const overTxt = item.overdue && item.overdue !== 'N/A' && item.overdue !== '0'
-                            ? `₹${fmt(item.overdue)}` : '₹0';
-
-            res.innerHTML += `
-            <div class="c-card${isToday ? ' is-today' : ''}">
-
-                <!-- ══ MAIN CARD (always visible) ══ -->
-                <div class="c-main" onclick="toggle(${i})">
-
-                    <!-- Name + Amount -->
-                    <div class="row1">
-                        <div>
-                            <div class="c-name">${safe(item.name)}</div>
-                            <div style="font-size:11px; color:#333; margin-top:4px; display:flex; align-items:center; gap:6px;">
-                                <span>#${item.contract}</span>
-                                ${isToday ? '<span class="badge b-today">TODAY</span>' : ''}
-                            </div>
-                        </div>
-                        <div class="c-amount">₹${fmt(item.amount)}</div>
-                    </div>
-
-                    <!-- 4 Pills: Contract No · Date · EMI · Payment -->
-                    <div class="info-pills">
-                        <div class="pill">
-                            <div class="pill-lbl">📅 Date Received</div>
-                            <div class="pill-val gold">${safe(item.date)}</div>
-                        </div>
-                        <div class="pill">
-                            <div class="pill-lbl">💰 EMI Amount</div>
-                            <div class="pill-val green">${emiTxt}</div>
-                        </div>
-                        <div class="pill">
-                            <div class="pill-lbl">📱 Mobile</div>
-                            <div class="pill-val">${safe(item.mobile)}</div>
-                        </div>
-                        <div class="pill">
-                            <div class="pill-lbl">💳 Payment</div>
-                            <div class="pill-val orange">${item.payment_mode === 'CASH' ? '💵 CASH' : item.payment_mode === 'BANK TRANSFER' ? '🏦 BANK' : '—'}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ══ TOGGLE BUTTON ══ -->
-                <div class="c-toggle" onclick="toggle(${i})">
-                    <span id="lb-${i}">DETAILS DEKHEIN</span>
-                    <span id="ar-${i}" class="t-arrow">▼</span>
-                </div>
-
-                <!-- ══ EXPANDED DETAILS ══ -->
-                <div id="det-${i}" class="c-details">
-                    <div class="d-row">
-                        <span class="d-key">🧾 Receipt No</span>
-                        <span class="d-val white">${safe(item.receipt_no)}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">⚠️ Over Dues</span>
-                        <span class="d-val red">${overTxt}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">🛡️ Guarantor</span>
-                        <span class="d-val">${safe(item.gu_name)}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">📞 GU Mobile</span>
-                        <span class="d-val white">${safe(item.gu_mobile)}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">👤 Co-Applicant</span>
-                        <span class="d-val">${safe(item.co_name)}</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-key">📞 Co-App Mobile</span>
-                        <span class="d-val white">${safe(item.co_mobile)}</span>
-                    </div>
-                </div>
-
-            </div>`;
-        });
-
-        document.getElementById('tCount').textContent = tCnt;
-        document.getElementById('tAmt').textContent   = tCnt > 0
-            ? '₹' + tAmt.toLocaleString('en-IN') : '₹0';
-
-    } catch(e) {
-        errBox.innerHTML = `<div class="err">❌ Error: ${e.message}</div>`;
-    } finally {
-        setLoad(false);
+    if(!Array.isArray(data)||!data.length){
+      $err.innerHTML='<div class="err">⚠️ Koi data nahi mila. Contract numbers check karo.</div>';
+      return;
     }
+
+    const td=today();
+    let tCnt=0,tAmt=0;
+    $sec.style.display='block';
+
+    data.forEach((item,i)=>{
+      const isT=item.date&&item.date.toUpperCase()===td;
+      const amtN=parseFloat(String(item.amount||0).replace(/,/g,''))||0;
+      if(isT){tCnt++;tAmt+=amtN;}
+
+      const instr=item.instr||item.payment_mode||'';
+      const over=item.overdue&&item.overdue!=='N/A'&&item.overdue!=='0'
+                 ?'₹'+fmt(item.overdue):'₹0';
+
+      $res.innerHTML+=`
+<div class="card">
+
+  <!-- Name + Amount + meta -->
+  <div class="card-top" onclick="toggle(${i})">
+    <div class="name-row">
+      <div class="cname">${safe(item.name)}</div>
+      <div class="camount">₹${fmt(item.amount)}</div>
+    </div>
+    <div class="meta-row">
+      <span class="cnum">#${item.contract}</span>
+      ${isT?'<span class="badge b-today">✦ TODAY</span>':''}
+      ${payBadge(instr)}
+    </div>
+  </div>
+
+  <!-- 4 Tiles: Date · EMI · Mobile · Payment -->
+  <div class="tiles" onclick="toggle(${i})">
+    <div class="tile">
+      <div class="tile-l">📅 Date Received</div>
+      <div class="tile-v tv-gold">${safe(item.date)}</div>
+    </div>
+    <div class="tile">
+      <div class="tile-l">💰 EMI Amount</div>
+      <div class="tile-v tv-green">₹${fmt(item.amount)}</div>
+    </div>
+    <div class="tile">
+      <div class="tile-l">📱 Mobile</div>
+      <div class="tile-v tv-blue">${safe(item.mobile)}</div>
+    </div>
+    <div class="tile">
+      <div class="tile-l">💳 Payment Mode</div>
+      <div class="tile-v tv-orange">${payLabel(instr)}</div>
+    </div>
+  </div>
+
+  <!-- Toggle button -->
+  <div class="expand-row" onclick="toggle(${i})">
+    <span id="l${i}">DETAILS DEKHEIN</span>
+    <span id="a${i}" class="arrow">▼</span>
+  </div>
+
+  <!-- Expanded Details -->
+  <div id="d${i}" class="details">
+    <div class="drow">
+      <span class="dk">🧾 Receipt No</span>
+      <span class="dv dv-w">${safe(item.receipt_no)}</span>
+    </div>
+    <div class="drow">
+      <span class="dk">⚠️ Over Dues</span>
+      <span class="dv dv-r">${over}</span>
+    </div>
+    <div class="drow">
+      <span class="dk">🛡️ Guarantor</span>
+      <span class="dv">${safe(item.gu_name)}</span>
+    </div>
+    <div class="drow">
+      <span class="dk">📞 GU Mobile</span>
+      <span class="dv dv-w">${safe(item.gu_mobile)}</span>
+    </div>
+    <div class="drow">
+      <span class="dk">👤 Co-Applicant</span>
+      <span class="dv">${safe(item.co_name)}</span>
+    </div>
+    <div class="drow">
+      <span class="dk">📞 Co-App Mobile</span>
+      <span class="dv dv-w">${safe(item.co_mobile)}</span>
+    </div>
+  </div>
+
+</div>`;
+    });
+
+    $tC.textContent=tCnt;
+    $tA.textContent=tCnt>0?'₹'+tAmt.toLocaleString('en-IN'):'₹0';
+
+  }catch(e){
+    $err.innerHTML=`<div class="err">❌ Error: ${e.message}</div>`;
+  }finally{
+    setLoad(false);
+  }
 };
 </script>
 </body>
