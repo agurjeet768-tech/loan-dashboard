@@ -1,5 +1,4 @@
 ---
-// index.astro - ContractTrack Pro v5.0
 ---
 <html lang="hi">
 <head>
@@ -7,348 +6,301 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ContractTrack Pro</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#d4af37;--gold2:rgba(212,175,55,0.15);--gold3:rgba(212,175,55,0.35);
-  --bg:#000;--c1:#0e0e0e;--c2:#080808;--border:#1e1e1e;
-  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;--muted:#4a4a4a;--txt:#e8e8e8;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#e8e8e8;-webkit-font-smoothing:antialiased}
 
-/* ── TOPBAR ── */
-.topbar{position:sticky;top:0;z-index:50;background:#050505;border-bottom:1px solid #181818;padding:12px 16px;display:flex;align-items:center;gap:11px}
-.logo{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;flex-shrink:0;letter-spacing:-0.5px}
-.tb-t{font-size:16px;font-weight:700;color:#fff;line-height:1.2}
-.tb-s{font-size:10px;color:var(--muted);margin-top:1px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:#050505;border-bottom:1px solid #181818;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:#d4af37;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:700;color:#fff}
+.tb-sub{font-size:10px;color:#444;margin-top:1px}
 
-/* ── WRAP ── */
+/* WRAP */
 .wrap{max-width:600px;margin:0 auto;padding:14px 12px 40px}
 
-/* ── INPUT BOX ── */
-.inp-box{background:var(--c1);border:1px solid #222;border-radius:16px;padding:15px;margin-bottom:13px}
-.inp-lbl{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px}
-textarea{
-  width:100%;background:#000;border:1px solid #202020;color:#fff;
-  padding:11px 12px;border-radius:10px;font-family:'Courier New',monospace;
-  font-size:13px;line-height:1.8;resize:none;height:96px;
-  transition:border-color .2s;
-}
-textarea:focus{outline:none;border-color:var(--gold)}
+/* INPUT */
+.inp-box{background:#0e0e0e;border:1px solid #222;border-radius:16px;padding:15px;margin-bottom:13px}
+.inp-lbl{font-size:10px;color:#d4af37;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+textarea{width:100%;background:#000;border:1px solid #202020;color:#fff;padding:11px 12px;border-radius:10px;font-family:'Courier New',monospace;font-size:13px;line-height:1.8;resize:none;height:96px;transition:border-color .2s;display:block}
+textarea:focus{outline:none;border-color:#d4af37}
 textarea::placeholder{color:#252525}
-.go-btn{
-  width:100%;margin-top:11px;background:var(--gold);color:#000;
-  border:none;padding:14px;border-radius:11px;font-size:13px;
-  font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:opacity .15s,transform .1s;-webkit-tap-highlight-color:transparent;
-}
-.go-btn:active{opacity:.78;transform:scale(.99)}
+.go-btn{width:100%;margin-top:11px;background:#d4af37;color:#000;border:none;padding:14px;border-radius:11px;font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent}
+.go-btn:active{opacity:.78}
 .go-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* ── STATS ── */
+/* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.stat{background:var(--c1);border:1px solid #1e1e1e;border-radius:13px;padding:13px 14px;text-align:center}
-.stat-l{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
-.stat-v{font-size:26px;font-weight:800;color:#fff;margin-top:5px;line-height:1}
+.stat{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:13px;padding:13px 14px;text-align:center}
+.stat-l{font-size:9px;color:#d4af37;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block}
+.stat-v{font-size:26px;font-weight:800;color:#fff;margin-top:5px;line-height:1;display:block}
 
-/* ── LOADER ── */
+/* LOADER */
 .loader{display:none;text-align:center;padding:30px 0}
-.ring{width:38px;height:38px;border:3px solid #1a1a1a;border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 10px}
+.ring{width:38px;height:38px;border:3px solid #1a1a1a;border-top-color:#d4af37;border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-t{font-size:10px;color:var(--muted);letter-spacing:2.5px}
+.load-t{font-size:10px;color:#444;letter-spacing:2.5px}
 
-/* ── SECTION LABEL ── */
+/* SECTION LABEL */
 .sec-l{display:none;font-size:10px;color:#2a2a2a;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;text-align:center;margin:6px 0 12px}
 
-/* ══════════════════════════════════
-   ── CARD ──
-══════════════════════════════════ */
-.card{
-  background:var(--c1);
-  border:1.5px solid var(--gold3);       /* gold border always */
-  border-radius:18px;
-  margin-bottom:14px;
-  overflow:hidden;
-  box-shadow:0 2px 20px rgba(212,175,55,.06);
-}
+/* ══ CARD ══ */
+.card{background:#0e0e0e;border:1.5px solid rgba(212,175,55,0.4);border-radius:18px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 20px rgba(212,175,55,0.07)}
 
-/* ── Card Top: Name row ── */
-.card-top{
-  padding:14px 15px 0;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-.card-top:active{background:#131313}
+/* Card Header */
+.card-hdr{padding:14px 15px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.card-hdr:active{background:#131313}
 
-.name-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.cname{font-size:16px;font-weight:800;color:#fff;line-height:1.25;flex:1;min-width:0;letter-spacing:.2px}
-.camount{font-size:21px;font-weight:900;color:var(--gold);flex-shrink:0;line-height:1}
+.name-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.cname{font-size:16px;font-weight:800;color:#fff;line-height:1.25;flex:1;min-width:0}
+.camount{font-size:21px;font-weight:900;color:#d4af37;flex-shrink:0;line-height:1}
 
-.meta-row{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap}
+.meta-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .cnum{font-size:11px;color:#333;font-weight:600}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;line-height:1.4}
-.b-today{background:var(--green);color:#000}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;line-height:1.4}
+.b-today{background:#22c55e;color:#000}
 .b-cash{background:#2a1400;color:#fb923c;border:1px solid #3d2000}
-.b-bank{background:#001533;color:var(--blue);border:1px solid #002255}
+.b-bank{background:#001533;color:#60a5fa;border:1px solid #002255}
 
-/* ── 4 Info Tiles ── */
-.tiles{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:8px;padding:12px 15px 14px;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-}
-.tile{
-  background:#000;border:1px solid #191919;
-  border-radius:11px;padding:9px 11px;
-}
-.tile-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
-.tile-v{font-size:13px;font-weight:700;line-height:1.3;word-break:break-word}
-.tv-gold{color:var(--gold)}
-.tv-green{color:var(--green)}
-.tv-blue{color:var(--blue)}
+/* 4 Tiles Grid */
+.tiles-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 15px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tile{background:#000;border:1px solid #1a1a1a;border-radius:11px;padding:9px 11px}
+.tile-l{font-size:9px;color:#4a4a4a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:block}
+.tile-v{font-size:13px;font-weight:700;line-height:1.3;display:block;word-break:break-word}
+.tv-gold{color:#d4af37}
+.tv-green{color:#22c55e}
+.tv-blue{color:#60a5fa}
 .tv-orange{color:#fb923c}
 
-/* ── Expand Toggle ── */
-.expand-row{
-  border-top:1px solid #181818;
-  padding:9px 15px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  font-size:10px;color:var(--gold);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-}
+/* Divider */
+.divider{height:1px;background:#181818;margin:0 15px}
+
+/* Expand Toggle */
+.expand-row{border-top:1px solid #181818;padding:10px 15px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:10px;color:#d4af37;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
 .expand-row:active{background:#111}
 .arrow{display:inline-block;transition:transform .25s ease;font-size:9px}
-.arrow.up{transform:rotate(180deg)}
+.arrow-up{transform:rotate(180deg)}
 
-/* ── Expanded Details ── */
-.details{display:none;border-top:1px dashed rgba(212,175,55,.2);background:var(--c2)}
-.drow{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:11px 15px;border-bottom:1px solid #0d0d0d;
-}
+/* Expanded Details */
+.details{display:none;border-top:1px dashed rgba(212,175,55,0.2);background:#080808}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid #0d0d0d}
 .drow:last-child{border-bottom:none}
-.dk{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
-.dv{font-size:13px;font-weight:700;color:var(--gold);text-align:right;max-width:56%;word-break:break-word}
-.dv-w{color:#888;font-weight:500}
-.dv-r{color:var(--red)}
-.dv-g{color:var(--green)}
+.dk{font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px}
+.dv{font-size:13px;font-weight:700;color:#d4af37;text-align:right;max-width:58%;word-break:break-word}
+.dv-w{color:#777;font-weight:500}
+.dv-r{color:#ef4444}
 
-/* ── Error ── */
+/* Error */
 .err{background:#140000;border:1px solid #380000;color:#f87171;padding:12px 15px;border-radius:12px;font-size:13px;margin-bottom:12px}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">CT</div>
   <div>
-    <div class="tb-t">ContractTrack Pro</div>
-    <div class="tb-s">Mahindra Finance · Receipt Tracker</div>
+    <div class="tb-title">ContractTrack Pro</div>
+    <div class="tb-sub">Mahindra Finance · Receipt Tracker</div>
   </div>
 </div>
 
 <div class="wrap">
 
-  <!-- INPUT -->
   <div class="inp-box">
     <span class="inp-lbl">Contract Numbers</span>
-    <textarea id="inp" placeholder="Ek line mein ek number paste karo&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
+    <textarea id="inp" placeholder="Ek line mein ek number&#10;&#10;10341364&#10;8721082&#10;9801882"></textarea>
     <button class="go-btn" id="btn">
       <span id="bic">⚡</span>
       <span id="btx">FETCH ALL RECEIPTS</span>
     </button>
   </div>
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat">
-      <div class="stat-l">Aaj ke Records</div>
-      <div class="stat-v" id="tC">—</div>
+      <span class="stat-l">Aaj ke Records</span>
+      <span class="stat-v" id="tC">—</span>
     </div>
     <div class="stat">
-      <div class="stat-l">Aaj ka Total</div>
-      <div class="stat-v" style="color:var(--green)" id="tA">—</div>
+      <span class="stat-l">Aaj ka Total</span>
+      <span class="stat-v" style="color:#22c55e" id="tA">—</span>
     </div>
   </div>
 
-  <!-- LOADER -->
   <div class="loader" id="ldr">
     <div class="ring"></div>
     <div class="load-t">DATA SYNC HO RAHA HAI...</div>
   </div>
 
-  <div id="err"></div>
+  <div id="errbox"></div>
   <div class="sec-l" id="secl">— RESULTS —</div>
   <div id="res"></div>
 
 </div>
 
 <script>
-const $btn=document.getElementById('btn');
-const $inp=document.getElementById('inp');
-const $res=document.getElementById('res');
-const $err=document.getElementById('err');
-const $ldr=document.getElementById('ldr');
-const $sec=document.getElementById('secl');
-const $tC =document.getElementById('tC');
-const $tA =document.getElementById('tA');
+var btn  = document.getElementById('btn');
+var inp  = document.getElementById('inp');
+var res  = document.getElementById('res');
+var err  = document.getElementById('errbox');
+var ldr  = document.getElementById('ldr');
+var secl = document.getElementById('secl');
+var tC   = document.getElementById('tC');
+var tA   = document.getElementById('tA');
 
-function today(){
-  return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
-    .toUpperCase().replace(/ /g,'-');
+function todayStr() {
+  var d = new Date();
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+          .toUpperCase().replace(/ /g,'-');
 }
-function safe(v){
-  if(v===null||v===undefined)return'—';
-  const s=String(v).trim();
-  return['','n/a','null','none','undefined','0'].includes(s.toLowerCase())?'—':s;
+
+function safe(v) {
+  if(v===null||v===undefined) return '—';
+  var s = String(v).trim();
+  if(['','n/a','null','none','undefined','0'].indexOf(s.toLowerCase()) >= 0) return '—';
+  return s;
 }
-function fmt(v){
-  const n=parseFloat(String(v||0).replace(/,/g,''));
-  return isNaN(n)?'0':n.toLocaleString('en-IN');
+
+function fmt(v) {
+  var n = parseFloat(String(v||0).replace(/,/g,''));
+  return isNaN(n) ? '0' : n.toLocaleString('en-IN');
 }
-function payBadge(instr){
-  if(!instr||instr==='N/A'||instr==='—')return'';
-  const s=String(instr).toUpperCase();
-  if(s.includes('CASH'))return'<span class="badge b-cash">💵 CASH</span>';
-  return'<span class="badge b-bank">🏦 BANK</span>';
-}
-function payLabel(instr){
-  if(!instr||instr==='N/A')return'—';
-  const s=String(instr).toUpperCase();
-  if(s.includes('CASH'))return'💵 CASH';
-  if(s.includes('BANK')||s.includes('TRANSFER'))return'🏦 BANK';
+
+function payLabel(instr) {
+  if(!instr || instr==='N/A') return '—';
+  var s = String(instr).toUpperCase();
+  if(s.indexOf('CASH') >= 0) return '💵 CASH';
+  if(s.indexOf('BANK') >= 0 || s.indexOf('TRANSFER') >= 0) return '🏦 BANK';
   return instr;
 }
 
-window.toggle=function(i){
-  const d=document.getElementById('d'+i);
-  const a=document.getElementById('a'+i);
-  const l=document.getElementById('l'+i);
-  const open=d.style.display==='block';
-  d.style.display=open?'none':'block';
-  a.className='arrow'+(open?'':' up');
-  l.textContent=open?'DETAILS DEKHEIN':'BAND KAREIN';
-};
-
-function setLoad(on){
-  $ldr.style.display=on?'block':'none';
-  $btn.disabled=on;
-  document.getElementById('bic').textContent=on?'⏳':'⚡';
-  document.getElementById('btx').textContent=on?'FETCHING...':'FETCH ALL RECEIPTS';
+function payBadge(instr) {
+  if(!instr || instr==='N/A') return '';
+  var s = String(instr).toUpperCase();
+  if(s.indexOf('CASH') >= 0) return '<span class="badge b-cash">💵 CASH</span>';
+  if(s.indexOf('BANK') >= 0 || s.indexOf('TRANSFER') >= 0) return '<span class="badge b-bank">🏦 BANK</span>';
+  return '';
 }
 
-$btn.onclick=async()=>{
-  const val=$inp.value.trim();
-  if(!val)return;
-  const list=val.split('\n').map(s=>s.trim()).filter(Boolean).join(',');
+function toggle(i) {
+  var d  = document.getElementById('det'+i);
+  var a  = document.getElementById('arr'+i);
+  var lb = document.getElementById('lbl'+i);
+  var open = d.style.display === 'block';
+  d.style.display = open ? 'none' : 'block';
+  if(open) { a.className='arrow'; lb.textContent='DETAILS DEKHEIN'; }
+  else     { a.className='arrow arrow-up'; lb.textContent='BAND KAREIN'; }
+}
+
+function setLoad(on) {
+  ldr.style.display = on ? 'block' : 'none';
+  btn.disabled = on;
+  document.getElementById('bic').textContent = on ? '⏳' : '⚡';
+  document.getElementById('btx').textContent = on ? 'FETCHING...' : 'FETCH ALL RECEIPTS';
+}
+
+btn.onclick = async function() {
+  var val = inp.value.trim();
+  if(!val) return;
+  var list = val.split('\n').map(function(s){return s.trim();}).filter(Boolean).join(',');
+
   setLoad(true);
-  $res.innerHTML='';$err.innerHTML='';
-  $sec.style.display='none';$tC.textContent='—';$tA.textContent='—';
+  res.innerHTML = '';
+  err.innerHTML = '';
+  secl.style.display = 'none';
+  tC.textContent = '—';
+  tA.textContent = '—';
 
-  try{
-    const r=await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${encodeURIComponent(list)}`);
-    if(!r.ok)throw new Error('Server error: '+r.status);
-    const data=await r.json();
+  try {
+    var r = await fetch('https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=' + encodeURIComponent(list));
+    if(!r.ok) throw new Error('Server ' + r.status);
+    var data = await r.json();
 
-    if(!Array.isArray(data)||!data.length){
-      $err.innerHTML='<div class="err">⚠️ Koi data nahi mila. Contract numbers check karo.</div>';
+    if(!Array.isArray(data) || !data.length) {
+      err.innerHTML = '<div class="err">⚠️ Koi data nahi mila. Contract numbers check karo.</div>';
+      setLoad(false);
       return;
     }
 
-    const td=today();
-    let tCnt=0,tAmt=0;
-    $sec.style.display='block';
+    var td = todayStr();
+    var tCnt = 0, tAmt = 0;
+    secl.style.display = 'block';
 
-    data.forEach((item,i)=>{
-      const isT=item.date&&item.date.toUpperCase()===td;
-      const amtN=parseFloat(String(item.amount||0).replace(/,/g,''))||0;
-      if(isT){tCnt++;tAmt+=amtN;}
+    data.forEach(function(item, i) {
+      var isT  = item.date && item.date.toUpperCase() === td;
+      var amtN = parseFloat(String(item.amount||0).replace(/,/g,'')) || 0;
+      if(isT){ tCnt++; tAmt += amtN; }
 
-      const instr=item.instr||item.payment_mode||'';
-      const over=item.overdue&&item.overdue!=='N/A'&&item.overdue!=='0'
-                 ?'₹'+fmt(item.overdue):'₹0';
+      var instr = item.instr || item.payment_mode || '';
+      var over  = (item.overdue && item.overdue !== 'N/A' && item.overdue !== '0')
+                  ? '₹' + fmt(item.overdue) : '₹0';
 
-      $res.innerHTML+=`
-<div class="card">
+      var html =
+        '<div class="card">' +
 
-  <!-- Name + Amount + meta -->
-  <div class="card-top" onclick="toggle(${i})">
-    <div class="name-row">
-      <div class="cname">${safe(item.name)}</div>
-      <div class="camount">₹${fmt(item.amount)}</div>
-    </div>
-    <div class="meta-row">
-      <span class="cnum">#${item.contract}</span>
-      ${isT?'<span class="badge b-today">✦ TODAY</span>':''}
-      ${payBadge(instr)}
-    </div>
-  </div>
+          /* ── HEADER (tap = toggle) ── */
+          '<div class="card-hdr" onclick="toggle(' + i + ')">' +
+            '<div class="name-row">' +
+              '<div class="cname">' + safe(item.name) + '</div>' +
+              '<div class="camount">₹' + fmt(item.amount) + '</div>' +
+            '</div>' +
+            '<div class="meta-row">' +
+              '<span class="cnum">#' + item.contract + '</span>' +
+              (isT ? '<span class="badge b-today">✦ TODAY</span>' : '') +
+              payBadge(instr) +
+            '</div>' +
+          '</div>' +
 
-  <!-- 4 Tiles: Date · EMI · Mobile · Payment -->
-  <div class="tiles" onclick="toggle(${i})">
-    <div class="tile">
-      <div class="tile-l">📅 Date Received</div>
-      <div class="tile-v tv-gold">${safe(item.date)}</div>
-    </div>
-    <div class="tile">
-      <div class="tile-l">💰 EMI Amount</div>
-      <div class="tile-v tv-green">₹${fmt(item.amount)}</div>
-    </div>
-    <div class="tile">
-      <div class="tile-l">📱 Mobile</div>
-      <div class="tile-v tv-blue">${safe(item.mobile)}</div>
-    </div>
-    <div class="tile">
-      <div class="tile-l">💳 Payment Mode</div>
-      <div class="tile-v tv-orange">${payLabel(instr)}</div>
-    </div>
-  </div>
+          /* ── 4 TILES (tap = toggle) ── */
+          '<div class="tiles-grid" onclick="toggle(' + i + ')">' +
 
-  <!-- Toggle button -->
-  <div class="expand-row" onclick="toggle(${i})">
-    <span id="l${i}">DETAILS DEKHEIN</span>
-    <span id="a${i}" class="arrow">▼</span>
-  </div>
+            '<div class="tile">' +
+              '<span class="tile-l">📅 Date Received</span>' +
+              '<span class="tile-v tv-gold">' + safe(item.date) + '</span>' +
+            '</div>' +
 
-  <!-- Expanded Details -->
-  <div id="d${i}" class="details">
-    <div class="drow">
-      <span class="dk">🧾 Receipt No</span>
-      <span class="dv dv-w">${safe(item.receipt_no)}</span>
-    </div>
-    <div class="drow">
-      <span class="dk">⚠️ Over Dues</span>
-      <span class="dv dv-r">${over}</span>
-    </div>
-    <div class="drow">
-      <span class="dk">🛡️ Guarantor</span>
-      <span class="dv">${safe(item.gu_name)}</span>
-    </div>
-    <div class="drow">
-      <span class="dk">📞 GU Mobile</span>
-      <span class="dv dv-w">${safe(item.gu_mobile)}</span>
-    </div>
-    <div class="drow">
-      <span class="dk">👤 Co-Applicant</span>
-      <span class="dv">${safe(item.co_name)}</span>
-    </div>
-    <div class="drow">
-      <span class="dk">📞 Co-App Mobile</span>
-      <span class="dv dv-w">${safe(item.co_mobile)}</span>
-    </div>
-  </div>
+            '<div class="tile">' +
+              '<span class="tile-l">💰 EMI Amount</span>' +
+              '<span class="tile-v tv-green">₹' + fmt(item.amount) + '</span>' +
+            '</div>' +
 
-</div>`;
+            '<div class="tile">' +
+              '<span class="tile-l">📱 Mobile</span>' +
+              '<span class="tile-v tv-blue">' + safe(item.mobile) + '</span>' +
+            '</div>' +
+
+            '<div class="tile">' +
+              '<span class="tile-l">💳 Payment</span>' +
+              '<span class="tile-v tv-orange">' + payLabel(instr) + '</span>' +
+            '</div>' +
+
+          '</div>' +
+
+          /* ── TOGGLE BUTTON ── */
+          '<div class="expand-row" onclick="toggle(' + i + ')">' +
+            '<span id="lbl' + i + '">DETAILS DEKHEIN</span>' +
+            '<span id="arr' + i + '" class="arrow">▼</span>' +
+          '</div>' +
+
+          /* ── EXPANDED DETAILS ── */
+          '<div id="det' + i + '" class="details">' +
+            '<div class="drow"><span class="dk">🧾 Receipt No</span><span class="dv dv-w">' + safe(item.receipt_no) + '</span></div>' +
+            '<div class="drow"><span class="dk">⚠️ Over Dues</span><span class="dv dv-r">' + over + '</span></div>' +
+            '<div class="drow"><span class="dk">🛡️ Guarantor</span><span class="dv">' + safe(item.gu_name) + '</span></div>' +
+            '<div class="drow"><span class="dk">📞 GU Mobile</span><span class="dv dv-w">' + safe(item.gu_mobile) + '</span></div>' +
+            '<div class="drow"><span class="dk">👤 Co-Applicant</span><span class="dv">' + safe(item.co_name) + '</span></div>' +
+            '<div class="drow"><span class="dk">📞 Co-App Mobile</span><span class="dv dv-w">' + safe(item.co_mobile) + '</span></div>' +
+          '</div>' +
+
+        '</div>';
+
+      res.innerHTML += html;
     });
 
-    $tC.textContent=tCnt;
-    $tA.textContent=tCnt>0?'₹'+tAmt.toLocaleString('en-IN'):'₹0';
+    tC.textContent = tCnt;
+    tA.textContent = tCnt > 0 ? '₹' + tAmt.toLocaleString('en-IN') : '₹0';
 
-  }catch(e){
-    $err.innerHTML=`<div class="err">❌ Error: ${e.message}</div>`;
-  }finally{
+  } catch(e) {
+    err.innerHTML = '<div class="err">❌ Error: ' + e.message + '</div>';
+  } finally {
     setLoad(false);
   }
 };
