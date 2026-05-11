@@ -22,4 +22,4 @@ jobs:
         run: pip install requests
 
       - name: Run Night Bot
-        run: python night_bot.py
+        run: python src/pages/night_bot.py
