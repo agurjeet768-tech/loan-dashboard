@@ -1,0 +1,25 @@
+name: Mahindra Night Bot
+
+on:
+  schedule:
+    # Ye time set hai raat 1:30 AM se lekar subah 6:15 AM (India Time) tak, har 15 minute mein chalne ke liye
+    - cron: '*/15 20-23,0 * * *'
+  workflow_dispatch: # Isse aap manually bhi run karke test kar sakte hain
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Download (Checkout)
+        uses: actions/checkout@v3
+
+      - name: Python Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Requests Library
+        run: pip install requests
+
+      - name: Run Night Bot
+        run: python night_bot.py
