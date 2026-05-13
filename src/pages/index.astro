@@ -1,331 +1,331 @@
----
-// CT PRO - Astro Page
-// Koi import nahi, koi JS nahi yahan
----
-<!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CT PRO - Admin Access</title>
-    <style>
-        :root { --gold: #d4af37; --bg: #050505; --card: #121212; --green: #00ff99; --red: #ff4444; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-        .card { width: 100%; max-width: 450px; background: var(--card); border: 1px solid var(--gold); border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .logo { color: var(--gold); font-size: 32px; font-weight: 900; margin-bottom: 20px; letter-spacing: 2px; }
-        input { width: 100%; padding: 14px; margin-top: 10px; border-radius: 10px; border: 1px solid #333; background: black; color: white; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--gold); }
-        .btn { width: 100%; padding: 15px; margin-top: 15px; border: none; border-radius: 10px; background: var(--gold); color: black; font-weight: bold; cursor: pointer; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ContractTrack Pro</title>
+    <style is:global>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+
+        :root { --gold: #d4af37; --bg: #000; --card: #151515; --border: #222; --success: #22c55e; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: #fff; 
+            margin: 0; 
+            padding: 12px; 
+            overflow-x: hidden; 
+        }
+        
+        .container { max-width: 800px; margin: 0 auto; width: 100%; }
+        
+        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .logo { background: var(--gold); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 900; }
+
+        .input-card { background: var(--card); padding: 12px; border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 15px; width: 100%; }
+        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 14px; }
+        textarea:focus { outline: none; border-color: var(--gold); }
+        
+        .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; text-transform: uppercase; font-size: 15px; touch-action: manipulation; transition: transform 0.1s; }
         .btn:active { transform: scale(0.98); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .tracking { background: #000; padding: 15px; border-radius: 12px; margin: 20px 0; text-align: left; font-size: 12px; border-left: 4px solid var(--gold); line-height: 2; }
-        .tracking b { color: var(--gold); }
-        .msg { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 14px; display: none; }
-        .msg.error   { background: #2a0000; color: #ff6666; border: 1px solid #ff3333; }
-        .msg.success { background: #002a10; color: #00ff99; border: 1px solid #00ff99; }
-        .msg.info    { background: #1a1400; color: var(--gold); border: 1px solid var(--gold); }
-        #blockScreen { display: none; position: fixed; inset: 0; background: black; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: var(--red); text-align: center; gap: 12px; }
-        .admin-panel { display: none; margin-top: 20px; padding: 15px; border: 1px dashed var(--gold); border-radius: 12px; background: #1a1500; }
+        .btn:disabled { opacity: 0.6; }
+
+        /* Fetch Report Box Design */
+        .report-box { background: #0c0c0c; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; }
+        .report-header { color: var(--gold); font-weight: bold; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .report-stats { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .failed-badge { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 3px 6px; border-radius: 4px; font-size: 11px; margin: 2px 2px 0 0; display: inline-block; font-family: monospace; }
+
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 2px solid var(--gold); text-align: center; }
+        .s-card small { color: var(--gold); font-size: 10px; text-transform: uppercase; font-weight: bold; }
+
+        .filters-container { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .filter-input { width: 100%; background: var(--card); border: 2px solid var(--gold); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s; }
+        .filter-input:focus { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+        .section-title { color: var(--gold); font-size: 14px; font-weight: 900; margin: 20px 0 10px 0; text-transform: uppercase; border-bottom: 1px dashed var(--gold); padding-bottom: 8px; letter-spacing: 0.5px; }
+
+        .item-card { background: var(--card); border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 12px; width: 100%; overflow: hidden; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.12); }
+        
+        .item-main { padding: 14px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; cursor: pointer; touch-action: manipulation; }
+        .item-main:active { background: #1a1a1a; }
+        
+        .deep-details { padding: 15px; background: #080808; border-top: 1px dashed var(--gold); font-size: 13px; }
+        .d-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #1a1a1a; }
+        .d-row:last-child { border-bottom: none; }
+        .d-row b { color: var(--gold); text-align: right; }
+
+        .today-badge { background: var(--success); color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 900; display: inline-block; }
+        .date-text { color: var(--success); font-weight: bold; font-size: 13px; text-align: center; }
+        
+        .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; letter-spacing: 1px; }
+        .toggle-icon { font-size: 12px; color: var(--gold); margin-left: 5px; }
+        
+        .share-btn { width: 100%; margin-top: 12px; background: var(--gold); color: #000; font-weight: 900; border: none; padding: 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; touch-action: manipulation; }
+
+        @media (max-width: 480px) {
+            .item-main { grid-template-columns: 1.2fr 1fr 1fr; gap: 5px; padding: 12px; }
+            .header h2 { font-size: 18px; }
+            .share-btn { font-size: 13px; padding: 10px; }
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">CT</div>
+            <h2 style="margin:0;">ContractTrack Pro</h2>
+        </div>
 
-<div id="blockScreen">
-    <div style="font-size:100px;">🚫</div>
-    <h1>ACCESS DENIED</h1>
-    <p>Aapka device block kar diya gaya hai.</p>
-    <p id="blockedDevId" style="font-size:10px; color:#444;"></p>
-</div>
+        <div class="input-card">
+            <textarea id="contractsInput" rows="4" placeholder="Enter Contracts (One per line)"></textarea>
+            <button id="fetchBtn" class="btn">FETCH ALL RECEIPTS</button>
+        </div>
 
-<div class="card">
-    <div class="logo">CT PRO</div>
+        <div id="loader" class="loader">FETCHING DATA... PLEASE WAIT</div>
 
-    <div id="authBox">
-        <p id="authMsg" style="color:#888; margin-bottom:5px;">Security Verification Required</p>
-        <input type="email"    id="email" placeholder="Email Address">
-        <input type="password" id="pass"  placeholder="Password">
-        <div id="authMsgBox" class="msg"></div>
-        <button class="btn" id="submitBtn">ENTER SYSTEM</button>
-        <p style="margin-top:20px; font-size:14px;">
-            <span id="toggleText">Naye user?</span>
-            <span id="toggleBtn" style="color:var(--gold); cursor:pointer; text-decoration:underline; font-weight:bold;">Register Karein</span>
-        </p>
+        <div id="fetchReport" class="report-box" style="display: none;">
+            <div class="report-header">📊 Fetch Report</div>
+            <div class="report-stats">
+                <div>Total IDs: <b id="repTotal" style="color: #fff;">0</b></div>
+                <div>Success: <b id="repSuccess" style="color: var(--success);">0</b></div>
+                <div>Failed: <b id="repFailed" style="color: #ff4d4d;">0</b></div>
+            </div>
+            <div id="failedListContainer" style="display: none; margin-top: 5px; border-top: 1px solid #222; padding-top: 8px;">
+                <div style="color: #888; font-size: 11px; margin-bottom: 4px;">Data Not Found For:</div>
+                <div id="failedList"></div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="s-card">
+                <small id="statLabelCount">Dikhne Wale Records</small>
+                <div id="tCount" style="font-size: 20px; font-weight: bold; margin-top: 4px;">0</div>
+            </div>
+            <div class="s-card">
+                <small id="statLabelAmt">Total Amount</small>
+                <div id="tAmt" style="font-size: 20px; font-weight: bold; color:var(--success); margin-top: 4px;">₹0</div>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Search Name, Contract...">
+            <input type="date" id="dateFilter" class="filter-input">
+        </div>
+
+        <div id="todaySection" style="display: none;">
+            <div class="section-title">⭐ Today's Paid Accounts</div>
+            <div id="todayResults"></div>
+        </div>
+
+        <div id="otherSection" style="display: none;">
+            <div class="section-title">📂 Previous Records</div>
+            <div id="otherResults"></div>
+        </div>
+
     </div>
 
-    <div id="mainApp" style="display:none;">
-        <div class="tracking">
-            <b>WELCOME:</b> <span id="dispEmail"></span><br>
-            <b>MY IP:</b>   <span id="dispIP">Detecting...</span><br>
-            <b>DEVICE:</b>  <span id="dispDev">Scanning...</span><br>
-            <b>LIMIT:</b>   <span id="dispLimit" style="color:var(--green); font-weight:bold;">0</span>
-        </div>
-        <input type="text" id="searchId" placeholder="Enter Contract No">
-        <div id="searchMsgBox" class="msg"></div>
-        <button class="btn" id="searchBtn">START SEARCH</button>
-        <div id="adminPanel" class="admin-panel">
-            <p style="color:var(--gold); font-weight:bold; font-size:14px;">👑 ADMIN CONTROL</p>
-            <button class="btn" id="logsBtn" style="background:white; margin-top:10px; font-size:12px;">CHECK ALL SEARCH LOGS</button>
-        </div>
-        <button class="btn" id="logoutBtn" style="background:var(--red); color:white; margin-top:20px;">LOGOUT SECURELY</button>
-    </div>
-</div>
+    <script>
+        const btn = document.getElementById('fetchBtn');
+        const input = document.getElementById('contractsInput');
+        const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
+        
+        window.allRecordsData = [];
 
-<!-- 
-    IMPORTANT: Astro mein external scripts ke liye
-    script tag ke andar directly CDN URL likhte hain
-    is:inline nahi chahiye kyunki hum defer kar rahe hain
--->
-<script type="text/javascript">
-// Supabase aur FingerprintJS ko dynamically load karo
-// Yeh method Astro ke saath 100% kaam karta hai
+        const cleanVal = (val) => {
+            if (!val || String(val).toLowerCase() === 'null') return 'N/A';
+            return val;
+        };
 
-function loadScript(url, callback) {
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = url;
-    s.onload = callback;
-    s.onerror = function() { console.error('Script load failed: ' + url); };
-    document.head.appendChild(s);
-}
-
-// Pehle Supabase load karo, phir FingerprintJS, phir app init
-loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js', function() {
-    loadScript('https://openfpcdn.io/fingerprintjs/v4', function() {
-        initApp();
-    });
-});
-
-// ============================================================
-// SAARI APP LOGIC — initApp ke andar
-// ============================================================
-function initApp() {
-
-    var ADMIN_EMAIL = 'agurjeet768@gmail.com';
-
-    // Ab window.supabase guaranteed available hai
-    var sb_client = window.supabase.createClient(
-        'https://ihcmbsvsfwakmmmymtxq.supabase.co',
-        'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE'
-    );
-
-    var isLoginMode = true;
-    var visitorId   = "";
-
-    // --- Button Listeners ---
-    document.getElementById('submitBtn').addEventListener('click', handleAuth);
-    document.getElementById('toggleBtn').addEventListener('click', toggleMode);
-    document.getElementById('searchBtn').addEventListener('click', runSearch);
-    document.getElementById('logoutBtn').addEventListener('click', doLogout);
-    document.getElementById('logsBtn').addEventListener('click',   viewLogs);
-
-    // --- Fingerprint ---
-    FingerprintJS.load()
-        .then(function(fp) { return fp.get(); })
-        .then(function(r) {
-            visitorId = r.visitorId;
-            var d1 = document.getElementById('dispDev');
-            var d2 = document.getElementById('blockedDevId');
-            if (d1) d1.innerText = visitorId;
-            if (d2) d2.innerText = "Device: " + visitorId;
-        })
-        .catch(function() { visitorId = "dev-" + Date.now(); });
-
-    // --- Fetch IP ---
-    function fetchIP() {
-        return fetch('https://api.ipify.org?format=json')
-            .then(function(r) { return r.json(); })
-            .then(function(d) {
-                var el = document.getElementById('dispIP');
-                if (el) el.innerText = d.ip;
-                return d.ip;
-            })
-            .catch(function() { return "Private"; });
-    }
-
-    // --- Msg Helpers ---
-    function showMsg(id, type, text) {
-        var el = document.getElementById(id);
-        el.className = 'msg ' + type;
-        el.innerText = text;
-        el.style.display = 'block';
-    }
-
-    function hideMsg(id) {
-        var el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    }
-
-    // --- Toggle Mode ---
-    function toggleMode() {
-        isLoginMode = !isLoginMode;
-        hideMsg('authMsgBox');
-        document.getElementById('authMsg').innerText    = isLoginMode ? "Security Verification Required" : "Create Professional ID";
-        document.getElementById('submitBtn').innerText  = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
-        document.getElementById('toggleText').innerText = isLoginMode ? "Naye user?" : "Already user?";
-        document.getElementById('toggleBtn').innerText  = isLoginMode ? "Register Karein" : "Login Karein";
-    }
-
-    // --- Handle Auth ---
-    function handleAuth() {
-        var email = document.getElementById('email').value.trim();
-        var pass  = document.getElementById('pass').value.trim();
-        var btn   = document.getElementById('submitBtn');
-
-        if (!email || !pass) { showMsg('authMsgBox', 'error', "Dono details bhariye!"); return; }
-
-        hideMsg('authMsgBox');
-        btn.disabled  = true;
-        btn.innerText = "Processing...";
-
-        if (isLoginMode) {
-            // LOGIN
-            sb_client.auth.signInWithPassword({ email: email, password: pass })
-                .then(function(res) {
-                    if (res.error) {
-                        var msg = res.error.message;
-                        if (msg.toLowerCase().includes('email not confirmed')) {
-                            showMsg('authMsgBox', 'info', "Email confirm nahi hai — inbox mein link check karo.");
-                        } else if (msg.toLowerCase().includes('invalid')) {
-                            showMsg('authMsgBox', 'error', "Email ya password galat hai.");
-                        } else {
-                            showMsg('authMsgBox', 'error', msg);
-                        }
-                        btn.disabled = false; btn.innerText = "ENTER SYSTEM";
-                        return;
-                    }
-                    return fetchIP().then(function(ip) {
-                        return sb_client.from('ContractTrack').select('limit_left').eq('email', email).single()
-                            .then(function(chk) {
-                                if (chk.data) {
-                                    return sb_client.from('ContractTrack')
-                                        .update({ device_id: visitorId, last_ip: ip })
-                                        .eq('email', email);
-                                } else {
-                                    return sb_client.from('ContractTrack')
-                                        .insert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false });
-                                }
-                            })
-                            .then(function() {
-                                showMsg('authMsgBox', 'success', "Login ho gaya! Loading...");
-                                setTimeout(function() { location.reload(); }, 900);
-                            });
-                    });
-                })
-                .catch(function(e) {
-                    showMsg('authMsgBox', 'error', "Error: " + e.message);
-                    btn.disabled = false; btn.innerText = "ENTER SYSTEM";
-                });
-
-        } else {
-            // REGISTER
-            sb_client.auth.signUp({ email: email, password: pass })
-                .then(function(res) {
-                    if (res.error) {
-                        showMsg('authMsgBox', 'error', res.error.message);
-                        btn.disabled = false; btn.innerText = "REGISTER NOW";
-                        return;
-                    }
-                    var ud = res.data;
-                    return fetchIP().then(function(ip) {
-                        return sb_client.from('ContractTrack')
-                            .upsert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false }, { onConflict: 'email' })
-                            .then(function() {
-                                btn.disabled = false; btn.innerText = "REGISTER NOW";
-                                if (ud.user && ud.user.identities && ud.user.identities.length === 0) {
-                                    showMsg('authMsgBox', 'info', "Yeh email pehle se registered hai. Login karein.");
-                                    setTimeout(function() { isLoginMode = true; toggleMode(); }, 2500);
-                                } else if (ud.session) {
-                                    showMsg('authMsgBox', 'success', "Account ban gaya! Loading...");
-                                    setTimeout(function() { location.reload(); }, 900);
-                                } else {
-                                    showMsg('authMsgBox', 'info', "Account ban gaya! Inbox mein confirmation link click karo phir login karein.");
-                                    setTimeout(function() { isLoginMode = true; toggleMode(); }, 4000);
-                                }
-                            });
-                    });
-                })
-                .catch(function(e) {
-                    showMsg('authMsgBox', 'error', "Error: " + e.message);
-                    btn.disabled = false; btn.innerText = "REGISTER NOW";
-                });
-        }
-    }
-
-    // --- Search ---
-    function runSearch() {
-        var id = document.getElementById('searchId').value.trim();
-        if (!id) { showMsg('searchMsgBox', 'error', "Contract number dalo"); return; }
-        hideMsg('searchMsgBox');
-        sb_client.auth.getSession().then(function(res) {
-            var session = res.data.session;
-            if (!session) { showMsg('searchMsgBox', 'error', "Session khatam. Login karein."); return; }
-            sb_client.from('ContractTrack').select('*').eq('email', session.user.email).single()
-                .then(function(dbRes) {
-                    var user = dbRes.data;
-                    if (!user) { showMsg('searchMsgBox', 'error', "User data nahi mila"); return; }
-                    if (user.is_blocked) { document.getElementById('blockScreen').style.display = 'flex'; return; }
-                    if (user.limit_left <= 0) { showMsg('searchMsgBox', 'error', "Limit Khatam! Admin se contact karein."); return; }
-                    var newLimit = user.limit_left - 1;
-                    Promise.all([
-                        sb_client.from('search_logs').insert({ email: session.user.email, search_query: id, device_id: visitorId }),
-                        sb_client.from('ContractTrack').update({ limit_left: newLimit }).eq('email', session.user.email)
-                    ]).then(function() {
-                        document.getElementById('dispLimit').innerText = newLimit;
-                        showMsg('searchMsgBox', 'success', "Searching: " + id);
-                    });
-                });
-        });
-    }
-
-    // --- Admin Logs ---
-    function viewLogs() {
-        sb_client.from('search_logs').select('*').order('created_at', { ascending: false })
-            .then(function(res) {
-                console.table(res.data);
-                alert("F12 dabao aur Console tab mein puri list dekho!");
-            });
-    }
-
-    // --- Session Check ---
-    function checkSession() {
-        sb_client.auth.getSession().then(function(res) {
-            var session = res.data.session;
-            if (session) {
-                document.getElementById('authBox').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                document.getElementById('dispEmail').innerText   = session.user.email;
-                if (session.user.email === ADMIN_EMAIL) {
-                    document.getElementById('adminPanel').style.display = 'block';
-                }
-                fetchIP();
-                sb_client.from('ContractTrack').select('*').eq('email', session.user.email).single()
-                    .then(function(dbRes) {
-                        var u = dbRes.data;
-                        if (u) {
-                            document.getElementById('dispLimit').innerText = u.limit_left !== null ? u.limit_left : 0;
-                            document.getElementById('dispDev').innerText   = u.device_id || visitorId;
-                            if (u.is_blocked) document.getElementById('blockScreen').style.display = 'flex';
-                        }
-                    });
+        window.toggleCard = function(index) {
+            const detailsDiv = document.getElementById('det-' + index);
+            const iconSpan = document.getElementById('icon-' + index);
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'block'; 
+                iconSpan.innerText = '▲'; 
             } else {
-                document.getElementById('authBox').style.display = 'block';
-                document.getElementById('mainApp').style.display = 'none';
+                detailsDiv.style.display = 'none';  
+                iconSpan.innerText = '▼'; 
             }
-        });
-    }
+        };
 
-    // --- Logout ---
-    function doLogout() {
-        sb_client.auth.signOut().then(function() { location.reload(); });
-    }
+        window.shareCard = function(index) {
+            const item = window.allRecordsData[index];
+            const emiAmountText = item.emi_amount !== 'N/A' ? `₹${item.emi_amount}` : 'N/A';
+            const overdueText = cleanVal(item.overdue) !== 'N/A' ? `₹${item.overdue}` : '0';
 
-    // --- START ---
-    fetchIP();
-    checkSession();
+            const shareText = `*ContractTrack Details*\n👤 Name: ${item.name}\n📝 Contract: ${item.contract}\n📱 Mobile: ${item.mobile}\n💰 Amount Paid: ₹${item.amount}\n📅 Date: ${item.date}\n📊 EMI Amount: ${emiAmountText}\n⚠️ Over Dues: ${overdueText}\n🧾 Receipt: ${item.receipt_no}`;
 
-} // end initApp
-</script>
+            if (navigator.share) {
+                navigator.share({ title: 'Contract Details', text: shareText }).catch(err => console.log('Share error:', err));
+            } else {
+                navigator.clipboard.writeText(shareText);
+                alert("Details copied! Ab aap isko paste karke share kar sakte hain.");
+            }
+        };
 
+        const formatFilterDate = (dateStr) => {
+            if(!dateStr) return "";
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const parts = dateStr.split('-'); 
+            return `${parts[2]}-${months[parseInt(parts[1])-1]}-${parts[0]}`;
+        };
+
+        const applyFilters = () => {
+            const term = searchInput.value.toLowerCase();
+            const selectedDate = formatFilterDate(dateFilter.value);
+            
+            let visibleCount = 0;
+            let visibleAmt = 0;
+            
+            const cards = document.querySelectorAll('.item-card');
+
+            requestAnimationFrame(() => {
+                window.allRecordsData.forEach((item, index) => {
+                    const card = document.getElementById('card-wrapper-' + index);
+                    if (!card) return;
+
+                    const matchesSearch = card.innerText.toLowerCase().includes(term);
+                    const matchesDate = selectedDate === "" || item.date === selectedDate;
+
+                    if (matchesSearch && matchesDate) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                        visibleAmt += parseFloat(item.amount.toString().replace(/,/g, '')) || 0;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                document.getElementById('tCount').innerText = visibleCount;
+                document.getElementById('tAmt').innerText = "₹" + visibleAmt.toLocaleString('en-IN');
+            });
+        };
+
+        searchInput.addEventListener('input', applyFilters);
+        dateFilter.addEventListener('change', applyFilters);
+
+        btn.onclick = async () => {
+            const val = input.value.trim();
+            if(!val) return;
+            
+            const rawArray = val.split('\n').map(n => n.trim()).filter(n => n);
+            const uniqueArray = [...new Set(rawArray)]; 
+            const list = uniqueArray.join(',');
+            
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('todayResults').innerHTML = '';
+            document.getElementById('otherResults').innerHTML = '';
+            document.getElementById('todaySection').style.display = 'none';
+            document.getElementById('otherSection').style.display = 'none';
+            document.getElementById('fetchReport').style.display = 'none';
+            
+            btn.disabled = true;
+            btn.innerText = "FETCHING...";
+
+            try {
+                const r = await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${list}`);
+                const data = await r.json();
+                window.allRecordsData = data; 
+                
+                const totalRequested = uniqueArray.length;
+                const totalFetched = data.length;
+                const failedCount = totalRequested - totalFetched;
+                
+                const fetchedIds = data.map(item => String(item.contract).trim());
+                const failedIds = uniqueArray.filter(id => !fetchedIds.includes(String(id).trim()));
+
+                document.getElementById('repTotal').innerText = totalRequested;
+                document.getElementById('repSuccess').innerText = totalFetched;
+                document.getElementById('repFailed').innerText = failedCount;
+
+                const failedListDiv = document.getElementById('failedList');
+                const failedListContainer = document.getElementById('failedListContainer');
+                
+                if (failedCount > 0) {
+                    failedListContainer.style.display = 'block';
+                    failedListDiv.innerHTML = failedIds.map(id => `<span class="failed-badge">${id}</span>`).join('');
+                } else {
+                    failedListContainer.style.display = 'none';
+                }
+                
+                document.getElementById('fetchReport').style.display = 'block';
+
+                const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase().replace(/ /g, '-');
+                
+                let todayHtml = ''; 
+                let otherHtml = '';
+
+                data.forEach((item, i) => {
+                    const isToday = item.date === today;
+                    const emiAmountText = item.emi_amount !== 'N/A' ? `₹${item.emi_amount}` : 'N/A';
+                    const overdueText = cleanVal(item.overdue) !== 'N/A' ? `₹${item.overdue}` : '0';
+                    
+                    const dateDisplay = isToday ? '<span class="today-badge">TODAY</span>' : `<div class="date-text">${item.date}</div>`;
+
+                    const cardHTML = `
+                        <div class="item-card" id="card-wrapper-${i}">
+                            <div class="item-main" onclick="toggleCard(${i})">
+                                <div>
+                                    <div style="font-weight:bold; font-size: 15px;">${item.name}</div>
+                                    <div style="color:var(--gold); font-size: 12px; margin-top: 4px; font-weight:bold;">${item.contract}</div>
+                                </div>
+                                <div style="text-align:center;">
+                                    ${dateDisplay}
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="color:#d4af37; font-weight:bold; font-size: 17px;">₹${item.amount}</div>
+                                    <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
+                                        Details <span id="icon-${i}" class="toggle-icon">▼</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="det-${i}" class="deep-details" style="display: none;">
+                                <div class="d-row"><span>Cust Mobile:</span> <b>${item.mobile}</b></div>
+                                <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
+                                <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
+                                <div class="d-row"><span>Guarantor:</span> <b>${item.gu_name}</b></div>
+                                <div class="d-row"><span>GU Mobile:</span> <b>${item.gu_mobile}</b></div>
+                                <div class="d-row"><span>Co-Applicant:</span> <b>${item.co_name}</b></div>
+                                <div class="d-row"><span>Co-App Mobile:</span> <b>${item.co_mobile}</b></div>
+                                <div class="d-row"><span>Receipt No:</span> <b style="color:#aaa;">${item.receipt_no}</b></div>
+                                <div class="d-row"><span>Type:</span> <b style="color:#aaa;">${item.instr}</b></div>
+                                <button class="share-btn" onclick="shareCard(${i})">🔗 Share Details</button>
+                            </div>
+                        </div>
+                    `;
+
+                    if (isToday) {
+                        todayHtml += cardHTML;
+                    } else {
+                        otherHtml += cardHTML;
+                    }
+                });
+
+                if (todayHtml === '') {
+                    todayHtml = `<div style="text-align:center; padding:15px; color:#aaa; font-style:italic; background: var(--card); border-radius: 10px; border: 1px dashed var(--gold); margin-bottom:12px; font-size: 14px;">⏳ Abhi tak aaj ki date mein kisi contract par payment nahi aaya hai.</div>`;
+                }
+
+                document.getElementById('todayResults').innerHTML = todayHtml;
+                document.getElementById('otherResults').innerHTML = otherHtml;
+
+                document.getElementById('todaySection').style.display = 'block';
+                if (otherHtml !== '') document.getElementById('otherSection').style.display = 'block';
+                
+                applyFilters();
+
+            } catch (err) {
+                alert("Connection failed. Check hugging face server.");
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+                btn.disabled = false;
+                btn.innerText = "FETCH ALL RECEIPTS";
+            }
+        }
+    </script>
 </body>
 </html>
