@@ -6,24 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CT PRO</title>
 
-    <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- FINGERPRINT -->
-    <script src="https://openfpcdn.io/fingerprintjs/v4"></script>
-
     <style>
         :root {
             --gold: #d4af37;
             --bg: #050505;
             --card: #121212;
-            --red: #ff3333;
             --green: #00ff99;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -75,6 +66,12 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .tracking {
@@ -87,13 +84,9 @@
             border-left: 4px solid var(--gold);
         }
 
-        .tracking b {
-            color: var(--gold);
-        }
+        .tracking b { color: var(--gold); }
 
-        #mainApp {
-            display: none;
-        }
+        #mainApp { display: none; }
 
         #blockScreen {
             display: none;
@@ -107,6 +100,18 @@
             color: red;
             text-align: center;
         }
+
+        .msg {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .msg.error   { background: #2a0000; color: #ff6666; border: 1px solid #ff3333; }
+        .msg.success { background: #002a10; color: #00ff99; border: 1px solid #00ff99; }
+        .msg.info    { background: #1a1400; color: var(--gold); border: 1px solid var(--gold); }
     </style>
 </head>
 
@@ -114,545 +119,370 @@
 
     <!-- BLOCK SCREEN -->
     <div id="blockScreen">
-
-        <div style="font-size:80px;">
-            🚫
-        </div>
-
-        <h1>
-            ACCESS DENIED
-        </h1>
-
-        <p>
-            Device Blocked
-        </p>
-
+        <div style="font-size:80px;">&#x1F6AB;</div>
+        <h1>ACCESS DENIED</h1>
+        <p>Device Blocked</p>
         <p id="blockedDevId"></p>
-
     </div>
 
     <!-- MAIN CARD -->
     <div class="card">
+        <div class="logo">CT PRO</div>
 
-        <div class="logo">
-            CT PRO
-        </div>
-
-        <!-- LOGIN / REGISTER -->
+        <!-- LOGIN / REGISTER BOX -->
         <div id="authBox">
+            <p id="authMsg">Security Clearance Required</p>
 
-            <p id="authMsg">
-                Security Clearance Required
-            </p>
+            <input type="email"    id="email" placeholder="Email Address">
+            <input type="password" id="pass"  placeholder="Password">
 
-            <input type="email"
-                   id="email"
-                   placeholder="Email Address">
+            <div id="authMsgBox" class="msg"></div>
 
-            <input type="password"
-                   id="pass"
-                   placeholder="Password">
-
-            <button class="btn"
-                    id="submitBtn"
-                    onclick="handleAuth()">
+            <button class="btn" id="submitBtn" onclick="handleAuth()">
                 ENTER SYSTEM
             </button>
 
             <p style="margin-top:20px; font-size:14px;">
-
-                <span id="toggleText">
-                    Naye user?
-                </span>
-
+                <span id="toggleText">Naye user?</span>
                 <span id="toggleBtn"
                       onclick="toggleMode()"
-                      style="color:var(--gold);
-                             cursor:pointer;
-                             text-decoration:underline;">
-
+                      style="color:var(--gold); cursor:pointer; text-decoration:underline;">
                     Register Karein
-
                 </span>
-
             </p>
-
         </div>
 
-        <!-- APP -->
+        <!-- MAIN APP -->
         <div id="mainApp">
-
             <div class="tracking">
-
-                <b>WELCOME:</b>
-                <span id="dispEmail"></span>
-                <br><br>
-
-                <b>IP:</b>
-                <span id="dispIP"></span>
-                <br><br>
-
-                <b>DEVICE:</b>
-                <span id="dispDev"></span>
-                <br><br>
-
-                <b>LIMIT:</b>
-                <span id="dispLimit"
-                      style="color:var(--green);">
-                    0
-                </span>
-
+                <b>WELCOME:</b> <span id="dispEmail"></span><br><br>
+                <b>IP:</b>      <span id="dispIP"></span><br><br>
+                <b>DEVICE:</b>  <span id="dispDev"></span><br><br>
+                <b>LIMIT:</b>   <span id="dispLimit" style="color:var(--green);">0</span>
             </div>
 
-            <input type="text"
-                   id="searchId"
-                   placeholder="Enter Contract No">
+            <input type="text" id="searchId" placeholder="Enter Contract No">
+
+            <div id="searchMsgBox" class="msg"></div>
+
+            <button class="btn" onclick="runSearch()">START SEARCH</button>
 
             <button class="btn"
-                    onclick="runSearch()">
-                START SEARCH
-            </button>
-
-            <button class="btn"
-                    onclick="logout()"
-                    style="background:red;color:white;">
+                    onclick="doLogout()"
+                    style="background:red; color:white; margin-top:10px;">
                 LOGOUT
             </button>
-
         </div>
-
     </div>
 
+    <!-- Supabase — UMD build, exposes window.supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+    <!-- FingerprintJS -->
+    <script src="https://openfpcdn.io/fingerprintjs/v4"></script>
+
     <script>
+        // =========================================================
+        // SUPABASE CLIENT
+        // sb_client naam diya — window.supabase se conflict na ho
+        // =========================================================
+        var sb_client = window.supabase.createClient(
+            'https://ihcmbsvsfwakmmmymtxq.supabase.co',
+            'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE'
+        );
 
-        // ==========================
-        // SUPABASE CONFIG
-        // ==========================
+        // =========================================================
+        // GLOBAL STATE
+        // =========================================================
+        var isLogin   = true;
+        var visitorId = "";
 
-        const SB_URL =
-            'https://ihcmbsvsfwakmmmymtxq.supabase.co';
-
-        const SB_KEY =
-            'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
-
-        const supabase =
-            window.supabase.createClient(
-                SB_URL,
-                SB_KEY
-            );
-
-        // ==========================
-
-        let isLogin = true;
-
-        let visitorId = "";
-
-        // ==========================
-        // DEVICE SECURITY
-        // ==========================
-
-        async function startSecurity() {
-
-            try {
-
-                const fp =
-                    await FingerprintJS.load();
-
-                const result =
-                    await fp.get();
-
-                visitorId =
-                    result.visitorId;
-
-                document
-                    .getElementById('dispDev')
-                    .innerText = visitorId;
-
-                document
-                    .getElementById('blockedDevId')
-                    .innerText = visitorId;
-
-            } catch (e) {
-
-                console.log(e);
-
-            }
-
+        // =========================================================
+        // HELPERS
+        // =========================================================
+        function showMsg(id, type, text) {
+            var el       = document.getElementById(id);
+            el.className = 'msg ' + type;
+            el.innerText = text;
+            el.style.display = 'block';
         }
 
-        // ==========================
-        // TOGGLE MODE
-        // ==========================
-
-        function toggleMode() {
-
-            isLogin = !isLogin;
-
-            if (isLogin) {
-
-                document
-                    .getElementById('authMsg')
-                    .innerText =
-                    "Security Clearance Required";
-
-                document
-                    .getElementById('submitBtn')
-                    .innerText =
-                    "ENTER SYSTEM";
-
-                document
-                    .getElementById('toggleText')
-                    .innerText =
-                    "Naye user?";
-
-                document
-                    .getElementById('toggleBtn')
-                    .innerText =
-                    "Register Karein";
-
-            } else {
-
-                document
-                    .getElementById('authMsg')
-                    .innerText =
-                    "Create New Account";
-
-                document
-                    .getElementById('submitBtn')
-                    .innerText =
-                    "REGISTER";
-
-                document
-                    .getElementById('toggleText')
-                    .innerText =
-                    "Already account hai?";
-
-                document
-                    .getElementById('toggleBtn')
-                    .innerText =
-                    "Login Karein";
-
-            }
-
+        function hideMsg(id) {
+            document.getElementById(id).style.display = 'none';
         }
 
-        // ==========================
+        function setBtn(id, disabled, text) {
+            var b    = document.getElementById(id);
+            b.disabled  = disabled;
+            b.innerText = text;
+        }
+
+        // =========================================================
+        // FINGERPRINT
+        // =========================================================
+        function startSecurity() {
+            FingerprintJS.load()
+                .then(function(fp) { return fp.get(); })
+                .then(function(r) {
+                    visitorId = r.visitorId;
+                    var d1 = document.getElementById('dispDev');
+                    var d2 = document.getElementById('blockedDevId');
+                    if (d1) d1.innerText = visitorId;
+                    if (d2) d2.innerText = visitorId;
+                })
+                .catch(function() {
+                    visitorId = "dev-" + Date.now();
+                });
+        }
+
+        // =========================================================
         // FETCH IP
-        // ==========================
-
-        async function fetchIP() {
-
-            try {
-
-                const r =
-                    await fetch(
-                        'https://api.ipify.org?format=json'
-                    );
-
-                const d =
-                    await r.json();
-
-                document
-                    .getElementById('dispIP')
-                    .innerText = d.ip;
-
-                return d.ip;
-
-            } catch {
-
-                return "Unknown";
-
-            }
-
+        // =========================================================
+        function fetchIP() {
+            return fetch('https://api.ipify.org?format=json')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    var el = document.getElementById('dispIP');
+                    if (el) el.innerText = d.ip;
+                    return d.ip;
+                })
+                .catch(function() { return "Unknown"; });
         }
 
-        // ==========================
-        // LOGIN / REGISTER
-        // ==========================
-
-        async function handleAuth() {
-
-            const email =
-                document
-                .getElementById('email')
-                .value
-                .trim();
-
-            const password =
-                document
-                .getElementById('pass')
-                .value
-                .trim();
-
-            if (!email || !password) {
-
-                alert("Email aur password dalo");
-
-                return;
-
-            }
-
-            const ip =
-                await fetchIP();
-
-            // ======================
-            // LOGIN
-            // ======================
+        // =========================================================
+        // TOGGLE LOGIN / REGISTER
+        // =========================================================
+        function toggleMode() {
+            isLogin = !isLogin;
+            hideMsg('authMsgBox');
 
             if (isLogin) {
+                document.getElementById('authMsg').innerText    = "Security Clearance Required";
+                document.getElementById('submitBtn').innerText  = "ENTER SYSTEM";
+                document.getElementById('toggleText').innerText = "Naye user?";
+                document.getElementById('toggleBtn').innerText  = "Register Karein";
+            } else {
+                document.getElementById('authMsg').innerText    = "Create New Account";
+                document.getElementById('submitBtn').innerText  = "REGISTER";
+                document.getElementById('toggleText').innerText = "Already account hai?";
+                document.getElementById('toggleBtn').innerText  = "Login Karein";
+            }
+        }
 
-                const { data, error } =
-                    await supabase.auth
-                    .signInWithPassword({
+        // =========================================================
+        // HANDLE AUTH  (login + register dono)
+        // =========================================================
+        function handleAuth() {
 
-                        email,
-                        password
+            var email = document.getElementById('email').value.trim();
+            var pass  = document.getElementById('pass').value.trim();
 
-                    });
-
-                console.log(data);
-                console.log(error);
-
-                if (error) {
-
-                    alert(
-                        "Login Error : " +
-                        error.message
-                    );
-
-                    return;
-
-                }
-
-                // SAVE LOGIN INFO
-
-                await supabase
-                    .from('ContractTrack')
-                    .upsert({
-
-                        email: email,
-                        device_id: visitorId,
-                        last_ip: ip,
-                        limit_left: 5
-
-                    }, {
-
-                        onConflict: 'email'
-
-                    });
-
-                alert("Login Successful");
-
-                location.reload();
-
+            if (!email || !pass) {
+                showMsg('authMsgBox', 'error', "Email aur password dalo");
+                return;
             }
 
-            // ======================
-            // REGISTER
-            // ======================
+            hideMsg('authMsgBox');
 
-            else {
+            // ---------- LOGIN ----------
+            if (isLogin) {
 
-                const { data, error } =
-                    await supabase.auth
-                    .signUp({
+                setBtn('submitBtn', true, "Logging in...");
 
-                        email,
-                        password,
+                sb_client.auth
+                    .signInWithPassword({ email: email, password: pass })
+                    .then(function(res) {
 
-                        options: {
-                            emailRedirectTo:
-                                window.location.href
+                        if (res.error) {
+                            showMsg('authMsgBox', 'error', "Login Error: " + res.error.message);
+                            setBtn('submitBtn', false, "ENTER SYSTEM");
+                            return;
                         }
 
+                        // DB: sirf device + IP update karo, limit mat chhuo
+                        fetchIP().then(function(ip) {
+                            sb_client.from('ContractTrack')
+                                .select('email')
+                                .eq('email', email)
+                                .single()
+                                .then(function(chk) {
+                                    if (chk.data) {
+                                        sb_client.from('ContractTrack')
+                                            .update({ device_id: visitorId, last_ip: ip })
+                                            .eq('email', email)
+                                            .then(function() {});
+                                    } else {
+                                        sb_client.from('ContractTrack')
+                                            .insert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 5, is_blocked: false })
+                                            .then(function() {});
+                                    }
+                                });
+                        });
+
+                        showMsg('authMsgBox', 'success', "Login Ho Gaya! Loading...");
+                        setTimeout(function() { checkSession(); }, 900);
+
+                    })
+                    .catch(function(e) {
+                        showMsg('authMsgBox', 'error', "Error: " + e.message);
+                        setBtn('submitBtn', false, "ENTER SYSTEM");
                     });
 
-                console.log(data);
-                console.log(error);
+            }
 
-                if (error) {
+            // ---------- REGISTER ----------
+            else {
 
-                    alert(
-                        "Register Error : " +
-                        error.message
-                    );
+                setBtn('submitBtn', true, "Registering...");
 
-                    return;
-
-                }
-
-                // INSERT USER DATA
-
-                const { error: dbError } =
-                    await supabase
-                    .from('ContractTrack')
-                    .upsert({
-
+                sb_client.auth
+                    .signUp({
                         email: email,
-                        device_id: visitorId,
-                        last_ip: ip,
-                        limit_left: 5,
-                        is_blocked: false
+                        password: pass,
+                        options: { emailRedirectTo: window.location.href }
+                    })
+                    .then(function(res) {
 
-                    }, {
+                        if (res.error) {
+                            showMsg('authMsgBox', 'error', "Register Error: " + res.error.message);
+                            setBtn('submitBtn', false, "REGISTER");
+                            return;
+                        }
 
-                        onConflict: 'email'
+                        var ud = res.data;
 
+                        fetchIP().then(function(ip) {
+                            sb_client.from('ContractTrack')
+                                .upsert(
+                                    { email: email, device_id: visitorId, last_ip: ip, limit_left: 5, is_blocked: false },
+                                    { onConflict: 'email' }
+                                )
+                                .then(function() {});
+                        });
+
+                        setBtn('submitBtn', false, "REGISTER");
+
+                        // Case 1: Email pehle se exist karti hai
+                        if (ud.user && ud.user.identities && ud.user.identities.length === 0) {
+                            showMsg('authMsgBox', 'info', "Yeh email pehle se registered hai. Login karein.");
+                            setTimeout(function() { isLogin = true; toggleMode(); }, 2500);
+                        }
+                        // Case 2: Email confirmation OFF — turant session
+                        else if (ud.session) {
+                            showMsg('authMsgBox', 'success', "Account ban gaya! Loading...");
+                            setTimeout(function() { checkSession(); }, 900);
+                        }
+                        // Case 3: Email confirmation ON — confirm karna padega
+                        else {
+                            showMsg('authMsgBox', 'info',
+                                "Register ho gaya! Email confirmation ON hai — inbox check karo, link click karo, phir login karein.");
+                            setTimeout(function() { isLogin = true; toggleMode(); }, 3500);
+                        }
+
+                    })
+                    .catch(function(e) {
+                        showMsg('authMsgBox', 'error', "Error: " + e.message);
+                        setBtn('submitBtn', false, "REGISTER");
                     });
-
-                console.log(dbError);
-
-                alert(
-                    "Account Ban Gaya! Ab Login Karein."
-                );
-
-                toggleMode();
-
             }
-
         }
 
-        // ==========================
+        // =========================================================
         // SEARCH
-        // ==========================
+        // =========================================================
+        function runSearch() {
 
-        async function runSearch() {
-
-            const id =
-                document
-                .getElementById('searchId')
-                .value
-                .trim();
-
+            var id = document.getElementById('searchId').value.trim();
             if (!id) {
-
-                alert("Contract Number dalo");
-
+                showMsg('searchMsgBox', 'error', "Contract Number dalo");
                 return;
-
             }
+            hideMsg('searchMsgBox');
 
-            const { data: user } =
-                await supabase
-                .from('ContractTrack')
-                .select('*')
-                .eq('device_id', visitorId)
-                .single();
+            sb_client.auth.getSession().then(function(res) {
 
-            if (!user) {
-
-                alert("User data nahi mila");
-
-                return;
-
-            }
-
-            if (user.limit_left <= 0) {
-
-                alert("Limit Khatam");
-
-                return;
-
-            }
-
-            alert("Searching : " + id);
-
-            await supabase
-                .from('ContractTrack')
-                .update({
-
-                    limit_left:
-                        user.limit_left - 1
-
-                })
-                .eq(
-                    'device_id',
-                    visitorId
-                );
-
-            document
-                .getElementById('dispLimit')
-                .innerText =
-                user.limit_left - 1;
-
-        }
-
-        // ==========================
-        // LOGOUT
-        // ==========================
-
-        async function logout() {
-
-            await supabase.auth.signOut();
-
-            location.reload();
-
-        }
-
-        // ==========================
-        // SESSION CHECK
-        // ==========================
-
-        async function checkSession() {
-
-            const {
-                data: {
-                    session
+                var session = res.data.session;
+                if (!session) {
+                    showMsg('searchMsgBox', 'error', "Session khatam. Dobara login karein.");
+                    return;
                 }
-            } =
-            await supabase.auth
-                .getSession();
 
-            if (session) {
-
-                document
-                    .getElementById('authBox')
-                    .style.display = 'none';
-
-                document
-                    .getElementById('mainApp')
-                    .style.display = 'block';
-
-                document
-                    .getElementById('dispEmail')
-                    .innerText =
-                    session.user.email;
-
-                const { data } =
-                    await supabase
-                    .from('ContractTrack')
+                sb_client.from('ContractTrack')
                     .select('*')
-                    .eq(
-                        'email',
-                        session.user.email
-                    )
-                    .single();
+                    .eq('email', session.user.email)
+                    .single()
+                    .then(function(dbRes) {
 
-                if (data) {
+                        var user = dbRes.data;
+                        if (!user) { showMsg('searchMsgBox', 'error', "User data nahi mila"); return; }
+                        if (user.is_blocked) { document.getElementById('blockScreen').style.display = 'flex'; return; }
+                        if (user.limit_left <= 0) { showMsg('searchMsgBox', 'error', "Limit Khatam!"); return; }
 
-                    document
-                        .getElementById('dispLimit')
-                        .innerText =
-                        data.limit_left;
+                        var newLimit = user.limit_left - 1;
 
-                }
-
-            }
-
+                        sb_client.from('ContractTrack')
+                            .update({ limit_left: newLimit })
+                            .eq('email', session.user.email)
+                            .then(function() {
+                                document.getElementById('dispLimit').innerText = newLimit;
+                                showMsg('searchMsgBox', 'success', "Searching: " + id);
+                            });
+                    });
+            });
         }
 
-        // ==========================
-        // START
-        // ==========================
+        // =========================================================
+        // LOGOUT
+        // =========================================================
+        function doLogout() {
+            sb_client.auth.signOut().then(function() { location.reload(); });
+        }
 
+        // =========================================================
+        // SESSION CHECK
+        // =========================================================
+        function checkSession() {
+            sb_client.auth.getSession().then(function(res) {
+
+                var session = res.data.session;
+
+                if (session) {
+                    document.getElementById('authBox').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    document.getElementById('dispEmail').innerText    = session.user.email;
+
+                    fetchIP();
+
+                    sb_client.from('ContractTrack')
+                        .select('*')
+                        .eq('email', session.user.email)
+                        .single()
+                        .then(function(dbRes) {
+                            var data = dbRes.data;
+                            if (data) {
+                                document.getElementById('dispLimit').innerText = data.limit_left;
+                                document.getElementById('dispDev').innerText   = data.device_id || visitorId;
+                                if (data.is_blocked) {
+                                    document.getElementById('blockScreen').style.display = 'flex';
+                                }
+                            }
+                        });
+
+                } else {
+                    document.getElementById('authBox').style.display = 'block';
+                    document.getElementById('mainApp').style.display = 'none';
+                }
+            });
+        }
+
+        // =========================================================
+        // INIT
+        // =========================================================
         startSecurity();
-
         checkSession();
-
         fetchIP();
 
     </script>
 
 </body>
-
 </html>
