@@ -1,5 +1,5 @@
 ---
-// CT PRO - Admin Panel
+// CT PRO - Super Admin Panel (Updated)
 ---
 <!DOCTYPE html>
 <html lang="hi">
@@ -10,236 +10,34 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style is:global>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
-
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         :root {
-            --gold: #d4af37;
-            --gold2: #f0d060;
-            --bg: #060608;
-            --card: #0f0f12;
-            --card2: #14141a;
-            --border: #1e1e28;
-            --border2: #2a2a38;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --info: #3b82f6;
-            --warn: #f59e0b;
-            --text: #e8e8f0;
-            --muted: #666680;
+            --gold: #d4af37; --bg: #060608; --card: #0f0f12; --card2: #14141a;
+            --border: #1e1e28; --border2: #2a2a38; --success: #22c55e;
+            --danger: #ef4444; --text: #e8e8f0; --muted: #666680;
         }
-
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* GRID BG */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
+        body { font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
         .container { max-width: 1100px; margin: 0 auto; padding: 16px; position: relative; z-index: 1; }
-
-        /* TOP BAR */
-        .topbar {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--card); border: 1px solid var(--border2);
-            border-radius: 12px; padding: 12px 18px; margin-bottom: 20px;
-        }
-        .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .logo-box {
-            background: var(--gold); color: #000;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700; font-size: 13px;
-            padding: 5px 10px; border-radius: 6px; letter-spacing: 1px;
-        }
-        .admin-badge {
-            background: rgba(212,175,55,0.12); color: var(--gold);
-            border: 1px solid rgba(212,175,55,0.3);
-            font-size: 11px; font-weight: 700;
-            padding: 3px 10px; border-radius: 20px; letter-spacing: 1px;
-        }
-        .back-btn {
-            background: var(--card2); border: 1px solid var(--border2);
-            color: var(--muted); padding: 7px 14px; border-radius: 8px;
-            cursor: pointer; font-family: 'Rajdhani', sans-serif;
-            font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-        .back-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-        /* TABS */
-        .tabs {
-            display: flex; gap: 6px; margin-bottom: 20px;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 10px; padding: 5px; overflow-x: auto;
-        }
-        .tab {
-            flex: 1; min-width: 100px; padding: 9px 14px; border-radius: 7px;
-            border: none; background: transparent; color: var(--muted);
-            font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
-            cursor: pointer; letter-spacing: 0.5px; white-space: nowrap;
-            transition: all 0.2s;
-        }
+        .topbar { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border2); border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; }
+        .logo-box { background: var(--gold); color: #000; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; padding: 5px 10px; border-radius: 6px; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 5px; overflow-x: auto; }
+        .tab { flex: 1; min-width: 100px; padding: 9px 14px; border-radius: 7px; border: none; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; }
         .tab.active { background: var(--gold); color: #000; }
-        .tab:hover:not(.active) { color: var(--gold); }
-
-        /* STAT CARDS */
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .stat-card {
-            background: var(--card); border: 1px solid var(--border2);
-            border-radius: 12px; padding: 14px 16px;
-        }
-        .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700; margin-top: 4px; color: var(--gold); }
-        .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-        /* PANELS */
+        .stat-card { background: var(--card); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 16px; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700; color: var(--gold); }
         .panel { display: none; }
         .panel.active { display: block; }
-
-        /* SECTION TITLE */
-        .sec-title {
-            font-size: 12px; color: var(--gold); font-weight: 700;
-            letter-spacing: 2px; text-transform: uppercase;
-            border-bottom: 1px solid var(--border2); padding-bottom: 8px; margin-bottom: 14px;
-        }
-
-        /* TABLE */
         .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead th {
-            background: var(--card2); color: var(--gold); font-weight: 700;
-            padding: 10px 12px; text-align: left; font-size: 11px;
-            letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
-        }
-        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: var(--card2); }
-        tbody td { padding: 10px 12px; color: var(--text); font-size: 13px; white-space: nowrap; }
-
-        /* BADGES */
-        .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
-        .badge-green { background: rgba(34,197,94,0.12); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
-        .badge-red { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-        .badge-gold { background: rgba(212,175,55,0.12); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
-
-        /* ACTION BUTTONS */
-        .action-btn {
-            padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
-            cursor: pointer; font-family: 'Rajdhani', sans-serif;
-            border: 1px solid; transition: all 0.2s; letter-spacing: 0.3px;
-        }
+        thead th { background: var(--card2); color: var(--gold); padding: 10px 12px; text-align: left; }
+        tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .action-btn { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid; transition: 0.2s; }
         .btn-block { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.3); }
-        .btn-block:hover { background: var(--danger); color: #fff; }
         .btn-unblock { background: rgba(34,197,94,0.1); color: var(--success); border-color: rgba(34,197,94,0.3); }
-        .btn-unblock:hover { background: var(--success); color: #000; }
-        .btn-gold { background: rgba(212,175,55,0.1); color: var(--gold); border-color: rgba(212,175,55,0.3); }
-        .btn-gold:hover { background: var(--gold); color: #000; }
-
-        /* LIMIT EDITOR */
-        .limit-input {
-            background: var(--bg); border: 1px solid var(--border2);
-            color: var(--gold); font-family: 'JetBrains Mono', monospace;
-            font-size: 13px; padding: 4px 8px; border-radius: 6px;
-            width: 60px; text-align: center; outline: none;
-        }
-        .limit-input:focus { border-color: var(--gold); }
-
-        /* SEARCH BAR */
-        .search-bar {
-            width: 100%; background: var(--card); border: 1px solid var(--border2);
-            color: var(--text); padding: 10px 14px; border-radius: 8px;
-            font-size: 13px; font-family: 'Rajdhani', sans-serif;
-            margin-bottom: 14px; outline: none;
-        }
-        .search-bar:focus { border-color: var(--gold); }
-
-        /* LOG CARDS */
-        .log-item {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 8px; padding: 10px 14px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 6px; font-size: 13px;
-        }
-        .log-id { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 12px; }
-        .log-email { color: var(--muted); font-size: 12px; }
-        .log-time { color: var(--muted); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
-
-        /* PENDING BOX */
-        .pending-box {
-            background: var(--card); border: 1px solid var(--border2);
-            border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 14px;
-        }
-        .pending-num { font-family: 'JetBrains Mono', monospace; font-size: 48px; font-weight: 700; color: var(--warn); }
-        .pending-label { color: var(--muted); font-size: 13px; margin-top: 4px; }
-
-        /* EXPORT BTN */
-        .export-btn {
-            background: var(--gold); color: #000; border: none;
-            padding: 10px 22px; border-radius: 8px; font-family: 'Rajdhani', sans-serif;
-            font-size: 14px; font-weight: 900; cursor: pointer; letter-spacing: 1px;
-            transition: transform 0.1s;
-        }
-        .export-btn:active { transform: scale(0.97); }
-
-        /* LOADER */
-        .spin { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* LOADING OVERLAY */
-        #loadingScreen {
-            position: fixed; inset: 0; background: var(--bg);
-            z-index: 999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 16px;
-        }
-        .loading-logo { font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: 700; color: var(--gold); }
-        .loading-bar { width: 200px; height: 3px; background: var(--border2); border-radius: 2px; overflow: hidden; }
-        .loading-fill { height: 100%; background: var(--gold); border-radius: 2px; animation: fill 1.5s ease forwards; }
-        @keyframes fill { from { width: 0; } to { width: 100%; } }
-        .loading-text { color: var(--muted); font-size: 13px; letter-spacing: 2px; }
-
-        /* TOAST */
-        #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--card2); border: 1px solid var(--gold);
-            color: var(--gold); padding: 10px 20px; border-radius: 8px;
-            font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
-            z-index: 9999; display: none; animation: fadeUp 0.3s ease;
-        }
-        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-
-        /* BLOCK SCREEN */
-        #blockScreen {
-            display: none; position: fixed; inset: 0; background: #000;
-            z-index: 9999; justify-content: center; align-items: center;
-            flex-direction: column; color: var(--danger); text-align: center; gap: 12px;
-        }
-
-        .refresh-btn {
-            background: transparent; border: 1px solid var(--border2);
-            color: var(--muted); padding: 5px 12px; border-radius: 6px;
-            cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 12px;
-            transition: all 0.2s; margin-left: 10px;
-        }
-        .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-        @media (max-width: 600px) {
-            .stat-value { font-size: 20px; }
-            .tabs { gap: 3px; }
-            .tab { font-size: 11px; padding: 8px 10px; }
-        }
+        #loadingScreen { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #blockScreen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: var(--danger); text-align: center; }
+        .limit-input { background: var(--bg); border: 1px solid var(--border2); color: var(--gold); width: 60px; text-align: center; border-radius: 6px; padding: 4px; }
     </style>
 </head>
 <body>
@@ -251,399 +49,147 @@
 </div>
 
 <div id="loadingScreen">
-    <div class="loading-logo">CT PRO</div>
-    <div class="loading-bar"><div class="loading-fill"></div></div>
-    <div class="loading-text">ADMIN PANEL LOADING...</div>
+    <div style="font-size: 32px; color: var(--gold); font-family: 'JetBrains Mono'; font-weight: bold;">CT PRO</div>
+    <p style="color: var(--muted); margin-top: 10px;">VERIFYING ADMIN STATUS...</p>
 </div>
 
-<div id="toast"></div>
-
 <div class="container" id="adminApp" style="display:none;">
-
-    <!-- TOP BAR -->
     <div class="topbar">
-        <div class="topbar-left">
-            <div class="logo-box">CT PRO</div>
-            <span class="admin-badge">👑 ADMIN</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; color:var(--muted);" id="adminEmail"></span>
-            <button class="back-btn" onclick="goBack()">← Main App</button>
-            <button class="back-btn" onclick="logout()" style="color:var(--danger); border-color:rgba(239,68,68,0.3);">Logout</button>
+        <div class="logo-box">CT PRO ADMIN</div>
+        <div style="display:flex; gap:8px;">
+            <button class="action-btn" onclick="location.href='/'">← Home</button>
+            <button class="action-btn btn-block" id="logoutBtn">Logout</button>
         </div>
     </div>
 
-    <!-- STAT CARDS -->
-    <div class="stat-grid" id="statGrid">
-        <div class="stat-card">
-            <div class="stat-label">Total Users</div>
-            <div class="stat-value" id="statUsers">--</div>
-            <div class="stat-sub">Registered accounts</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Active Users</div>
-            <div class="stat-value" id="statActive" style="color:var(--success);">--</div>
-            <div class="stat-sub">Not blocked</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Total Searches</div>
-            <div class="stat-value" id="statSearches" style="color:var(--info);">--</div>
-            <div class="stat-sub">All time logs</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Today Searches</div>
-            <div class="stat-value" id="statToday" style="color:var(--warn);">--</div>
-            <div class="stat-sub">Last 24 hours</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Pending IDs</div>
-            <div class="stat-value" id="statPending" style="color:var(--warn);">--</div>
-            <div class="stat-sub">GitHub se</div>
-        </div>
+    <div class="stat-grid">
+        <div class="stat-card"><div style="font-size: 11px;">TOTAL USERS</div><div class="stat-value" id="statUsers">--</div></div>
+        <div class="stat-card"><div style="font-size: 11px;">ACTIVE</div><div class="stat-value" id="statActive" style="color:var(--success);">--</div></div>
+        <div class="stat-card"><div style="font-size: 11px;">PENDING IDs</div><div class="stat-value" id="statPending" style="color:#f59e0b;">--</div></div>
     </div>
 
-    <!-- TABS -->
     <div class="tabs">
         <button class="tab active" onclick="switchTab('users')">👥 Users</button>
-        <button class="tab" onclick="switchTab('logs')">📋 Search Logs</button>
-        <button class="tab" onclick="switchTab('pending')">⏳ Pending IDs</button>
+        <button class="tab" onclick="switchTab('logs')">📋 Logs</button>
         <button class="tab" onclick="switchTab('export')">📥 Export</button>
     </div>
 
-    <!-- PANEL: USERS -->
     <div class="panel active" id="panel-users">
-        <div class="sec-title">User Management
-            <button class="refresh-btn" onclick="loadUsers()">↺ Refresh</button>
-        </div>
-        <input type="text" class="search-bar" id="userSearch" placeholder="🔍 Email se search karo..." oninput="filterUsers()">
         <div class="tbl-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Email</th>
-                        <th>Limit Left</th>
-                        <th>Status</th>
-                        <th>Device ID</th>
-                        <th>Last IP</th>
-                        <th>Limit Edit</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>Email</th><th>Limit</th><th>Status</th><th>Device</th><th>Action</th></tr>
                 </thead>
-                <tbody id="userTableBody">
-                    <tr><td colspan="8" style="text-align:center; color:var(--muted); padding:20px;"><span class="spin"></span> Loading...</td></tr>
-                </tbody>
+                <tbody id="userTableBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- PANEL: LOGS -->
     <div class="panel" id="panel-logs">
-        <div class="sec-title">Live Search Logs
-            <button class="refresh-btn" onclick="loadLogs()">↺ Refresh</button>
-        </div>
-        <input type="text" class="search-bar" id="logSearch" placeholder="🔍 Email ya Contract ID se search karo..." oninput="filterLogs()">
-        <div id="logList">
-            <div style="text-align:center; color:var(--muted); padding:30px;"><span class="spin"></span> Loading logs...</div>
-        </div>
+        <div id="logList"></div>
     </div>
 
-    <!-- PANEL: PENDING -->
-    <div class="panel" id="panel-pending">
-        <div class="sec-title">Pending IDs (GitHub se)
-            <button class="refresh-btn" onclick="loadPending()">↺ Refresh</button>
-        </div>
-        <div class="pending-box">
-            <div class="pending-num" id="pendingCount">--</div>
-            <div class="pending-label">IDs abhi bhi pending hain</div>
-        </div>
-        <div id="pendingList" style="max-height:400px; overflow-y:auto;"></div>
+    <div class="panel" id="panel-export" style="padding: 20px; text-align: center;">
+        <button class="action-btn" style="background:var(--gold); color:black; padding: 15px 30px; font-size: 16px;" onclick="exportUsers()">📥 DOWNLOAD USER LIST (CSV)</button>
     </div>
-
-    <!-- PANEL: EXPORT -->
-    <div class="panel" id="panel-export">
-        <div class="sec-title">Data Export</div>
-        <div style="display:grid; gap:14px;">
-            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-weight:700; margin-bottom:4px;">Search Logs Export</div>
-                    <div style="font-size:12px; color:var(--muted);">Poori search history CSV mein download karo</div>
-                </div>
-                <button class="export-btn" onclick="exportLogs()">📥 Download CSV</button>
-            </div>
-            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-weight:700; margin-bottom:4px;">Users Export</div>
-                    <div style="font-size:12px; color:var(--muted);">Sab users ki list CSV mein</div>
-                </div>
-                <button class="export-btn" onclick="exportUsers()">📥 Download CSV</button>
-            </div>
-            <div class="stat-card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-weight:700; margin-bottom:4px;">Pending IDs Export</div>
-                    <div style="font-size:12px; color:var(--muted);">GitHub se pending IDs ki list</div>
-                </div>
-                <button class="export-btn" onclick="exportPending()">📥 Download CSV</button>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <script is:inline>
-window.addEventListener('DOMContentLoaded', () => {
-
+window.addEventListener('DOMContentLoaded', async () => {
     const ADMIN_EMAIL = 'agurjeet768@gmail.com';
-    const SUPABASE_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
+    const SB_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
+    const SB_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
     const GITHUB_RAW = 'https://raw.githubusercontent.com/agurjeet768-tech/loan-dashboard/main/src/pages/pending_ids.json';
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Wait for Supabase to be defined
+    while (typeof window.supabase === 'undefined') { await new Promise(r => setTimeout(r, 100)); }
+    const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-    let allUsers = [];
-    let allLogs = [];
-    let allPending = {};
-
-    // ====== TOAST ======
-    function toast(msg, dur = 2500) {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, dur);
+    // Security Check
+    const { data: sess } = await sb.auth.getSession();
+    if (!sess?.session || sess.session.user.email !== ADMIN_EMAIL) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('blockScreen').style.display = 'flex';
+        return;
     }
 
-    // ====== LOGOUT / BACK ======
-    window.logout = async function() {
-        await sb.auth.signOut();
-        location.href = '/';
-    };
-    window.goBack = function() { location.href = '/'; };
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
 
-    // ====== TABS ======
-    window.switchTab = function(name) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        event.target.classList.add('active');
-        document.getElementById('panel-' + name).classList.add('active');
-        if (name === 'logs') loadLogs();
-        if (name === 'pending') loadPending();
-        if (name === 'export') { loadLogs(); loadPending(); }
-    };
-
-    // ====== LOAD STATS ======
-    async function loadStats() {
-        const { data: users } = await sb.from('ContractTrack').select('*');
-        const { data: logs } = await sb.from('search_logs').select('created_at');
-
+    // Functions
+    async function loadData() {
+        const { data: users } = await sb.from('ContractTrack').select('*').order('created_at', {ascending: false});
         if (users) {
             document.getElementById('statUsers').innerText = users.length;
             document.getElementById('statActive').innerText = users.filter(u => !u.is_blocked).length;
-        }
-        if (logs) {
-            document.getElementById('statSearches').innerText = logs.length;
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            const todayCount = logs.filter(l => new Date(l.created_at) >= today).length;
-            document.getElementById('statToday').innerText = todayCount;
+            renderUsers(users);
         }
 
-        // Pending count from GitHub
         try {
             const r = await fetch(GITHUB_RAW + '?t=' + Date.now());
-            const data = await r.json();
-            const count = Object.keys(data).length;
-            document.getElementById('statPending').innerText = count;
-            allPending = data;
-        } catch(e) {
-            document.getElementById('statPending').innerText = 'N/A';
-        }
+            const pData = await r.json();
+            document.getElementById('statPending').innerText = Object.keys(pData).length;
+        } catch(e) { document.getElementById('statPending').innerText = '0'; }
     }
 
-    // ====== LOAD USERS ======
-    window.loadUsers = async function() {
-        document.getElementById('userTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:20px;"><span class="spin"></span> Loading...</td></tr>`;
-        const { data } = await sb.from('ContractTrack').select('*').order('limit_left', { ascending: true });
-        if (data) {
-            allUsers = data;
-            renderUsers(data);
-        }
-    };
-
     function renderUsers(users) {
-        if (!users.length) {
-            document.getElementById('userTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:20px;">Koi user nahi mila</td></tr>`;
-            return;
-        }
-        document.getElementById('userTableBody').innerHTML = users.map((u, i) => `
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = users.map(u => `
             <tr>
-                <td style="color:var(--muted);">${i+1}</td>
-                <td style="font-weight:700;">${u.email || 'N/A'}</td>
-                <td><span class="badge ${u.limit_left > 5 ? 'badge-green' : u.limit_left > 0 ? 'badge-gold' : 'badge-red'}">${u.limit_left ?? 0}</span></td>
-                <td><span class="badge ${u.is_blocked ? 'badge-red' : 'badge-green'}">${u.is_blocked ? 'BLOCKED' : 'ACTIVE'}</span></td>
-                <td style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">${(u.device_id || 'N/A').substring(0,12)}...</td>
-                <td style="font-family:'JetBrains Mono',monospace; font-size:11px;">${u.last_ip || 'N/A'}</td>
+                <td style="font-weight:bold;">${u.email}</td>
+                <td><input type="number" class="limit-input" id="lim-${u.email}" value="${u.limit_left || 0}" onchange="updateLimit('${u.email}', this.value)"></td>
+                <td><span style="color:${u.is_blocked ? 'red':'green'}">${u.is_blocked ? 'BLOCKED':'ACTIVE'}</span></td>
+                <td style="font-size:10px; color:#666;">${(u.device_id || 'N/A').substring(0,10)}</td>
                 <td>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <input type="number" class="limit-input" id="lim-${u.email}" value="${u.limit_left ?? 0}" min="0" max="9999">
-                        <button class="action-btn btn-gold" onclick="updateLimit('${u.email}')">Set</button>
-                    </div>
-                </td>
-                <td>
-                    ${u.is_blocked
-                        ? `<button class="action-btn btn-unblock" onclick="toggleBlock('${u.email}', false)">Unblock</button>`
-                        : `<button class="action-btn btn-block" onclick="toggleBlock('${u.email}', true)">Block</button>`
-                    }
+                    <button class="action-btn ${u.is_blocked ? 'btn-unblock':'btn-block'}" onclick="toggleBlock('${u.email}', ${!u.is_blocked})">
+                        ${u.is_blocked ? 'Unblock':'Block'}
+                    </button>
                 </td>
             </tr>
         `).join('');
     }
 
-    window.filterUsers = function() {
-        const term = document.getElementById('userSearch').value.toLowerCase();
-        renderUsers(allUsers.filter(u => (u.email || '').toLowerCase().includes(term)));
+    window.updateLimit = async (email, val) => {
+        await sb.from('ContractTrack').update({ limit_left: parseInt(val) }).eq('email', email);
+        alert('Limit Updated for ' + email);
     };
 
-    window.updateLimit = async function(email) {
-        const newLimit = parseInt(document.getElementById('lim-' + email).value);
-        if (isNaN(newLimit) || newLimit < 0) { toast('❌ Valid number daalo!'); return; }
-        const { error } = await sb.from('ContractTrack').update({ limit_left: newLimit }).eq('email', email);
-        if (!error) {
-            toast('✅ Limit update ho gayi: ' + newLimit);
-            allUsers = allUsers.map(u => u.email === email ? {...u, limit_left: newLimit} : u);
-            renderUsers(allUsers);
-        } else { toast('❌ Error: ' + error.message); }
+    window.toggleBlock = async (email, status) => {
+        await sb.from('ContractTrack').update({ is_blocked: status }).eq('email', email);
+        loadData();
     };
 
-    window.toggleBlock = async function(email, block) {
-        const { error } = await sb.from('ContractTrack').update({ is_blocked: block }).eq('email', email);
-        if (!error) {
-            toast(block ? '🚫 User block ho gaya!' : '✅ User unblock ho gaya!');
-            allUsers = allUsers.map(u => u.email === email ? {...u, is_blocked: block} : u);
-            renderUsers(allUsers);
-            loadStats();
-        } else { toast('❌ Error: ' + error.message); }
+    window.switchTab = (name) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
+        if(name === 'logs') loadLogs();
     };
 
-    // ====== LOAD LOGS ======
-    window.loadLogs = async function() {
-        document.getElementById('logList').innerHTML = `<div style="text-align:center; color:var(--muted); padding:30px;"><span class="spin"></span> Loading logs...</div>`;
-        const { data } = await sb.from('search_logs').select('*').order('created_at', { ascending: false }).limit(200);
-        if (data) {
-            allLogs = data;
-            renderLogs(data);
-        }
-    };
-
-    function renderLogs(logs) {
-        if (!logs.length) {
-            document.getElementById('logList').innerHTML = `<div style="text-align:center; color:var(--muted); padding:30px;">Koi log nahi mila</div>`;
-            return;
-        }
-        document.getElementById('logList').innerHTML = logs.map(l => {
-            const d = new Date(l.created_at);
-            const timeStr = d.toLocaleDateString('en-IN') + ' ' + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-            return `
-            <div class="log-item">
-                <div>
-                    <div class="log-id">📄 ${l.search_query || 'N/A'}</div>
-                    <div class="log-email">${l.email || 'N/A'}</div>
-                </div>
-                <div class="log-time">${timeStr}</div>
-            </div>`;
-        }).join('');
+    async function loadLogs() {
+        const { data: logs } = await sb.from('search_logs').select('*').order('created_at', {ascending: false}).limit(100);
+        document.getElementById('logList').innerHTML = logs.map(l => `
+            <div style="background:var(--card); padding:10px; border-radius:8px; margin-bottom:5px; border-left:3px solid var(--gold); display:flex; justify-content:space-between;">
+                <div><b>${l.search_query}</b><br><small>${l.email}</small></div>
+                <div style="font-size:11px; color:var(--muted);">${new Date(l.created_at).toLocaleString('en-IN')}</div>
+            </div>
+        `).join('');
     }
 
-    window.filterLogs = function() {
-        const term = document.getElementById('logSearch').value.toLowerCase();
-        renderLogs(allLogs.filter(l =>
-            (l.email || '').toLowerCase().includes(term) ||
-            (l.search_query || '').toLowerCase().includes(term)
-        ));
-    };
-
-    // ====== LOAD PENDING ======
-    window.loadPending = async function() {
-        document.getElementById('pendingList').innerHTML = `<div style="text-align:center; color:var(--muted); padding:20px;"><span class="spin"></span> GitHub se load ho raha hai...</div>`;
-        try {
-            const r = await fetch(GITHUB_RAW + '?t=' + Date.now());
-            allPending = await r.json();
-            const keys = Object.keys(allPending);
-            document.getElementById('pendingCount').innerText = keys.length;
-            document.getElementById('statPending').innerText = keys.length;
-
-            if (!keys.length) {
-                document.getElementById('pendingList').innerHTML = `<div style="text-align:center; color:var(--success); padding:20px; font-weight:700;">✅ Koi ID pending nahi hai!</div>`;
-                return;
-            }
-            document.getElementById('pendingList').innerHTML = keys.map(id => `
-                <div class="log-item">
-                    <div class="log-id">⏳ ${id}</div>
-                    <span class="badge badge-gold">${allPending[id]}</span>
-                </div>
-            `).join('');
-        } catch(e) {
-            document.getElementById('pendingList').innerHTML = `<div style="text-align:center; color:var(--danger); padding:20px;">❌ GitHub se data load nahi hua</div>`;
-        }
-    };
-
-    // ====== EXPORT CSV ======
-    function downloadCSV(filename, rows, headers) {
-        const csv = [headers.join(','), ...rows.map(r => headers.map(h => `"${(r[h] || '').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+    window.exportUsers = async () => {
+        const { data } = await sb.from('ContractTrack').select('*');
+        const csv = "Email,Limit,Blocked\n" + data.map(u => `${u.email},${u.limit_left},${u.is_blocked}`).join("\n");
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = filename;
+        a.download = `CT_Users_${new Date().toISOString().slice(0,10)}.csv`;
         a.click();
-        toast('✅ ' + filename + ' download ho gaya!');
-    }
-
-    window.exportLogs = async function() {
-        const { data } = await sb.from('search_logs').select('*').order('created_at', { ascending: false });
-        if (data && data.length) {
-            downloadCSV('search_logs_' + new Date().toISOString().slice(0,10) + '.csv', data, ['email','search_query','device_id','created_at']);
-        } else { toast('❌ Koi log nahi mila!'); }
     };
 
-    window.exportUsers = async function() {
-        const { data } = await sb.from('ContractTrack').select('*');
-        if (data && data.length) {
-            downloadCSV('users_' + new Date().toISOString().slice(0,10) + '.csv', data, ['email','limit_left','is_blocked','device_id','last_ip']);
-        } else { toast('❌ Koi user nahi mila!'); }
-    };
+    document.getElementById('logoutBtn').onclick = async () => { await sb.auth.signOut(); location.href='/'; };
 
-    window.exportPending = function() {
-        const keys = Object.keys(allPending);
-        if (!keys.length) { toast('❌ Koi pending ID nahi hai!'); return; }
-        const rows = keys.map(k => ({ contract_id: k, status: allPending[k] }));
-        downloadCSV('pending_ids_' + new Date().toISOString().slice(0,10) + '.csv', rows, ['contract_id','status']);
-    };
-
-    // ====== SESSION CHECK ======
-    async function init() {
-        const { data } = await sb.auth.getSession();
-        if (!data || !data.session) {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('blockScreen').style.display = 'flex';
-            return;
-        }
-        const email = data.session.user.email;
-        if (email !== ADMIN_EMAIL) {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('blockScreen').style.display = 'flex';
-            return;
-        }
-        document.getElementById('adminEmail').innerText = email;
-
-        await loadStats();
-        await loadUsers();
-
-        setTimeout(() => {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('adminApp').style.display = 'block';
-        }, 1200);
-    }
-
-    init();
+    loadData();
 });
 </script>
 </body>
