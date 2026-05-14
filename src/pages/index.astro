@@ -8,9 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ContractTrack Pro</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://openfpcdn.io/fingerprintjs/v4"></script>
-
     <style is:global>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
         :root { --gold: #d4af37; --bg: #000; --card: #151515; --border: #222; --success: #22c55e; --red: #ff4444; }
@@ -182,325 +179,378 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://openfpcdn.io/fingerprintjs/v4"></script>
+
 <script is:inline>
-window.addEventListener('DOMContentLoaded', () => {
-
-    const ADMIN_EMAIL = 'agurjeet768@gmail.com'; 
-    const sb_client = window.supabase.createClient('https://ihcmbsvsfwakmmmymtxq.supabase.co', 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE');
-
-    let isLoginMode = true;
-    let visitorId = "";
-    
-    const btnFetch = document.getElementById('fetchBtn');
-    const inputContracts = document.getElementById('contractsInput');
-    const searchInput = document.getElementById('searchInput');
-    const dateFilter = document.getElementById('dateFilter');
-    
-    // Auth listeners
-    document.getElementById('authSubmitBtn').addEventListener('click', handleAuth);
-    document.getElementById('toggleBtn').addEventListener('click', toggleAuthMode);
-    document.getElementById('logoutBtn').addEventListener('click', () => { sb_client.auth.signOut().then(() => location.reload()); });
-    document.getElementById('logsBtn').addEventListener('click', () => { window.location.href = '/admin'; });
-
-    // Fingerprint Init
-    try {
-        FingerprintJS.load().then(fp => fp.get()).then(r => { 
-            visitorId = r.visitorId; 
-            if(document.getElementById('blockedDevId')) document.getElementById('blockedDevId').innerText = "Device: " + visitorId;
-        }).catch(() => { visitorId = "dev-" + Date.now(); });
-    } catch(e) { console.log("FP Error", e); }
-
-    function fetchIP() { return fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => "Private"); }
-    function showMsg(id, type, text) { var el = document.getElementById(id); el.className = 'msg ' + type; el.innerText = text; el.style.display = 'block'; }
-    function hideMsg(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; }
-
-    // ================== AUTH LOGIC ==================
-    function toggleAuthMode() {
-        isLoginMode = !isLoginMode;
-        hideMsg('authMsgBox');
-        document.getElementById('authMsg').innerText = isLoginMode ? "Security Verification" : "Create Account";
-        document.getElementById('authSubmitBtn').innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
-        document.getElementById('toggleText').innerText = isLoginMode ? "Naye user?" : "Already user?";
-        document.getElementById('toggleBtn').innerText = isLoginMode ? "Register Karein" : "Login Karein";
-    }
-
-    async function handleAuth() {
-        var email = document.getElementById('emailInput').value.trim();
-        var pass = document.getElementById('passInput').value.trim();
-        var btn = document.getElementById('authSubmitBtn');
-        if (!email || !pass) { showMsg('authMsgBox', 'error', "Dono details bhariye!"); return; }
-
-        hideMsg('authMsgBox'); btn.disabled = true; btn.innerText = "Processing...";
-
-        try {
-            if (isLoginMode) {
-                const { data, error } = await sb_client.auth.signInWithPassword({ email, password: pass });
-                if (error) { throw error; }
-                const ip = await fetchIP();
-                await sb_client.from('ContractTrack').update({ device_id: visitorId, last_ip: ip }).eq('email', email);
-                showMsg('authMsgBox', 'success', "Login successful!");
-                setTimeout(() => checkSession(), 800);
-            } else {
-                const { data, error } = await sb_client.auth.signUp({ email, password: pass });
-                if (error) { throw error; }
-                const ip = await fetchIP();
-                // Check if user exists in ContractTrack, if not insert
-                const { data: existing } = await sb_client.from('ContractTrack').select('email').eq('email', email).single();
-                if (!existing) {
-                    await sb_client.from('ContractTrack').insert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false });
-                } else {
-                    await sb_client.from('ContractTrack').update({ device_id: visitorId, last_ip: ip }).eq('email', email);
-                }
-                showMsg('authMsgBox', 'success', "Account ban gaya! Login karein.");
-                // Switch to login mode after successful registration
-                isLoginMode = true;
-                document.getElementById('authMsg').innerText = "Security Verification";
-                document.getElementById('authSubmitBtn').innerText = "ENTER SYSTEM";
-                document.getElementById('toggleText').innerText = "Naye user?";
-                document.getElementById('toggleBtn').innerText = "Register Karein";
-                document.getElementById('emailInput').value = "";
-                document.getElementById('passInput').value = "";
-            }
-        } catch (e) {
-            console.error("Auth Error:", e);
-            showMsg('authMsgBox', 'error', e.message.includes('invalid') ? "Galat details." : e.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
-        }
-    }
-
-    async function checkSession() {
-        const { data } = await sb_client.auth.getSession();
-        if (data && data.session) {
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block'; 
-            document.getElementById('dispEmail').innerText = data.session.user.email;
-            if (data.session.user.email === ADMIN_EMAIL) { document.getElementById('adminPanel').style.display = 'block'; }
-            
-            const dbRes = await sb_client.from('ContractTrack').select('*').eq('email', data.session.user.email).single();
-            if (dbRes.data) {
-                document.getElementById('dispLimit').innerText = dbRes.data.limit_left !== null ? dbRes.data.limit_left : 0;
-                if (dbRes.data.is_blocked) document.getElementById('blockScreen').style.display = 'flex';
-            } else {
-                // If user not in ContractTrack, add them
-                const ip = await fetchIP();
-                await sb_client.from('ContractTrack').insert({ email: data.session.user.email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false });
-                document.getElementById('dispLimit').innerText = 10;
-            }
+(function() {
+    // Wait for Supabase to be fully loaded
+    function waitForSupabase(callback) {
+        if (typeof supabase !== 'undefined') {
+            callback();
         } else {
-            document.getElementById('authSection').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
+            setTimeout(function() { waitForSupabase(callback); }, 100);
         }
     }
 
-    // ================== APP LOGIC & SMART DATA GETTER ==================
-    window.allRecordsData = [];
-    const cleanVal = (val) => (!val || String(val).toLowerCase() === 'null' || val === 'undefined') ? 'N/A' : val;
+    waitForSupabase(function() {
+        const ADMIN_EMAIL = 'agurjeet768@gmail.com'; 
+        const sb_client = supabase.createClient('https://ihcmbsvsfwakmmmymtxq.supabase.co', 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE');
 
-    // Helper to find key case-insensitively (Fix for 'undefined' issue)
-    const getVal = (obj, keyName) => {
-        if (!obj) return 'N/A';
-        const foundKey = Object.keys(obj).find(k => k.toLowerCase() === keyName.toLowerCase());
-        return foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null ? obj[foundKey] : 'N/A';
-    };
-
-    window.toggleCard = function(index) {
-        const detailsDiv = document.getElementById('det-' + index);
-        const iconSpan = document.getElementById('icon-' + index);
-        if (detailsDiv.style.display === 'none') { detailsDiv.style.display = 'block'; iconSpan.innerText = '▲'; } 
-        else { detailsDiv.style.display = 'none'; iconSpan.innerText = '▼'; }
-    };
-
-    window.shareCard = function(index) {
-        const item = window.allRecordsData[index];
-        const shareText = `*ContractTrack Details*\n👤 Name: ${getVal(item,'name')}\n📝 Contract: ${getVal(item,'contract')}\n📱 Mobile: ${getVal(item,'mobile')}\n💰 Amount Paid: ₹${getVal(item,'amount')}\n📅 Date: ${getVal(item,'date')}\n🧾 Receipt: ${getVal(item,'receipt_no')}`;
-        if (navigator.share) { navigator.share({ title: 'Details', text: shareText }).catch(err => console.log(err)); } 
-        else { navigator.clipboard.writeText(shareText); alert("Details copied!"); }
-    };
-
-    const formatFilterDate = (dateStr) => {
-        if(!dateStr) return "";
-        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-        const parts = dateStr.split('-');
-        return `${parts[2]}-${months[parseInt(parts[1])-1]}-${parts[0]}`;
-    };
-
-    const applyFilters = () => {
-        const term = searchInput.value.toLowerCase();
-        const selectedDate = formatFilterDate(dateFilter.value);
-        let visibleCount = 0, visibleAmt = 0;
+        let isLoginMode = true;
+        let visitorId = "";
         
-        requestAnimationFrame(() => {
-            window.allRecordsData.forEach((item, index) => {
-                const card = document.getElementById('card-wrapper-' + index);
+        const btnFetch = document.getElementById('fetchBtn');
+        const inputContracts = document.getElementById('contractsInput');
+        const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
+        
+        // Auth listeners
+        document.getElementById('authSubmitBtn').addEventListener('click', handleAuth);
+        document.getElementById('toggleBtn').addEventListener('click', toggleAuthMode);
+        document.getElementById('logoutBtn').addEventListener('click', function() { sb_client.auth.signOut().then(function() { location.reload(); }); });
+        document.getElementById('logsBtn').addEventListener('click', function() { window.location.href = '/admin'; });
+
+        // Fingerprint Init
+        if (typeof FingerprintJS !== 'undefined') {
+            FingerprintJS.load().then(function(fp) { return fp.get(); }).then(function(r) { 
+                visitorId = r.visitorId; 
+                var blockedDevId = document.getElementById('blockedDevId');
+                if(blockedDevId) blockedDevId.innerText = "Device: " + visitorId;
+            }).catch(function() { visitorId = "dev-" + Date.now(); });
+        } else {
+            visitorId = "dev-" + Date.now();
+        }
+
+        function fetchIP() { 
+            return fetch('https://api.ipify.org?format=json').then(function(r) { return r.json(); }).then(function(d) { return d.ip; }).catch(function() { return "Private"; }); 
+        }
+        
+        function showMsg(id, type, text) { 
+            var el = document.getElementById(id); 
+            el.className = 'msg ' + type; 
+            el.innerText = text; 
+            el.style.display = 'block'; 
+        }
+        
+        function hideMsg(id) { 
+            var el = document.getElementById(id); 
+            if (el) el.style.display = 'none'; 
+        }
+
+        // ================== AUTH LOGIC ==================
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            hideMsg('authMsgBox');
+            document.getElementById('authMsg').innerText = isLoginMode ? "Security Verification" : "Create Account";
+            document.getElementById('authSubmitBtn').innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
+            document.getElementById('toggleText').innerText = isLoginMode ? "Naye user?" : "Already user?";
+            document.getElementById('toggleBtn').innerText = isLoginMode ? "Register Karein" : "Login Karein";
+        }
+
+        async function handleAuth() {
+            var email = document.getElementById('emailInput').value.trim();
+            var pass = document.getElementById('passInput').value.trim();
+            var btn = document.getElementById('authSubmitBtn');
+            if (!email || !pass) { showMsg('authMsgBox', 'error', "Dono details bhariye!"); return; }
+
+            hideMsg('authMsgBox'); 
+            btn.disabled = true; 
+            btn.innerText = "Processing...";
+
+            try {
+                if (isLoginMode) {
+                    var { data, error } = await sb_client.auth.signInWithPassword({ email: email, password: pass });
+                    if (error) { throw error; }
+                    var ip = await fetchIP();
+                    await sb_client.from('ContractTrack').update({ device_id: visitorId, last_ip: ip }).eq('email', email);
+                    showMsg('authMsgBox', 'success', "Login successful!");
+                    setTimeout(function() { checkSession(); }, 800);
+                } else {
+                    var { data, error } = await sb_client.auth.signUp({ email: email, password: pass });
+                    if (error) { throw error; }
+                    var ip = await fetchIP();
+                    // Check if user exists in ContractTrack, if not insert
+                    var { data: existing } = await sb_client.from('ContractTrack').select('email').eq('email', email).single();
+                    if (!existing) {
+                        await sb_client.from('ContractTrack').insert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false });
+                    } else {
+                        await sb_client.from('ContractTrack').update({ device_id: visitorId, last_ip: ip }).eq('email', email);
+                    }
+                    showMsg('authMsgBox', 'success', "Account ban gaya! Ab login karein.");
+                    // Switch to login mode after successful registration
+                    isLoginMode = true;
+                    document.getElementById('authMsg').innerText = "Security Verification";
+                    document.getElementById('authSubmitBtn').innerText = "ENTER SYSTEM";
+                    document.getElementById('toggleText').innerText = "Naye user?";
+                    document.getElementById('toggleBtn').innerText = "Register Karein";
+                    document.getElementById('emailInput').value = "";
+                    document.getElementById('passInput').value = "";
+                }
+            } catch (e) {
+                console.error("Auth Error:", e);
+                showMsg('authMsgBox', 'error', e.message.includes('invalid') ? "Galat details." : e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
+            }
+        }
+
+        async function checkSession() {
+            var { data } = await sb_client.auth.getSession();
+            if (data && data.session) {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block'; 
+                document.getElementById('dispEmail').innerText = data.session.user.email;
+                if (data.session.user.email === ADMIN_EMAIL) { document.getElementById('adminPanel').style.display = 'block'; }
+                
+                var dbRes = await sb_client.from('ContractTrack').select('*').eq('email', data.session.user.email).single();
+                if (dbRes.data) {
+                    document.getElementById('dispLimit').innerText = dbRes.data.limit_left !== null ? dbRes.data.limit_left : 0;
+                    if (dbRes.data.is_blocked) document.getElementById('blockScreen').style.display = 'flex';
+                } else {
+                    // If user not in ContractTrack, add them
+                    var ip = await fetchIP();
+                    await sb_client.from('ContractTrack').insert({ email: data.session.user.email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false });
+                    document.getElementById('dispLimit').innerText = 10;
+                }
+            } else {
+                document.getElementById('authSection').style.display = 'block';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+        }
+
+        // ================== APP LOGIC & SMART DATA GETTER ==================
+        window.allRecordsData = [];
+        
+        function cleanVal(val) {
+            return (!val || String(val).toLowerCase() === 'null' || val === 'undefined') ? 'N/A' : val;
+        }
+
+        // Helper to find key case-insensitively
+        function getVal(obj, keyName) {
+            if (!obj) return 'N/A';
+            var foundKey = Object.keys(obj).find(function(k) { return k.toLowerCase() === keyName.toLowerCase(); });
+            return foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null ? obj[foundKey] : 'N/A';
+        }
+
+        window.toggleCard = function(index) {
+            var detailsDiv = document.getElementById('det-' + index);
+            var iconSpan = document.getElementById('icon-' + index);
+            if (detailsDiv.style.display === 'none') { 
+                detailsDiv.style.display = 'block'; 
+                iconSpan.innerText = '▲'; 
+            } else { 
+                detailsDiv.style.display = 'none'; 
+                iconSpan.innerText = '▼'; 
+            }
+        };
+
+        window.shareCard = function(index) {
+            var item = window.allRecordsData[index];
+            var shareText = '*ContractTrack Details*\n👤 Name: ' + getVal(item,'name') + '\n📝 Contract: ' + getVal(item,'contract') + '\n📱 Mobile: ' + getVal(item,'mobile') + '\n💰 Amount Paid: ₹' + getVal(item,'amount') + '\n📅 Date: ' + getVal(item,'date') + '\n🧾 Receipt: ' + getVal(item,'receipt_no');
+            if (navigator.share) { 
+                navigator.share({ title: 'Details', text: shareText }).catch(function(err) { console.log(err); }); 
+            } else { 
+                navigator.clipboard.writeText(shareText); 
+                alert("Details copied!"); 
+            }
+        };
+
+        function formatFilterDate(dateStr) {
+            if(!dateStr) return "";
+            var months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            var parts = dateStr.split('-');
+            return parts[2] + '-' + months[parseInt(parts[1])-1] + '-' + parts[0];
+        }
+
+        function applyFilters() {
+            var term = searchInput.value.toLowerCase();
+            var selectedDate = formatFilterDate(dateFilter.value);
+            var visibleCount = 0, visibleAmt = 0;
+            
+            window.allRecordsData.forEach(function(item, index) {
+                var card = document.getElementById('card-wrapper-' + index);
                 if (!card) return;
-                const matchesSearch = card.innerText.toLowerCase().includes(term);
-                const itemDate = getVal(item, 'date');
-                const matchesDate = selectedDate === "" || itemDate === selectedDate;
+                var matchesSearch = card.innerText.toLowerCase().includes(term);
+                var itemDate = getVal(item, 'date');
+                var matchesDate = selectedDate === "" || itemDate === selectedDate;
 
                 if (matchesSearch && matchesDate) {
-                    card.style.display = 'block'; visibleCount++;
-                    const amtRaw = getVal(item, 'amount');
+                    card.style.display = 'block'; 
+                    visibleCount++;
+                    var amtRaw = getVal(item, 'amount');
                     visibleAmt += parseFloat(String(amtRaw).replace(/,/g, '')) || 0;
-                } else { card.style.display = 'none'; }
+                } else { 
+                    card.style.display = 'none'; 
+                }
             });
             document.getElementById('tCount').innerText = visibleCount;
             document.getElementById('tAmt').innerText = "₹" + visibleAmt.toLocaleString('en-IN');
-        });
-    };
+        }
 
-    searchInput.addEventListener('input', applyFilters);
-    dateFilter.addEventListener('change', applyFilters);
+        if(searchInput) searchInput.addEventListener('input', applyFilters);
+        if(dateFilter) dateFilter.addEventListener('change', applyFilters);
 
-    // ================== MAIN FETCH BUTTON ==================
-    btnFetch.onclick = async function() {
-        const val = inputContracts.value.trim();
-        if(!val) { alert("Bhai, pehle contract number toh daalo box mein!"); return; }
-        
-        btnFetch.disabled = true;
-        btnFetch.innerText = "CHECKING SECURE CONNECTION...";
-        document.getElementById('loader').style.display = 'block';
+        // ================== MAIN FETCH BUTTON ==================
+        if(btnFetch) {
+            btnFetch.onclick = async function() {
+                var val = inputContracts.value.trim();
+                if(!val) { alert("Bhai, pehle contract number toh daalo box mein!"); return; }
+                
+                btnFetch.disabled = true;
+                btnFetch.innerText = "CHECKING SECURE CONNECTION...";
+                document.getElementById('loader').style.display = 'block';
 
-        try {
-            const rawArray = val.split('\n').map(n => n.trim()).filter(n => n);
-            const uniqueArray = [...new Set(rawArray)]; 
-            const requiredLimit = uniqueArray.length;
+                try {
+                    var rawArray = val.split('\n').map(function(n) { return n.trim(); }).filter(function(n) { return n; });
+                    var uniqueArray = [...new Set(rawArray)]; 
+                    var requiredLimit = uniqueArray.length;
 
-            const { data: sessionData } = await sb_client.auth.getSession();
-            if (!sessionData || !sessionData.session) throw new Error("Session Error! Login karein."); 
-            
-            const email = sessionData.session.user.email;
-            const { data: user, error: userErr } = await sb_client.from('ContractTrack').select('*').eq('email', email).single();
-            
-            if (userErr || !user) throw new Error("Database error!");
-            if (user.is_blocked) { document.getElementById('blockScreen').style.display = 'flex'; return; }
-            
-            let currentLimit = user.limit_left !== null ? parseInt(user.limit_left) : 0;
-            if (currentLimit < requiredLimit) throw new Error(`Limit khatam! Aapko ${requiredLimit} limit chahiye, bachi hai: ${currentLimit}`);
+                    var sessionData = await sb_client.auth.getSession();
+                    if (!sessionData || !sessionData.session) throw new Error("Session Error! Login karein."); 
+                    
+                    var email = sessionData.session.user.email;
+                    var userRes = await sb_client.from('ContractTrack').select('*').eq('email', email).single();
+                    var user = userRes.data;
+                    
+                    if (userRes.error || !user) throw new Error("Database error!");
+                    if (user.is_blocked) { document.getElementById('blockScreen').style.display = 'flex'; return; }
+                    
+                    var currentLimit = user.limit_left !== null ? parseInt(user.limit_left) : 0;
+                    if (currentLimit < requiredLimit) throw new Error("Limit khatam! Aapko " + requiredLimit + " limit chahiye, bachi hai: " + currentLimit);
 
-            btnFetch.innerText = "FETCHING API DATA...";
-            document.getElementById('todayResults').innerHTML = '';
-            document.getElementById('otherResults').innerHTML = '';
-            document.getElementById('todaySection').style.display = 'none';
-            document.getElementById('otherSection').style.display = 'none';
-            document.getElementById('fetchReport').style.display = 'none';
+                    btnFetch.innerText = "FETCHING API DATA...";
+                    document.getElementById('todayResults').innerHTML = '';
+                    document.getElementById('otherResults').innerHTML = '';
+                    document.getElementById('todaySection').style.display = 'none';
+                    document.getElementById('otherSection').style.display = 'none';
+                    document.getElementById('fetchReport').style.display = 'none';
 
-            const list = uniqueArray.join(',');
-            const r = await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${list}`);
-            if (!r.ok) throw new Error(`API Server Down (Status: ${r.status})`);
-            
-            const data = await r.json();
-            
-            console.log("API SE YE DATA AAYA HAI:", data);
-            
-            window.allRecordsData = data; 
-            const newLimit = currentLimit - requiredLimit;
-            document.getElementById('dispLimit').innerText = newLimit;
+                    var list = uniqueArray.join(',');
+                    var r = await fetch('https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=' + list);
+                    if (!r.ok) throw new Error("API Server Down (Status: " + r.status + ")");
+                    
+                    var data = await r.json();
+                    
+                    console.log("API SE YE DATA AAYA HAI:", data);
+                    
+                    window.allRecordsData = data; 
+                    var newLimit = currentLimit - requiredLimit;
+                    document.getElementById('dispLimit').innerText = newLimit;
 
-            try {
-                const logEntries = uniqueArray.map(id => ({ email: email, search_query: id, device_id: visitorId }));
-                await sb_client.from('search_logs').insert(logEntries);
-                await sb_client.from('ContractTrack').update({ limit_left: newLimit }).eq('email', email);
-            } catch (dbErr) { console.log("Log error", dbErr); }
+                    try {
+                        var logEntries = uniqueArray.map(function(id) { return { email: email, search_query: id, device_id: visitorId }; });
+                        await sb_client.from('search_logs').insert(logEntries);
+                        await sb_client.from('ContractTrack').update({ limit_left: newLimit }).eq('email', email);
+                    } catch (dbErr) { console.log("Log error", dbErr); }
 
-            const totalRequested = uniqueArray.length;
-            const totalFetched = data.length;
-            const failedCount = totalRequested - totalFetched;
-            
-            const fetchedIds = data.map(item => String(getVal(item, 'contract')).trim());
-            const failedIds = uniqueArray.filter(id => !fetchedIds.includes(String(id).trim()));
+                    var totalRequested = uniqueArray.length;
+                    var totalFetched = data.length;
+                    var failedCount = totalRequested - totalFetched;
+                    
+                    var fetchedIds = data.map(function(item) { return String(getVal(item, 'contract')).trim(); });
+                    var failedIds = uniqueArray.filter(function(id) { return !fetchedIds.includes(String(id).trim()); });
 
-            document.getElementById('repTotal').innerText = totalRequested;
-            document.getElementById('repSuccess').innerText = totalFetched;
-            document.getElementById('repFailed').innerText = failedCount;
+                    document.getElementById('repTotal').innerText = totalRequested;
+                    document.getElementById('repSuccess').innerText = totalFetched;
+                    document.getElementById('repFailed').innerText = failedCount;
 
-            const failedListContainer = document.getElementById('failedListContainer');
-            if (failedCount > 0) {
-                failedListContainer.style.display = 'block';
-                document.getElementById('failedList').innerHTML = failedIds.map(id => `<span class="failed-badge">${id}</span>`).join('');
-            } else { failedListContainer.style.display = 'none'; }
-            
-            document.getElementById('fetchReport').style.display = 'block';
-            
-            const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase().replace(/ /g, '-');
-            let todayHtml = ''; let otherHtml = '';
+                    var failedListContainer = document.getElementById('failedListContainer');
+                    if (failedCount > 0) {
+                        failedListContainer.style.display = 'block';
+                        document.getElementById('failedList').innerHTML = failedIds.map(function(id) { return '<span class="failed-badge">' + id + '</span>'; }).join('');
+                    } else { 
+                        failedListContainer.style.display = 'none'; 
+                    }
+                    
+                    document.getElementById('fetchReport').style.display = 'block';
+                    
+                    var todayDate = new Date();
+                    var today = todayDate.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase().replace(/ /g, '-');
+                    var todayHtml = ''; 
+                    var otherHtml = '';
 
-            data.forEach((item, i) => {
-                const itemName = getVal(item, 'name');
-                const itemContract = getVal(item, 'contract');
-                const itemDate = getVal(item, 'date');
-                const itemAmount = getVal(item, 'amount');
-                const itemMobile = getVal(item, 'mobile');
-                const itemEmi = getVal(item, 'emi_amount');
-                const itemOverdue = getVal(item, 'overdue');
-                const itemGuName = getVal(item, 'gu_name');
-                const itemGuMobile = getVal(item, 'gu_mobile');
-                const itemCoName = getVal(item, 'co_name');
-                const itemCoMobile = getVal(item, 'co_mobile');
-                const itemReceipt = getVal(item, 'receipt_no');
-                const itemInstr = getVal(item, 'instr');
+                    data.forEach(function(item, i) {
+                        var itemName = getVal(item, 'name');
+                        var itemContract = getVal(item, 'contract');
+                        var itemDate = getVal(item, 'date');
+                        var itemAmount = getVal(item, 'amount');
+                        var itemMobile = getVal(item, 'mobile');
+                        var itemEmi = getVal(item, 'emi_amount');
+                        var itemOverdue = getVal(item, 'overdue');
+                        var itemGuName = getVal(item, 'gu_name');
+                        var itemGuMobile = getVal(item, 'gu_mobile');
+                        var itemCoName = getVal(item, 'co_name');
+                        var itemCoMobile = getVal(item, 'co_mobile');
+                        var itemReceipt = getVal(item, 'receipt_no');
+                        var itemInstr = getVal(item, 'instr');
 
-                const isToday = itemDate === today;
-                const emiAmountText = itemEmi !== 'N/A' ? `₹${itemEmi}` : 'N/A';
-                const overdueText = cleanVal(itemOverdue) !== 'N/A' ? `₹${itemOverdue}` : '0';
-                const dateDisplay = isToday ? '<span class="today-badge">TODAY</span>' : `<div class="date-text">${itemDate !== 'N/A' ? itemDate : ''}</div>`;
+                        var isToday = itemDate === today;
+                        var emiAmountText = itemEmi !== 'N/A' ? '₹' + itemEmi : 'N/A';
+                        var overdueText = cleanVal(itemOverdue) !== 'N/A' ? '₹' + itemOverdue : '0';
+                        var dateDisplay = isToday ? '<span class="today-badge">TODAY</span>' : '<div class="date-text">' + (itemDate !== 'N/A' ? itemDate : '') + '</div>';
 
-                const cardHTML = `
-                    <div class="item-card" id="card-wrapper-${i}">
-                        <div class="item-main" onclick="toggleCard(${i})">
-                            <div>
-                                <div style="font-weight:bold; font-size: 15px;">${itemName}</div>
-                                <div style="color:var(--gold); font-size: 12px; margin-top: 4px; font-weight:bold;">${itemContract}</div>
-                            </div>
-                            <div style="text-align:center;">${dateDisplay}</div>
-                            <div style="text-align:right;">
-                                <div style="color:#d4af37; font-weight:bold; font-size: 17px;">₹${itemAmount}</div>
-                                <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
-                                    Details <span id="icon-${i}" class="toggle-icon">▼</span>
+                        var cardHTML = `
+                            <div class="item-card" id="card-wrapper-${i}">
+                                <div class="item-main" onclick="toggleCard(${i})">
+                                    <div>
+                                        <div style="font-weight:bold; font-size: 15px;">${itemName}</div>
+                                        <div style="color:var(--gold); font-size: 12px; margin-top: 4px; font-weight:bold;">${itemContract}</div>
+                                    </div>
+                                    <div style="text-align:center;">${dateDisplay}</div>
+                                    <div style="text-align:right;">
+                                        <div style="color:#d4af37; font-weight:bold; font-size: 17px;">₹${itemAmount}</div>
+                                        <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
+                                            Details <span id="icon-${i}" class="toggle-icon">▼</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="det-${i}" class="deep-details" style="display: none;">
+                                    <div class="d-row"><span>Cust Mobile:</span> <b>${itemMobile}</b></div>
+                                    <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
+                                    <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
+                                    <div class="d-row"><span>Guarantor:</span> <b>${itemGuName}</b></div>
+                                    <div class="d-row"><span>GU Mobile:</span> <b>${itemGuMobile}</b></div>
+                                    <div class="d-row"><span>Co-Applicant:</span> <b>${itemCoName}</b></div>
+                                    <div class="d-row"><span>Co-App Mobile:</span> <b>${itemCoMobile}</b></div>
+                                    <div class="d-row"><span>Receipt No:</span> <b style="color:#aaa;">${itemReceipt}</b></div>
+                                    <div class="d-row"><span>Type:</span> <b style="color:#aaa;">${itemInstr}</b></div>
+                                    <button class="share-btn" onclick="shareCard(${i})">🔗 Share Details</button>
                                 </div>
                             </div>
-                        </div>
-                        <div id="det-${i}" class="deep-details" style="display: none;">
-                            <div class="d-row"><span>Cust Mobile:</span> <b>${itemMobile}</b></div>
-                            <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
-                            <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
-                            <div class="d-row"><span>Guarantor:</span> <b>${itemGuName}</b></div>
-                            <div class="d-row"><span>GU Mobile:</span> <b>${itemGuMobile}</b></div>
-                            <div class="d-row"><span>Co-Applicant:</span> <b>${itemCoName}</b></div>
-                            <div class="d-row"><span>Co-App Mobile:</span> <b>${itemCoMobile}</b></div>
-                            <div class="d-row"><span>Receipt No:</span> <b style="color:#aaa;">${itemReceipt}</b></div>
-                            <div class="d-row"><span>Type:</span> <b style="color:#aaa;">${itemInstr}</b></div>
-                            <button class="share-btn" onclick="shareCard(${i})">🔗 Share Details</button>
-                        </div>
-                    </div>
-                `;
-                if (isToday) todayHtml += cardHTML; else otherHtml += cardHTML;
-            });
+                        `;
+                        if (isToday) todayHtml += cardHTML; 
+                        else otherHtml += cardHTML;
+                    });
 
-            if (todayHtml === '') todayHtml = `<div style="text-align:center; padding:15px; color:#aaa; font-style:italic; background: var(--card); border-radius: 10px; border: 1px dashed var(--gold); margin-bottom:12px; font-size: 14px;">⏳ Abhi tak aaj ki date mein kisi contract par payment nahi aaya hai.</div>`;
+                    if (todayHtml === '') {
+                        todayHtml = '<div style="text-align:center; padding:15px; color:#aaa; font-style:italic; background: var(--card); border-radius: 10px; border: 1px dashed var(--gold); margin-bottom:12px; font-size: 14px;">⏳ Abhi tak aaj ki date mein kisi contract par payment nahi aaya hai.</div>';
+                    }
 
-            document.getElementById('todayResults').innerHTML = todayHtml;
-            document.getElementById('otherResults').innerHTML = otherHtml;
+                    document.getElementById('todayResults').innerHTML = todayHtml;
+                    document.getElementById('otherResults').innerHTML = otherHtml;
 
-            document.getElementById('todaySection').style.display = 'block';
-            if (otherHtml !== '') document.getElementById('otherSection').style.display = 'block';
-            
-            applyFilters();
+                    document.getElementById('todaySection').style.display = 'block';
+                    if (otherHtml !== '') document.getElementById('otherSection').style.display = 'block';
+                    
+                    applyFilters();
 
-        } catch (err) {
-            console.error("Fetch Error:", err);
-            alert("Error: " + err.message);
-        } finally {
-            document.getElementById('loader').style.display = 'none';
-            btnFetch.disabled = false;
-            btnFetch.innerText = "FETCH ALL RECEIPTS";
+                } catch (err) {
+                    console.error("Fetch Error:", err);
+                    alert("Error: " + err.message);
+                } finally {
+                    document.getElementById('loader').style.display = 'none';
+                    btnFetch.disabled = false;
+                    btnFetch.innerText = "FETCH ALL RECEIPTS";
+                }
+            };
         }
-    };
 
-    // Run session check on load
-    checkSession();
-});
+        // Run session check on load
+        checkSession();
+    });
+})();
 </script>
 </body>
 </html>
