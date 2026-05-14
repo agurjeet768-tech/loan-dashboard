@@ -1,5 +1,5 @@
 ---
-// CT PRO - Working with Fixed Auth
+// CT PRO - Fixed Redirect Issue
 ---
 <!DOCTYPE html>
 <html lang="hi">
@@ -43,6 +43,8 @@
         .report-box { background: #0c0c0c; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: none; }
         .failed-badge { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 3px 6px; border-radius: 4px; font-size: 11px; display: inline-block; margin: 2px; }
         #blockScreen { display: none; position: fixed; inset: 0; background: black; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: var(--red); text-align: center; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #000; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -131,14 +133,16 @@ function showMessage(elementId, message, type) {
         el.textContent = message;
         el.className = 'msg ' + type;
         el.style.display = 'block';
-        setTimeout(() => { el.style.display = 'none'; }, 3000);
+        setTimeout(() => { 
+            if (el) el.style.display = 'none'; 
+        }, 3000);
     }
 }
 
 function getValue(obj, key) {
     if (!obj) return 'N/A';
     const foundKey = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
-    if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null) {
+    if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null && obj[foundKey] !== 'undefined') {
         return obj[foundKey];
     }
     return 'N/A';
@@ -152,12 +156,6 @@ function formatDateForFilter(dateStr) {
         return `${parts[2]}-${months[parseInt(parts[1]) - 1]}-${parts[0]}`;
     }
     return dateStr;
-}
-
-// ============ CLEAR OLD SESSION ============
-function clearOldSession() {
-    localStorage.removeItem('sb-ihcmbsvsfwakmmmymtxq-auth-token');
-    sessionStorage.clear();
 }
 
 // ============ LOAD SUPABASE ============
@@ -175,43 +173,36 @@ function loadSupabase() {
     });
 }
 
-// ============ INITIALIZE ============
-async function init() {
-    clearOldSession(); // Clear any invalid tokens
-    
+// ============ CHECK AUTH ON PAGE LOAD ============
+async function checkAuthAndRedirect() {
     try {
         await loadSupabase();
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        await checkAuth();
-        setupEventListeners();
-    } catch (error) {
-        console.error('Init error:', error);
-        document.getElementById('authMessage').textContent = 'Error loading app. Refresh page.';
-    }
-}
-
-// ============ AUTH CHECK ============
-async function checkAuth() {
-    try {
+        
+        // Get current session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
             console.error('Session error:', error);
-            await supabase.auth.signOut();
             showAuthSection();
             return;
         }
         
         if (data?.session) {
+            // User is logged in - show main app
             currentUser = data.session.user;
             await loadUserData();
             showMainApp();
+            setupAppEventListeners();
         } else {
+            // No session - show login
             showAuthSection();
+            setupAuthEventListeners();
         }
     } catch (error) {
-        console.error('Auth check error:', error);
+        console.error('Init error:', error);
         showAuthSection();
+        setupAuthEventListeners();
     }
 }
 
@@ -247,26 +238,42 @@ async function loadUserData() {
 
 // ============ UI FUNCTIONS ============
 function showAuthSection() {
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('blockScreen').style.display = 'none';
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
+    
+    if (authSection) authSection.style.display = 'block';
+    if (mainApp) mainApp.style.display = 'none';
+    if (blockScreen) blockScreen.style.display = 'none';
 }
 
 function showMainApp() {
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('blockScreen').style.display = 'none';
-    document.getElementById('userEmail').innerText = currentUser.email;
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
     
-    if (currentUser.email === ADMIN_EMAIL) {
-        document.getElementById('adminPanel').style.display = 'block';
+    if (authSection) authSection.style.display = 'none';
+    if (mainApp) mainApp.style.display = 'block';
+    if (blockScreen) blockScreen.style.display = 'none';
+    
+    if (currentUser) {
+        document.getElementById('userEmail').innerText = currentUser.email;
+        
+        if (currentUser.email === ADMIN_EMAIL) {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel) adminPanel.style.display = 'block';
+        }
     }
 }
 
 function showBlockScreen() {
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('blockScreen').style.display = 'flex';
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
+    
+    if (authSection) authSection.style.display = 'none';
+    if (mainApp) mainApp.style.display = 'none';
+    if (blockScreen) blockScreen.style.display = 'flex';
 }
 
 // ============ AUTH HANDLER ============
@@ -281,7 +288,7 @@ async function handleAuth() {
     }
     
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
     
     try {
         let result;
@@ -295,37 +302,55 @@ async function handleAuth() {
                 await supabase
                     .from('ContractTrack')
                     .insert({ email, limit_left: 10, is_blocked: false });
-                showMessage('authMessage', 'Account created! Please login.', 'success');
+                showMessage('authMessage', '✅ Account created! Please login.', 'success');
                 // Switch to login mode
                 isLoginMode = true;
-                document.getElementById('authSubmitBtn').textContent = 'LOGIN';
+                document.getElementById('authSubmitBtn').innerHTML = 'LOGIN';
                 document.getElementById('authModeText').textContent = 'Login to your account';
                 document.getElementById('toggleText').textContent = 'New user?';
                 document.getElementById('toggleAuthBtn').textContent = 'Create Account';
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
                 submitBtn.disabled = false;
+                submitBtn.innerHTML = 'LOGIN';
                 return;
             }
         }
         
         if (result.error) throw result.error;
         
-        if (isLoginMode) {
-            showMessage('authMessage', 'Login successful!', 'success');
-            setTimeout(() => location.reload(), 1000);
+        if (isLoginMode && result.data?.session) {
+            // Login successful - update current user and show main app
+            currentUser = result.data.session.user;
+            showMessage('authMessage', '✅ Login successful! Redirecting...', 'success');
+            
+            // Load user data and show main app
+            await loadUserData();
+            
+            // Small delay then show main app
+            setTimeout(() => {
+                showMainApp();
+                setupAppEventListeners();
+            }, 500);
         }
         
     } catch (error) {
         console.error('Auth error:', error);
         let errorMsg = error.message;
-        if (errorMsg.includes('Invalid login')) errorMsg = 'Wrong email or password';
-        if (errorMsg.includes('Email not confirmed')) errorMsg = 'Please confirm your email';
+        if (errorMsg.includes('Invalid login')) errorMsg = '❌ Wrong email or password';
+        if (errorMsg.includes('Email not confirmed')) errorMsg = '❌ Please confirm your email';
+        if (errorMsg.includes('User already registered')) errorMsg = '❌ Email already exists. Please login.';
         showMessage('authMessage', errorMsg, 'error');
-    } finally {
         submitBtn.disabled = false;
-        if (isLoginMode) submitBtn.textContent = 'LOGIN';
-        else submitBtn.textContent = 'REGISTER';
+        submitBtn.innerHTML = isLoginMode ? 'LOGIN' : 'REGISTER';
+    } finally {
+        if (submitBtn.disabled && !isLoginMode) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'REGISTER';
+        } else if (submitBtn.disabled && isLoginMode && !currentUser) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'LOGIN';
+        }
     }
 }
 
@@ -337,21 +362,23 @@ function toggleAuthMode() {
     const toggleBtn = document.getElementById('toggleAuthBtn');
     
     if (isLoginMode) {
-        submitBtn.textContent = 'LOGIN';
+        submitBtn.innerHTML = 'LOGIN';
         modeText.textContent = 'Login to your account';
         toggleText.textContent = 'New user?';
         toggleBtn.textContent = 'Create Account';
     } else {
-        submitBtn.textContent = 'REGISTER';
+        submitBtn.innerHTML = 'REGISTER';
         modeText.textContent = 'Create new account';
         toggleText.textContent = 'Already have account?';
         toggleBtn.textContent = 'Login';
     }
-    document.getElementById('authMessage').style.display = 'none';
+    const msgDiv = document.getElementById('authMessage');
+    if (msgDiv) msgDiv.style.display = 'none';
 }
 
 async function handleLogout() {
     await supabase.auth.signOut();
+    currentUser = null;
     location.reload();
 }
 
@@ -387,6 +414,7 @@ async function fetchData() {
     const reportBox = document.getElementById('reportBox');
     
     fetchBtn.disabled = true;
+    fetchBtn.innerHTML = '<span class="loading-spinner"></span> FETCHING...';
     loader.style.display = 'block';
     reportBox.style.display = 'none';
     
@@ -435,6 +463,7 @@ async function fetchData() {
         alert('Error: ' + error.message);
     } finally {
         fetchBtn.disabled = false;
+        fetchBtn.innerHTML = '🔍 FETCH ALL RECEIPTS';
         loader.style.display = 'none';
     }
 }
@@ -460,22 +489,22 @@ function renderData() {
             <div class="item-card" data-date="${date}" data-name="${name.toLowerCase()}" data-contract="${contract.toLowerCase()}" data-amount="${amount}">
                 <div class="item-main" onclick="toggleDetails(${index})">
                     <div>
-                        <div style="font-weight:bold; font-size:16px;">${name}</div>
-                        <div style="color:var(--gold); font-size:12px;">${contract}</div>
+                        <div style="font-weight:bold; font-size:16px;">${escapeHtml(name)}</div>
+                        <div style="color:var(--gold); font-size:12px;">${escapeHtml(contract)}</div>
                     </div>
                     <div style="text-align:center;">
-                        ${isToday ? '<span class="today-badge">TODAY</span>' : `<span class="date-text">${date}</span>`}
+                        ${isToday ? '<span class="today-badge">TODAY</span>' : `<span class="date-text">${escapeHtml(date)}</span>`}
                     </div>
                     <div style="text-align:right;">
-                        <div style="color:var(--gold); font-weight:bold; font-size:18px;">₹${amount}</div>
+                        <div style="color:var(--gold); font-weight:bold; font-size:18px;">₹${escapeHtml(amount)}</div>
                         <div style="font-size:10px; color:#888;">▼ details</div>
                     </div>
                 </div>
                 <div id="details-${index}" class="deep-details">
-                    <div class="detail-row"><span>📱 Mobile:</span><b>${mobile}</b></div>
-                    <div class="detail-row"><span>💰 EMI Amount:</span><b>₹${emi !== 'N/A' ? emi : '0'}</b></div>
-                    <div class="detail-row"><span>🧾 Receipt No:</span><b>${receipt}</b></div>
-                    <div class="detail-row"><span>📅 Date:</span><b>${date}</b></div>
+                    <div class="detail-row"><span>📱 Mobile:</span><b>${escapeHtml(mobile)}</b></div>
+                    <div class="detail-row"><span>💰 EMI Amount:</span><b>₹${emi !== 'N/A' ? escapeHtml(emi) : '0'}</b></div>
+                    <div class="detail-row"><span>🧾 Receipt No:</span><b>${escapeHtml(receipt)}</b></div>
+                    <div class="detail-row"><span>📅 Date:</span><b>${escapeHtml(date)}</b></div>
                     <button class="share-btn" onclick="shareDetails(${index})">📤 Share Details</button>
                 </div>
             </div>
@@ -501,13 +530,25 @@ function renderData() {
     document.getElementById('otherSection').style.display = 'block';
 }
 
+function escapeHtml(str) {
+    if (!str) return 'N/A';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
 // ============ TOGGLE DETAILS ============
 window.toggleDetails = function(index) {
     const el = document.getElementById(`details-${index}`);
-    if (el.style.display === 'none' || el.style.display === '') {
-        el.style.display = 'block';
-    } else {
-        el.style.display = 'none';
+    if (el) {
+        if (el.style.display === 'none' || el.style.display === '') {
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
     }
 };
 
@@ -561,22 +602,38 @@ function applyFilters() {
 }
 
 // ============ SETUP EVENT LISTENERS ============
-function setupEventListeners() {
-    document.getElementById('authSubmitBtn').onclick = handleAuth;
-    document.getElementById('toggleAuthBtn').onclick = toggleAuthMode;
-    document.getElementById('logoutBtn').onclick = handleLogout;
-    document.getElementById('fetchBtn').onclick = fetchData;
-    document.getElementById('searchFilter').oninput = applyFilters;
-    document.getElementById('dateFilter').onchange = applyFilters;
+function setupAuthEventListeners() {
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const toggleBtn = document.getElementById('toggleAuthBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const searchFilter = document.getElementById('searchFilter');
+    const dateFilterElem = document.getElementById('dateFilter');
     
+    if (submitBtn) submitBtn.onclick = handleAuth;
+    if (toggleBtn) toggleBtn.onclick = toggleAuthMode;
+    if (logoutBtn) logoutBtn.onclick = handleLogout;
+    if (fetchBtn) fetchBtn.onclick = fetchData;
+    if (searchFilter) searchFilter.oninput = applyFilters;
+    if (dateFilterElem) dateFilterElem.onchange = applyFilters;
+}
+
+function setupAppEventListeners() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const searchFilter = document.getElementById('searchFilter');
+    const dateFilterElem = document.getElementById('dateFilter');
     const adminBtn = document.getElementById('adminBtn');
-    if (adminBtn) {
-        adminBtn.onclick = () => { window.location.href = '/admin'; };
-    }
+    
+    if (logoutBtn) logoutBtn.onclick = handleLogout;
+    if (fetchBtn) fetchBtn.onclick = fetchData;
+    if (searchFilter) searchFilter.oninput = applyFilters;
+    if (dateFilterElem) dateFilterElem.onchange = applyFilters;
+    if (adminBtn) adminBtn.onclick = () => { window.location.href = '/admin'; };
 }
 
 // ============ START ============
-init();
+checkAuthAndRedirect();
 </script>
 </body>
 </html>
