@@ -1,5 +1,5 @@
 ---
-// CT PRO - Final Secure Version (FIXED)
+// CT PRO - Fixed Redirect Issue
 ---
 <!DOCTYPE html>
 <html lang="hi">
@@ -7,511 +7,633 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ContractTrack Pro</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://openfpcdn.io/fingerprintjs/v4"></script>
-
-    <style is:global>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+    <style>
+        * { box-sizing: border-box; }
         :root { --gold: #d4af37; --bg: #000; --card: #151515; --border: #222; --success: #22c55e; --red: #ff4444; }
-        
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 12px; overflow-x: hidden; }
-        .container { max-width: 800px; margin: 0 auto; width: 100%; }
-        
-        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .logo { background: var(--gold); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 900; }
-
-        .input-card { background: var(--card); padding: 12px; border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 15px; width: 100%; }
-        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 14px; }
-        textarea:focus { outline: none; border-color: var(--gold); }
-        
-        .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; text-transform: uppercase; font-size: 15px; touch-action: manipulation; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .report-box { background: #0c0c0c; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; }
-        .report-header { color: var(--gold); font-weight: bold; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .report-stats { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .failed-badge { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 3px 6px; border-radius: 4px; font-size: 11px; margin: 2px 2px 0 0; display: inline-block; font-family: monospace; }
-
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 2px solid var(--gold); text-align: center; }
-        .s-card small { color: var(--gold); font-size: 10px; text-transform: uppercase; font-weight: bold; }
-
-        .filters-container { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .filter-input { width: 100%; background: var(--card); border: 2px solid var(--gold); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s; }
-        .filter-input:focus { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-
-        .section-title { color: var(--gold); font-size: 14px; font-weight: 900; margin: 20px 0 10px 0; text-transform: uppercase; border-bottom: 1px dashed var(--gold); padding-bottom: 8px; letter-spacing: 0.5px; }
-
-        .item-card { background: var(--card); border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 12px; width: 100%; overflow: hidden; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.12); }
-        .item-main { padding: 14px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; cursor: pointer; touch-action: manipulation; }
-        .item-main:active { background: #1a1a1a; }
-        
-        .deep-details { padding: 15px; background: #080808; border-top: 1px dashed var(--gold); font-size: 13px; }
-        .d-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #1a1a1a; }
-        .d-row:last-child { border-bottom: none; }
-        .d-row b { color: var(--gold); text-align: right; }
-
-        .today-badge { background: var(--success); color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 900; display: inline-block; }
-        .date-text { color: var(--success); font-weight: bold; font-size: 13px; text-align: center; }
-        
-        .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; letter-spacing: 1px; }
-        .toggle-icon { font-size: 12px; color: var(--gold); margin-left: 5px; }
-        .share-btn { width: 100%; margin-top: 12px; background: var(--gold); color: #000; font-weight: 900; border: none; padding: 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; touch-action: manipulation; }
-
-        /* ================= AUTH & ADMIN CSS ================= */
-        .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
-        .auth-card-inner { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--gold); border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .auth-input { width: 100%; padding: 14px; margin-top: 10px; border-radius: 10px; border: 1px solid #333; background: black; color: white; font-size: 16px; outline: none; }
-        .auth-input:focus { border-color: var(--gold); }
-        .msg { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 14px; display: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 12px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-card { max-width: 400px; margin: 50px auto; background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 30px; text-align: center; }
+        .auth-input { width: 100%; padding: 14px; margin-top: 10px; border-radius: 10px; border: 1px solid #333; background: black; color: white; font-size: 16px; }
+        .auth-input:focus { outline: none; border-color: var(--gold); }
+        .msg { margin-top: 12px; padding: 10px; border-radius: 8px; display: none; font-size: 14px; }
         .msg.error { background: #2a0000; color: #ff6666; border: 1px solid #ff3333; }
         .msg.success { background: #002a10; color: #00ff99; border: 1px solid #00ff99; }
-        .msg.info { background: #1a1400; color: var(--gold); border: 1px solid var(--gold); }
-        #blockScreen { display: none; position: fixed; inset: 0; background: black; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: var(--red); text-align: center; gap: 12px; }
-        
-        .top-nav { display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; font-size: 13px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
+        .input-card { background: var(--card); padding: 12px; border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 15px; }
+        textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 14px; }
+        textarea:focus { outline: none; border-color: var(--gold); }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .s-card { background: var(--card); padding: 12px; border-radius: 10px; border: 2px solid var(--gold); text-align: center; }
+        .item-card { background: var(--card); border-radius: 12px; border: 2px solid var(--gold); margin-bottom: 12px; overflow: hidden; }
+        .item-main { padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .item-main:hover { background: #1a1a1a; }
+        .today-badge { background: var(--success); color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .date-text { color: var(--success); font-size: 13px; }
+        .loader { display: none; text-align: center; color: var(--gold); padding: 20px; font-weight: bold; }
         .limit-badge { background: #002a10; color: var(--success); padding: 4px 8px; border-radius: 5px; font-weight: bold; border: 1px solid var(--success); }
         .admin-panel { display: none; margin-bottom: 20px; padding: 15px; border: 1px dashed var(--gold); border-radius: 12px; background: #1a1500; text-align: center; }
-
-        @media (max-width: 480px) {
-            .item-main { grid-template-columns: 1.2fr 1fr 1fr; gap: 5px; padding: 12px; }
-            .header h2 { font-size: 18px; }
-            .share-btn { font-size: 13px; padding: 10px; }
-        }
+        .filters-container { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .filter-input { width: 100%; background: var(--card); border: 2px solid var(--gold); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; }
+        .section-title { color: var(--gold); font-size: 14px; font-weight: 900; margin: 20px 0 10px 0; text-transform: uppercase; border-bottom: 1px dashed var(--gold); padding-bottom: 8px; }
+        .deep-details { padding: 15px; background: #080808; border-top: 1px dashed var(--gold); display: none; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+        .share-btn { width: 100%; background: var(--gold); color: #000; padding: 10px; border-radius: 6px; margin-top: 10px; cursor: pointer; font-weight: bold; border: none; }
+        .report-box { background: #0c0c0c; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: none; }
+        .failed-badge { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 3px 6px; border-radius: 4px; font-size: 11px; display: inline-block; margin: 2px; }
+        #blockScreen { display: none; position: fixed; inset: 0; background: black; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: var(--red); text-align: center; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #000; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="blockScreen">
-    <div style="font-size:100px;">🚫</div>
-    <h1>ACCESS DENIED</h1>
-    <p>Aapka device block kar diya gaya hai.</p>
-    <p id="blockedDevId" style="font-size:10px; color:#444;"></p>
-</div>
+<div id="blockScreen"><div style="font-size:80px;">🚫</div><h1>ACCESS DENIED</h1><p>Aapka device blocked hai</p></div>
 
-<div class="container" id="authSection">
-    <div class="auth-wrapper">
-        <div class="auth-card-inner">
-            <div class="logo" style="font-size: 30px; display: inline-block; margin-bottom: 20px;">CT PRO</div>
-            <p id="authMsg" style="color:#888; margin-bottom:5px;">Security Verification</p>
-            
-            <input type="email" id="emailInput" class="auth-input" placeholder="Email Address">
-            <input type="password" id="passInput" class="auth-input" placeholder="Password">
-            
-            <div id="authMsgBox" class="msg"></div>
-            
-            <button class="btn" id="authSubmitBtn">ENTER SYSTEM</button>
-            <p style="margin-top:20px; font-size:14px;">
-                <span id="toggleText">Naye user?</span>
-                <span id="toggleBtn" style="color:var(--gold); cursor:pointer; text-decoration:underline; font-weight:bold;">Register Karein</span>
-            </p>
-        </div>
+<!-- AUTH SECTION -->
+<div id="authSection">
+    <div class="auth-card">
+        <div style="background:var(--gold); color:#000; width:60px; height:60px; line-height:60px; border-radius:50%; margin:0 auto 15px; font-weight:900; font-size:24px;">CT</div>
+        <h3 style="color:var(--gold);">ContractTrack Pro</h3>
+        <p id="authModeText" style="color:#888; margin-bottom:15px;">Login to your account</p>
+        <input type="email" id="authEmail" class="auth-input" placeholder="Email Address">
+        <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+        <div id="authMessage" class="msg"></div>
+        <button class="btn" id="authSubmitBtn">LOGIN</button>
+        <p style="margin-top:15px;">
+            <span id="toggleText">New user?</span>
+            <button id="toggleAuthBtn" style="background:none; border:none; color:var(--gold); cursor:pointer; text-decoration:underline; font-weight:bold;">Create Account</button>
+        </p>
     </div>
 </div>
 
-<div class="container" id="mainApp" style="display:none;">
-    
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
     <div class="top-nav">
         <div>
-            <span style="color:#888;">User:</span> <b id="dispEmail" style="color:white;"></b><br>
-            <span style="color:#888; font-size:11px;">Limit Left:</span> <span id="dispLimit" class="limit-badge">0</span>
+            <span style="color:#888;">👤</span> <b id="userEmail"></b><br>
+            <span style="font-size:11px; color:#888;">Limit Left:</span> <span id="userLimit" class="limit-badge">0</span>
         </div>
-        <div>
-            <button id="logoutBtn" style="background:var(--red); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">LOGOUT</button>
-        </div>
+        <button id="logoutBtn" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">LOGOUT</button>
     </div>
 
     <div id="adminPanel" class="admin-panel">
-        <p style="color:var(--gold); font-weight:bold; font-size:14px; margin-bottom:8px;">👑 ADMIN CONTROL</p>
-        <button id="logsBtn" style="background:white; color:black; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:12px;">CHECK ALL SEARCH LOGS (F12)</button>
-    </div>
-
-    <div class="header">
-        <div class="logo">CT</div>
-        <h2 style="margin:0;">ContractTrack Pro</h2>
+        <b style="color:var(--gold);">👑 ADMIN MODE</b><br>
+        <button id="adminBtn" style="background:white; color:black; border:none; padding:8px 15px; border-radius:5px; margin-top:8px; cursor:pointer;">Open Admin Panel</button>
     </div>
 
     <div class="input-card">
-        <textarea id="contractsInput" rows="4" placeholder="Enter Contracts (One per line)"></textarea>
-        <button id="fetchBtn" class="btn">FETCH ALL RECEIPTS</button>
+        <textarea id="contractsInput" rows="4" placeholder="Enter Contract Numbers (One per line)&#10;Example:&#10;CT123456&#10;CT789012"></textarea>
+        <button class="btn" id="fetchBtn">🔍 FETCH ALL RECEIPTS</button>
     </div>
 
-    <div id="loader" class="loader">FETCHING DATA... PLEASE WAIT</div>
+    <div id="loader" class="loader">⏳ FETCHING DATA... PLEASE WAIT</div>
 
-    <div id="fetchReport" class="report-box" style="display: none;">
-        <div class="report-header">📊 Fetch Report</div>
-        <div class="report-stats">
-            <div>Total IDs: <b id="repTotal" style="color: #fff;">0</b></div>
-            <div>Success: <b id="repSuccess" style="color: var(--success);">0</b></div>
-            <div>Failed: <b id="repFailed" style="color: #ff4d4d;">0</b></div>
+    <div id="reportBox" class="report-box">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span>📊 Total: <b id="reportTotal">0</b></span>
+            <span>✅ Success: <b id="reportSuccess" style="color:var(--success);">0</b></span>
+            <span>❌ Failed: <b id="reportFailed" style="color:#ff4d4d;">0</b></span>
         </div>
-        <div id="failedListContainer" style="display: none; margin-top: 5px; border-top: 1px solid #222; padding-top: 8px;">
-            <div style="color: #888; font-size: 11px; margin-bottom: 4px;">Data Not Found For:</div>
-            <div id="failedList"></div>
-        </div>
+        <div id="failedIds" style="margin-top:8px;"></div>
     </div>
 
     <div class="stats">
-        <div class="s-card">
-            <small id="statLabelCount">Dikhne Wale Records</small>
-            <div id="tCount" style="font-size: 20px; font-weight: bold; margin-top: 4px;">0</div>
-        </div>
-        <div class="s-card">
-            <small id="statLabelAmt">Total Amount</small>
-            <div id="tAmt" style="font-size: 20px; font-weight: bold; color:var(--success); margin-top: 4px;">₹0</div>
-        </div>
+        <div class="s-card"><small>📋 Visible Records</small><div id="totalCount" style="font-size:24px; font-weight:bold;">0</div></div>
+        <div class="s-card"><small>💰 Total Amount</small><div id="totalAmount" style="font-size:24px; font-weight:bold; color:var(--success);">₹0</div></div>
     </div>
 
     <div class="filters-container">
-        <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Search Name, Contract...">
+        <input type="text" id="searchFilter" class="filter-input" placeholder="🔍 Search by Name or Contract...">
         <input type="date" id="dateFilter" class="filter-input">
     </div>
 
-    <div id="todaySection" style="display: none;">
-        <div class="section-title">⭐ Today's Paid Accounts</div>
-        <div id="todayResults"></div>
-    </div>
-
-    <div id="otherSection" style="display: none;">
-        <div class="section-title">📂 Previous Records</div>
-        <div id="otherResults"></div>
-    </div>
-
+    <div id="todaySection" style="display:none;"><div class="section-title">⭐ TODAY'S PAYMENTS</div><div id="todayList"></div></div>
+    <div id="otherSection" style="display:none;"><div class="section-title">📂 PREVIOUS RECORDS</div><div id="otherList"></div></div>
 </div>
 
-<script is:inline>
-// Wait for DOM and Supabase to be ready
-window.addEventListener('DOMContentLoaded', () => {
-    
-    // Wait for Supabase to be defined
-    function waitForSupabase(callback) {
-        if (typeof supabase !== 'undefined') {
-            callback();
+<script>
+// ============ CONFIGURATION ============
+const SUPABASE_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
+const ADMIN_EMAIL = 'agurjeet768@gmail.com';
+const API_URL = 'https://gauravkumar80500-loandataapi.hf.space/scrape_custom';
+
+// ============ GLOBALS ============
+let supabase = null;
+let currentUser = null;
+let allRecords = [];
+let isLoginMode = true;
+
+// ============ HELPER FUNCTIONS ============
+function showMessage(elementId, message, type) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.textContent = message;
+        el.className = 'msg ' + type;
+        el.style.display = 'block';
+        setTimeout(() => { 
+            if (el) el.style.display = 'none'; 
+        }, 3000);
+    }
+}
+
+function getValue(obj, key) {
+    if (!obj) return 'N/A';
+    const foundKey = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
+    if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null && obj[foundKey] !== 'undefined') {
+        return obj[foundKey];
+    }
+    return 'N/A';
+}
+
+function formatDateForFilter(dateStr) {
+    if (!dateStr) return '';
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        return `${parts[2]}-${months[parseInt(parts[1]) - 1]}-${parts[0]}`;
+    }
+    return dateStr;
+}
+
+// ============ LOAD SUPABASE ============
+function loadSupabase() {
+    return new Promise((resolve, reject) => {
+        if (typeof window.supabase !== 'undefined') {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Supabase load failed'));
+        document.head.appendChild(script);
+    });
+}
+
+// ============ CHECK AUTH ON PAGE LOAD ============
+async function checkAuthAndRedirect() {
+    try {
+        await loadSupabase();
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Get current session
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+            console.error('Session error:', error);
+            showAuthSection();
+            return;
+        }
+        
+        if (data?.session) {
+            // User is logged in - show main app
+            currentUser = data.session.user;
+            await loadUserData();
+            showMainApp();
+            setupAppEventListeners();
         } else {
-            setTimeout(() => waitForSupabase(callback), 100);
+            // No session - show login
+            showAuthSection();
+            setupAuthEventListeners();
+        }
+    } catch (error) {
+        console.error('Init error:', error);
+        showAuthSection();
+        setupAuthEventListeners();
+    }
+}
+
+// ============ LOAD USER DATA ============
+async function loadUserData() {
+    try {
+        let { data, error } = await supabase
+            .from('ContractTrack')
+            .select('*')
+            .eq('email', currentUser.email)
+            .single();
+        
+        if (error && error.code === 'PGRST116') {
+            // User not found, create new
+            const { data: newUser, error: insertError } = await supabase
+                .from('ContractTrack')
+                .insert({ email: currentUser.email, limit_left: 10, is_blocked: false })
+                .select()
+                .single();
+            
+            if (!insertError && newUser) {
+                document.getElementById('userLimit').innerText = newUser.limit_left;
+                if (newUser.is_blocked) showBlockScreen();
+            }
+        } else if (data) {
+            document.getElementById('userLimit').innerText = data.limit_left;
+            if (data.is_blocked) showBlockScreen();
+        }
+    } catch (error) {
+        console.error('Load user data error:', error);
+    }
+}
+
+// ============ UI FUNCTIONS ============
+function showAuthSection() {
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
+    
+    if (authSection) authSection.style.display = 'block';
+    if (mainApp) mainApp.style.display = 'none';
+    if (blockScreen) blockScreen.style.display = 'none';
+}
+
+function showMainApp() {
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
+    
+    if (authSection) authSection.style.display = 'none';
+    if (mainApp) mainApp.style.display = 'block';
+    if (blockScreen) blockScreen.style.display = 'none';
+    
+    if (currentUser) {
+        document.getElementById('userEmail').innerText = currentUser.email;
+        
+        if (currentUser.email === ADMIN_EMAIL) {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel) adminPanel.style.display = 'block';
         }
     }
+}
 
-    waitForSupabase(() => {
-        const ADMIN_EMAIL = 'agurjeet768@gmail.com'; 
-        const sb_client = supabase.createClient('https://ihcmbsvsfwakmmmymtxq.supabase.co', 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE');
+function showBlockScreen() {
+    const authSection = document.getElementById('authSection');
+    const mainApp = document.getElementById('mainApp');
+    const blockScreen = document.getElementById('blockScreen');
+    
+    if (authSection) authSection.style.display = 'none';
+    if (mainApp) mainApp.style.display = 'none';
+    if (blockScreen) blockScreen.style.display = 'flex';
+}
 
-        let isLoginMode = true;
-        let visitorId = "";
+// ============ AUTH HANDLER ============
+async function handleAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    const submitBtn = document.getElementById('authSubmitBtn');
+    
+    if (!email || !password) {
+        showMessage('authMessage', 'Please enter email and password', 'error');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+    
+    try {
+        let result;
         
-        const btnFetch = document.getElementById('fetchBtn');
-        const inputContracts = document.getElementById('contractsInput');
-        const searchInput = document.getElementById('searchInput');
-        const dateFilter = document.getElementById('dateFilter');
+        if (isLoginMode) {
+            result = await supabase.auth.signInWithPassword({ email, password });
+        } else {
+            result = await supabase.auth.signUp({ email, password });
+            if (!result.error) {
+                // Create user in ContractTrack
+                await supabase
+                    .from('ContractTrack')
+                    .insert({ email, limit_left: 10, is_blocked: false });
+                showMessage('authMessage', '✅ Account created! Please login.', 'success');
+                // Switch to login mode
+                isLoginMode = true;
+                document.getElementById('authSubmitBtn').innerHTML = 'LOGIN';
+                document.getElementById('authModeText').textContent = 'Login to your account';
+                document.getElementById('toggleText').textContent = 'New user?';
+                document.getElementById('toggleAuthBtn').textContent = 'Create Account';
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'LOGIN';
+                return;
+            }
+        }
         
-        // Auth listeners
-        document.getElementById('authSubmitBtn').addEventListener('click', handleAuth);
-        document.getElementById('toggleBtn').addEventListener('click', toggleAuthMode);
-        document.getElementById('logoutBtn').addEventListener('click', () => { sb_client.auth.signOut().then(() => location.reload()); });
-        document.getElementById('logsBtn').addEventListener('click', viewLogs);
-
-        // Fingerprint Init
-        try {
-            FingerprintJS.load().then(fp => fp.get()).then(r => { 
-                visitorId = r.visitorId; 
-                if(document.getElementById('blockedDevId')) document.getElementById('blockedDevId').innerText = "Device: " + visitorId;
-            }).catch(() => { visitorId = "dev-" + Date.now(); });
-        } catch(e) { console.log("FP Error", e); }
-
-        function fetchIP() { return fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => "Private"); }
-        function showMsg(id, type, text) { var el = document.getElementById(id); el.className = 'msg ' + type; el.innerText = text; el.style.display = 'block'; }
-        function hideMsg(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; }
-
-        // ================== AUTH LOGIC ==================
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            hideMsg('authMsgBox');
-            document.getElementById('authMsg').innerText = isLoginMode ? "Security Verification" : "Create Account";
-            document.getElementById('authSubmitBtn').innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
-            document.getElementById('toggleText').innerText = isLoginMode ? "Naye user?" : "Already user?";
-            document.getElementById('toggleBtn').innerText = isLoginMode ? "Register Karein" : "Login Karein";
-        }
-
-        async function handleAuth() {
-            var email = document.getElementById('emailInput').value.trim();
-            var pass = document.getElementById('passInput').value.trim();
-            var btn = document.getElementById('authSubmitBtn');
-            if (!email || !pass) { showMsg('authMsgBox', 'error', "Dono details bhariye!"); return; }
-
-            hideMsg('authMsgBox'); btn.disabled = true; btn.innerText = "Processing...";
-
-            try {
-                if (isLoginMode) {
-                    const { data, error } = await sb_client.auth.signInWithPassword({ email, password: pass });
-                    if (error) { throw error; }
-                    const ip = await fetchIP();
-                    await sb_client.from('ContractTrack').update({ device_id: visitorId, last_ip: ip }).eq('email', email);
-                    showMsg('authMsgBox', 'success', "Login successful!");
-                    // FIXED: Directly show main app after login
-                    await checkSession();
-                } else {
-                    const { data, error } = await sb_client.auth.signUp({ email, password: pass });
-                    if (error) { throw error; }
-                    const ip = await fetchIP();
-                    await sb_client.from('ContractTrack').upsert({ email: email, device_id: visitorId, last_ip: ip, limit_left: 10, is_blocked: false }, { onConflict: 'email' });
-                    showMsg('authMsgBox', 'success', "Account ban gaya! Ab login karein.");
-                    // FIXED: Switch to login mode after registration
-                    setTimeout(() => {
-                        isLoginMode = true;
-                        document.getElementById('authMsg').innerText = "Security Verification";
-                        document.getElementById('authSubmitBtn').innerText = "ENTER SYSTEM";
-                        document.getElementById('toggleText').innerText = "Naye user?";
-                        document.getElementById('toggleBtn').innerText = "Register Karein";
-                        document.getElementById('emailInput').value = "";
-                        document.getElementById('passInput').value = "";
-                        btn.disabled = false;
-                        btn.innerText = "ENTER SYSTEM";
-                    }, 2000);
-                }
-            } catch (e) {
-                showMsg('authMsgBox', 'error', e.message.includes('invalid') ? "Galat details." : e.message);
-                btn.disabled = false;
-                btn.innerText = isLoginMode ? "ENTER SYSTEM" : "REGISTER NOW";
-            }
-        }
-
-        async function checkSession() {
-            const { data } = await sb_client.auth.getSession();
-            if (data && data.session) {
-                document.getElementById('authSection').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block'; 
-                document.getElementById('dispEmail').innerText = data.session.user.email;
-                if (data.session.user.email === ADMIN_EMAIL) { document.getElementById('adminPanel').style.display = 'block'; }
-                
-                await fetchIP();
-                const dbRes = await sb_client.from('ContractTrack').select('*').eq('email', data.session.user.email).single();
-                if (dbRes.data) {
-                    document.getElementById('dispLimit').innerText = dbRes.data.limit_left !== null ? dbRes.data.limit_left : 0;
-                    if (dbRes.data.is_blocked) document.getElementById('blockScreen').style.display = 'flex';
-                }
-            } else {
-                document.getElementById('authSection').style.display = 'block';
-                document.getElementById('mainApp').style.display = 'none';
-            }
-        }
-
-        function viewLogs() {
-            sb_client.from('search_logs').select('*').order('created_at', { ascending: false }).then(res => {
-                console.table(res.data); alert("F12 dabao aur Console tab mein puri list dekho!");
-            });
-        }
-
-        // ================== APP LOGIC & SMART DATA GETTER ==================
-        window.allRecordsData = [];
-        const cleanVal = (val) => (!val || String(val).toLowerCase() === 'null' || val === 'undefined') ? 'N/A' : val;
-
-        // Helper to find key case-insensitively
-        const getVal = (obj, keyName) => {
-            if (!obj) return 'N/A';
-            const foundKey = Object.keys(obj).find(k => k.toLowerCase() === keyName.toLowerCase());
-            return foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null ? obj[foundKey] : 'N/A';
-        };
-
-        window.toggleCard = function(index) {
-            const detailsDiv = document.getElementById('det-' + index);
-            const iconSpan = document.getElementById('icon-' + index);
-            if (detailsDiv.style.display === 'none') { detailsDiv.style.display = 'block'; iconSpan.innerText = '▲'; } 
-            else { detailsDiv.style.display = 'none'; iconSpan.innerText = '▼'; }
-        };
-
-        window.shareCard = function(index) {
-            const item = window.allRecordsData[index];
-            const shareText = `*ContractTrack Details*\n👤 Name: ${getVal(item,'name')}\n📝 Contract: ${getVal(item,'contract')}\n📱 Mobile: ${getVal(item,'mobile')}\n💰 Amount Paid: ₹${getVal(item,'amount')}\n📅 Date: ${getVal(item,'date')}\n🧾 Receipt: ${getVal(item,'receipt_no')}`;
-            if (navigator.share) { navigator.share({ title: 'Details', text: shareText }).catch(err => console.log(err)); } 
-            else { navigator.clipboard.writeText(shareText); alert("Details copied!"); }
-        };
-
-        const formatFilterDate = (dateStr) => {
-            if(!dateStr) return "";
-            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-            const parts = dateStr.split('-');
-            return `${parts[2]}-${months[parseInt(parts[1])-1]}-${parts[0]}`;
-        };
-
-        const applyFilters = () => {
-            const term = searchInput.value.toLowerCase();
-            const selectedDate = formatFilterDate(dateFilter.value);
-            let visibleCount = 0, visibleAmt = 0;
+        if (result.error) throw result.error;
+        
+        if (isLoginMode && result.data?.session) {
+            // Login successful - update current user and show main app
+            currentUser = result.data.session.user;
+            showMessage('authMessage', '✅ Login successful! Redirecting...', 'success');
             
-            requestAnimationFrame(() => {
-                window.allRecordsData.forEach((item, index) => {
-                    const card = document.getElementById('card-wrapper-' + index);
-                    if (!card) return;
-                    const matchesSearch = card.innerText.toLowerCase().includes(term);
-                    const itemDate = getVal(item, 'date');
-                    const matchesDate = selectedDate === "" || itemDate === selectedDate;
-
-                    if (matchesSearch && matchesDate) {
-                        card.style.display = 'block'; visibleCount++;
-                        const amtRaw = getVal(item, 'amount');
-                        visibleAmt += parseFloat(String(amtRaw).replace(/,/g, '')) || 0;
-                    } else { card.style.display = 'none'; }
-                });
-                document.getElementById('tCount').innerText = visibleCount;
-                document.getElementById('tAmt').innerText = "₹" + visibleAmt.toLocaleString('en-IN');
-            });
-        };
-
-        searchInput.addEventListener('input', applyFilters);
-        dateFilter.addEventListener('change', applyFilters);
-
-        // ================== MAIN FETCH BUTTON ==================
-        btnFetch.onclick = async function() {
-            const val = inputContracts.value.trim();
-            if(!val) { alert("Bhai, pehle contract number toh daalo box mein!"); return; }
+            // Load user data and show main app
+            await loadUserData();
             
-            btnFetch.disabled = true;
-            btnFetch.innerText = "CHECKING SECURE CONNECTION...";
-            document.getElementById('loader').style.display = 'block';
+            // Small delay then show main app
+            setTimeout(() => {
+                showMainApp();
+                setupAppEventListeners();
+            }, 500);
+        }
+        
+    } catch (error) {
+        console.error('Auth error:', error);
+        let errorMsg = error.message;
+        if (errorMsg.includes('Invalid login')) errorMsg = '❌ Wrong email or password';
+        if (errorMsg.includes('Email not confirmed')) errorMsg = '❌ Please confirm your email';
+        if (errorMsg.includes('User already registered')) errorMsg = '❌ Email already exists. Please login.';
+        showMessage('authMessage', errorMsg, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = isLoginMode ? 'LOGIN' : 'REGISTER';
+    } finally {
+        if (submitBtn.disabled && !isLoginMode) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'REGISTER';
+        } else if (submitBtn.disabled && isLoginMode && !currentUser) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'LOGIN';
+        }
+    }
+}
 
-            try {
-                const rawArray = val.split('\n').map(n => n.trim()).filter(n => n);
-                const uniqueArray = [...new Set(rawArray)]; 
-                const requiredLimit = uniqueArray.length;
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const modeText = document.getElementById('authModeText');
+    const toggleText = document.getElementById('toggleText');
+    const toggleBtn = document.getElementById('toggleAuthBtn');
+    
+    if (isLoginMode) {
+        submitBtn.innerHTML = 'LOGIN';
+        modeText.textContent = 'Login to your account';
+        toggleText.textContent = 'New user?';
+        toggleBtn.textContent = 'Create Account';
+    } else {
+        submitBtn.innerHTML = 'REGISTER';
+        modeText.textContent = 'Create new account';
+        toggleText.textContent = 'Already have account?';
+        toggleBtn.textContent = 'Login';
+    }
+    const msgDiv = document.getElementById('authMessage');
+    if (msgDiv) msgDiv.style.display = 'none';
+}
 
-                const { data: sessionData } = await sb_client.auth.getSession();
-                if (!sessionData || !sessionData.session) throw new Error("Session Error! Login karein."); 
-                
-                const email = sessionData.session.user.email;
-                const { data: user, error: userErr } = await sb_client.from('ContractTrack').select('*').eq('email', email).single();
-                
-                if (userErr || !user) throw new Error("Database error!");
-                if (user.is_blocked) { document.getElementById('blockScreen').style.display = 'flex'; return; }
-                
-                let currentLimit = user.limit_left !== null ? parseInt(user.limit_left) : 0;
-                if (currentLimit < requiredLimit) throw new Error(`Limit khatam! Aapko ${requiredLimit} limit chahiye, bachi hai: ${currentLimit}`);
+async function handleLogout() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    location.reload();
+}
 
-                btnFetch.innerText = "FETCHING API DATA...";
-                document.getElementById('todayResults').innerHTML = '';
-                document.getElementById('otherResults').innerHTML = '';
-                document.getElementById('todaySection').style.display = 'none';
-                document.getElementById('otherSection').style.display = 'none';
-                document.getElementById('fetchReport').style.display = 'none';
+// ============ FETCH DATA ============
+async function fetchData() {
+    const input = document.getElementById('contractsInput').value.trim();
+    if (!input) {
+        alert('Please enter contract numbers');
+        return;
+    }
+    
+    const contracts = [...new Set(input.split('\n').map(c => c.trim()).filter(c => c))];
+    
+    // Get current user data
+    const { data: userData } = await supabase
+        .from('ContractTrack')
+        .select('limit_left, is_blocked')
+        .eq('email', currentUser.email)
+        .single();
+    
+    if (userData.is_blocked) {
+        showBlockScreen();
+        return;
+    }
+    
+    if (userData.limit_left < contracts.length) {
+        alert(`Limit exceeded! Need ${contracts.length}, you have ${userData.limit_left}`);
+        return;
+    }
+    
+    const fetchBtn = document.getElementById('fetchBtn');
+    const loader = document.getElementById('loader');
+    const reportBox = document.getElementById('reportBox');
+    
+    fetchBtn.disabled = true;
+    fetchBtn.innerHTML = '<span class="loading-spinner"></span> FETCHING...';
+    loader.style.display = 'block';
+    reportBox.style.display = 'none';
+    
+    try {
+        const response = await fetch(`${API_URL}?contracts=${contracts.join(',')}`);
+        const data = await response.json();
+        
+        allRecords = data;
+        
+        // Update limit
+        const newLimit = userData.limit_left - contracts.length;
+        await supabase
+            .from('ContractTrack')
+            .update({ limit_left: newLimit })
+            .eq('email', currentUser.email);
+        document.getElementById('userLimit').innerText = newLimit;
+        
+        // Log search
+        for (const contract of contracts) {
+            await supabase
+                .from('search_logs')
+                .insert({ email: currentUser.email, search_query: contract });
+        }
+        
+        // Show report
+        const fetchedIds = data.map(item => getValue(item, 'contract'));
+        const failedIds = contracts.filter(id => !fetchedIds.includes(id));
+        
+        document.getElementById('reportTotal').innerText = contracts.length;
+        document.getElementById('reportSuccess').innerText = data.length;
+        document.getElementById('reportFailed').innerText = failedIds.length;
+        
+        if (failedIds.length > 0) {
+            document.getElementById('failedIds').innerHTML = failedIds.map(id => `<span class="failed-badge">${id}</span>`).join('');
+        } else {
+            document.getElementById('failedIds').innerHTML = '';
+        }
+        
+        reportBox.style.display = 'block';
+        
+        renderData();
+        applyFilters();
+        
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.innerHTML = '🔍 FETCH ALL RECEIPTS';
+        loader.style.display = 'none';
+    }
+}
 
-                const list = uniqueArray.join(',');
-                const r = await fetch(`https://gauravkumar80500-loandataapi.hf.space/scrape_custom?contracts=${list}`);
-                if (!r.ok) throw new Error(`API Server Down (Status: ${r.status})`);
-                
-                const data = await r.json();
-                
-                console.log("API SE YE DATA AAYA HAI:", data);
-                
-                window.allRecordsData = data; 
-                const newLimit = currentLimit - requiredLimit;
-                document.getElementById('dispLimit').innerText = newLimit;
-
-                try {
-                    const logEntries = uniqueArray.map(id => ({ email: email, search_query: id, device_id: visitorId }));
-                    await sb_client.from('search_logs').insert(logEntries);
-                    await sb_client.from('ContractTrack').update({ limit_left: newLimit }).eq('email', email);
-                } catch (dbErr) { console.log("Log error", dbErr); }
-
-                const totalRequested = uniqueArray.length;
-                const totalFetched = data.length;
-                const failedCount = totalRequested - totalFetched;
-                
-                const fetchedIds = data.map(item => String(getVal(item, 'contract')).trim());
-                const failedIds = uniqueArray.filter(id => !fetchedIds.includes(String(id).trim()));
-
-                document.getElementById('repTotal').innerText = totalRequested;
-                document.getElementById('repSuccess').innerText = totalFetched;
-                document.getElementById('repFailed').innerText = failedCount;
-
-                const failedListContainer = document.getElementById('failedListContainer');
-                if (failedCount > 0) {
-                    failedListContainer.style.display = 'block';
-                    document.getElementById('failedList').innerHTML = failedIds.map(id => `<span class="failed-badge">${id}</span>`).join('');
-                } else { failedListContainer.style.display = 'none'; }
-                
-                document.getElementById('fetchReport').style.display = 'block';
-                
-                const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase().replace(/ /g, '-');
-                let todayHtml = ''; let otherHtml = '';
-
-                data.forEach((item, i) => {
-                    const itemName = getVal(item, 'name');
-                    const itemContract = getVal(item, 'contract');
-                    const itemDate = getVal(item, 'date');
-                    const itemAmount = getVal(item, 'amount');
-                    const itemMobile = getVal(item, 'mobile');
-                    const itemEmi = getVal(item, 'emi_amount');
-                    const itemOverdue = getVal(item, 'overdue');
-                    const itemGuName = getVal(item, 'gu_name');
-                    const itemGuMobile = getVal(item, 'gu_mobile');
-                    const itemCoName = getVal(item, 'co_name');
-                    const itemCoMobile = getVal(item, 'co_mobile');
-                    const itemReceipt = getVal(item, 'receipt_no');
-                    const itemInstr = getVal(item, 'instr');
-
-                    const isToday = itemDate === today;
-                    const emiAmountText = itemEmi !== 'N/A' ? `₹${itemEmi}` : 'N/A';
-                    const overdueText = cleanVal(itemOverdue) !== 'N/A' ? `₹${itemOverdue}` : '0';
-                    const dateDisplay = isToday ? '<span class="today-badge">TODAY</span>' : `<div class="date-text">${itemDate !== 'N/A' ? itemDate : ''}</div>`;
-
-                    const cardHTML = `
-                        <div class="item-card" id="card-wrapper-${i}">
-                            <div class="item-main" onclick="toggleCard(${i})">
-                                <div>
-                                    <div style="font-weight:bold; font-size: 15px;">${itemName}</div>
-                                    <div style="color:var(--gold); font-size: 12px; margin-top: 4px; font-weight:bold;">${itemContract}</div>
-                                </div>
-                                <div style="text-align:center;">${dateDisplay}</div>
-                                <div style="text-align:right;">
-                                    <div style="color:#d4af37; font-weight:bold; font-size: 17px;">₹${itemAmount}</div>
-                                    <div style="font-size:11px; color:#aaa; margin-top: 6px; display:flex; align-items:center; justify-content:flex-end;">
-                                        Details <span id="icon-${i}" class="toggle-icon">▼</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="det-${i}" class="deep-details" style="display: none;">
-                                <div class="d-row"><span>Cust Mobile:</span> <b>${itemMobile}</b></div>
-                                <div class="d-row"><span>EMI Amount:</span> <b style="color:var(--success);">${emiAmountText}</b></div>
-                                <div class="d-row"><span>Over Dues:</span> <b style="color:#ff4d4d;">${overdueText}</b></div>
-                                <div class="d-row"><span>Guarantor:</span> <b>${itemGuName}</b></div>
-                                <div class="d-row"><span>GU Mobile:</span> <b>${itemGuMobile}</b></div>
-                                <div class="d-row"><span>Co-Applicant:</span> <b>${itemCoName}</b></div>
-                                <div class="d-row"><span>Co-App Mobile:</span> <b>${itemCoMobile}</b></div>
-                                <div class="d-row"><span>Receipt No:</span> <b style="color:#aaa;">${itemReceipt}</b></div>
-                                <div class="d-row"><span>Type:</span> <b style="color:#aaa;">${itemInstr}</b></div>
-                                <button class="share-btn" onclick="shareCard(${i})">🔗 Share Details</button>
-                            </div>
-                        </div>
-                    `;
-                    if (isToday) todayHtml += cardHTML; else otherHtml += cardHTML;
-                });
-
-                if (todayHtml === '') todayHtml = `<div style="text-align:center; padding:15px; color:#aaa; font-style:italic; background: var(--card); border-radius: 10px; border: 1px dashed var(--gold); margin-bottom:12px; font-size: 14px;">⏳ Abhi tak aaj ki date mein kisi contract par payment nahi aaya hai.</div>`;
-
-                document.getElementById('todayResults').innerHTML = todayHtml;
-                document.getElementById('otherResults').innerHTML = otherHtml;
-
-                document.getElementById('todaySection').style.display = 'block';
-                if (otherHtml !== '') document.getElementById('otherSection').style.display = 'block';
-                
-                applyFilters();
-
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                alert("Error: " + err.message);
-            } finally {
-                document.getElementById('loader').style.display = 'none';
-                btnFetch.disabled = false;
-                btnFetch.innerText = "FETCH ALL RECEIPTS";
-            }
-        };
-
-        // Run session check on load
-        checkSession();
+// ============ RENDER DATA ============
+function renderData() {
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase().replace(/ /g, '-');
+    
+    let todayHtml = '';
+    let otherHtml = '';
+    
+    allRecords.forEach((item, index) => {
+        const name = getValue(item, 'name');
+        const contract = getValue(item, 'contract');
+        const amount = getValue(item, 'amount');
+        const date = getValue(item, 'date');
+        const mobile = getValue(item, 'mobile');
+        const receipt = getValue(item, 'receipt_no');
+        const emi = getValue(item, 'emi_amount');
+        const isToday = date === today;
+        
+        const cardHtml = `
+            <div class="item-card" data-date="${date}" data-name="${name.toLowerCase()}" data-contract="${contract.toLowerCase()}" data-amount="${amount}">
+                <div class="item-main" onclick="toggleDetails(${index})">
+                    <div>
+                        <div style="font-weight:bold; font-size:16px;">${escapeHtml(name)}</div>
+                        <div style="color:var(--gold); font-size:12px;">${escapeHtml(contract)}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        ${isToday ? '<span class="today-badge">TODAY</span>' : `<span class="date-text">${escapeHtml(date)}</span>`}
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="color:var(--gold); font-weight:bold; font-size:18px;">₹${escapeHtml(amount)}</div>
+                        <div style="font-size:10px; color:#888;">▼ details</div>
+                    </div>
+                </div>
+                <div id="details-${index}" class="deep-details">
+                    <div class="detail-row"><span>📱 Mobile:</span><b>${escapeHtml(mobile)}</b></div>
+                    <div class="detail-row"><span>💰 EMI Amount:</span><b>₹${emi !== 'N/A' ? escapeHtml(emi) : '0'}</b></div>
+                    <div class="detail-row"><span>🧾 Receipt No:</span><b>${escapeHtml(receipt)}</b></div>
+                    <div class="detail-row"><span>📅 Date:</span><b>${escapeHtml(date)}</b></div>
+                    <button class="share-btn" onclick="shareDetails(${index})">📤 Share Details</button>
+                </div>
+            </div>
+        `;
+        
+        if (isToday) {
+            todayHtml += cardHtml;
+        } else {
+            otherHtml += cardHtml;
+        }
     });
-});
+    
+    if (todayHtml === '') {
+        todayHtml = '<div style="text-align:center; padding:20px; color:#888; background:var(--card); border-radius:10px;">⏳ No payments recorded today</div>';
+    }
+    if (otherHtml === '') {
+        otherHtml = '<div style="text-align:center; padding:20px; color:#888; background:var(--card); border-radius:10px;">📂 No previous records found</div>';
+    }
+    
+    document.getElementById('todayList').innerHTML = todayHtml;
+    document.getElementById('otherList').innerHTML = otherHtml;
+    document.getElementById('todaySection').style.display = 'block';
+    document.getElementById('otherSection').style.display = 'block';
+}
+
+function escapeHtml(str) {
+    if (!str) return 'N/A';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ============ TOGGLE DETAILS ============
+window.toggleDetails = function(index) {
+    const el = document.getElementById(`details-${index}`);
+    if (el) {
+        if (el.style.display === 'none' || el.style.display === '') {
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+};
+
+// ============ SHARE DETAILS ============
+window.shareDetails = function(index) {
+    const item = allRecords[index];
+    const text = `📋 CONTRACT TRACK DETAILS 📋\n\n👤 Name: ${getValue(item, 'name')}\n📝 Contract: ${getValue(item, 'contract')}\n📱 Mobile: ${getValue(item, 'mobile')}\n💰 Amount: ₹${getValue(item, 'amount')}\n📅 Date: ${getValue(item, 'date')}\n🧾 Receipt: ${getValue(item, 'receipt_no')}`;
+    
+    if (navigator.share) {
+        navigator.share({ title: 'Contract Details', text: text });
+    } else {
+        navigator.clipboard.writeText(text);
+        alert('📋 Details copied to clipboard!');
+    }
+};
+
+// ============ APPLY FILTERS ============
+function applyFilters() {
+    const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+    const dateFilterRaw = document.getElementById('dateFilter').value;
+    const selectedDate = formatDateForFilter(dateFilterRaw);
+    
+    let visibleCount = 0;
+    let totalAmount = 0;
+    
+    document.querySelectorAll('.item-card').forEach(card => {
+        const cardDate = card.getAttribute('data-date');
+        const cardName = card.getAttribute('data-name');
+        const cardContract = card.getAttribute('data-contract');
+        const cardAmount = parseFloat(card.getAttribute('data-amount')) || 0;
+        
+        let show = true;
+        
+        if (searchTerm && !cardName.includes(searchTerm) && !cardContract.includes(searchTerm)) {
+            show = false;
+        }
+        
+        if (selectedDate && cardDate !== selectedDate) {
+            show = false;
+        }
+        
+        card.style.display = show ? 'block' : 'none';
+        if (show) {
+            visibleCount++;
+            totalAmount += cardAmount;
+        }
+    });
+    
+    document.getElementById('totalCount').innerText = visibleCount;
+    document.getElementById('totalAmount').innerHTML = '₹' + totalAmount.toLocaleString('en-IN');
+}
+
+// ============ SETUP EVENT LISTENERS ============
+function setupAuthEventListeners() {
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const toggleBtn = document.getElementById('toggleAuthBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const searchFilter = document.getElementById('searchFilter');
+    const dateFilterElem = document.getElementById('dateFilter');
+    
+    if (submitBtn) submitBtn.onclick = handleAuth;
+    if (toggleBtn) toggleBtn.onclick = toggleAuthMode;
+    if (logoutBtn) logoutBtn.onclick = handleLogout;
+    if (fetchBtn) fetchBtn.onclick = fetchData;
+    if (searchFilter) searchFilter.oninput = applyFilters;
+    if (dateFilterElem) dateFilterElem.onchange = applyFilters;
+}
+
+function setupAppEventListeners() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const searchFilter = document.getElementById('searchFilter');
+    const dateFilterElem = document.getElementById('dateFilter');
+    const adminBtn = document.getElementById('adminBtn');
+    
+    if (logoutBtn) logoutBtn.onclick = handleLogout;
+    if (fetchBtn) fetchBtn.onclick = fetchData;
+    if (searchFilter) searchFilter.oninput = applyFilters;
+    if (dateFilterElem) dateFilterElem.onchange = applyFilters;
+    if (adminBtn) adminBtn.onclick = () => { window.location.href = '/admin'; };
+}
+
+// ============ START ============
+checkAuthAndRedirect();
 </script>
 </body>
 </html>
