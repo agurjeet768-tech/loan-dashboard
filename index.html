@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ContractTrack Pro</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+:root{--gold:#d4af37;--bg:#000;--card:#151515;--border:#222;--ok:#22c55e;--red:#ff4444}
+body{font-family:Arial,sans-serif;background:#000;color:#fff;padding:12px;overflow-x:hidden}
+.wrap{max-width:800px;margin:0 auto}
+
+/* AUTH */
+.auth-page{display:flex;justify-content:center;align-items:center;min-height:92vh}
+.auth-box{width:100%;max-width:390px;background:#151515;border:2px solid var(--gold);border-radius:20px;padding:30px 24px;text-align:center}
+.auth-logo{background:var(--gold);color:#000;padding:8px 16px;border-radius:6px;font-weight:900;font-size:22px;display:inline-block;margin-bottom:18px}
+.auth-sub{color:#777;font-size:14px;margin-bottom:6px}
+.inp{width:100%;padding:14px;margin-top:12px;border-radius:10px;border:1px solid #444;background:#000;color:#fff;font-size:16px;outline:none;display:block}
+.inp:focus{border-color:var(--gold)}
+.msg-box{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:14px;display:none;text-align:left}
+.msg-box.err{background:#200;color:#f88;border:1px solid #f33}
+.msg-box.ok{background:#020;color:#0f9;border:1px solid #0f9}
+.big-btn{width:100%;background:var(--gold);color:#000;border:none;padding:14px;border-radius:8px;font-weight:900;cursor:pointer;margin-top:14px;text-transform:uppercase;font-size:15px;letter-spacing:.5px}
+.big-btn:disabled{opacity:.5;cursor:not-allowed}
+.toggle-row{margin-top:16px;font-size:14px;color:#666}
+.toggle-link{color:var(--gold);cursor:pointer;font-weight:bold;text-decoration:underline;background:none;border:none;font-size:14px;margin-left:4px}
+
+/* TOP NAV */
+.top-nav{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;padding:13px 15px;border-radius:12px;border:1px solid #222;margin-bottom:16px;font-size:13px}
+.limit-pill{background:#002a10;color:var(--ok);padding:3px 9px;border-radius:5px;font-weight:bold;border:1px solid var(--ok);font-size:12px}
+.logout-btn{background:var(--red);color:#fff;border:none;padding:7px 13px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:12px}
+
+/* ADMIN BOX */
+.admin-row{display:none;margin-bottom:14px;padding:13px 16px;border:1px solid rgba(212,175,55,.4);border-radius:12px;background:#0d0b00;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.admin-open-btn{background:var(--gold);color:#000;border:none;padding:9px 16px;border-radius:7px;font-weight:900;font-size:13px;cursor:pointer}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.logo-sm{background:var(--gold);color:#000;padding:4px 8px;border-radius:4px;font-weight:900;font-size:14px}
+
+/* INPUT CARD */
+.in-card{background:#151515;padding:12px;border-radius:12px;border:2px solid var(--gold);margin-bottom:14px}
+.in-card textarea{width:100%;background:#000;border:1px solid #222;color:#fff;padding:10px;border-radius:8px;font-family:monospace;font-size:14px;resize:vertical;outline:none}
+.in-card textarea:focus{border-color:var(--gold)}
+
+/* REPORT */
+.report{background:#0c0c0c;border:1px solid #333;padding:12px;border-radius:10px;margin-bottom:14px;font-size:13px;display:none}
+.report-hdr{color:var(--gold);font-weight:bold;margin-bottom:8px;padding-bottom:5px;border-bottom:1px dashed #333;font-size:12px;text-transform:uppercase}
+.rep-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.fbadge{background:rgba(255,77,77,.1);color:#f55;border:1px solid #f55;padding:3px 6px;border-radius:4px;font-size:11px;margin:2px;display:inline-block;font-family:monospace}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:#151515;padding:12px;border-radius:10px;border:2px solid var(--gold);text-align:center}
+.stat-card small{color:var(--gold);font-size:10px;text-transform:uppercase;font-weight:bold}
+.stat-val{font-size:22px;font-weight:bold;margin-top:4px}
+
+/* FILTERS */
+.filter-row{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:12px}
+.fin{width:100%;background:#151515;border:2px solid var(--gold);color:#fff;padding:11px;border-radius:8px;font-size:14px;outline:none}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:pointer}
+
+/* SECTION */
+.sec-title{color:var(--gold);font-size:13px;font-weight:900;margin:18px 0 10px;text-transform:uppercase;border-bottom:1px dashed var(--gold);padding-bottom:7px}
+
+/* ITEM CARD */
+.item{background:#151515;border-radius:12px;border:2px solid var(--gold);margin-bottom:11px;overflow:hidden}
+.item-top{padding:13px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;cursor:pointer}
+.item-top:active{background:#1a1a1a}
+.today-tag{background:var(--ok);color:#000;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:900;display:inline-block}
+.date-lbl{color:var(--ok);font-weight:bold;font-size:12px;text-align:center}
+.detail-box{padding:14px;background:#080808;border-top:1px dashed var(--gold);font-size:13px}
+.drow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1a1a1a}
+.drow:last-child{border-bottom:none}
+.drow b{color:var(--gold);text-align:right}
+.share-btn{width:100%;margin-top:11px;background:var(--gold);color:#000;font-weight:900;border:none;padding:11px;border-radius:6px;cursor:pointer;text-transform:uppercase;font-size:13px}
+
+/* LOADER */
+.loader{display:none;text-align:center;color:var(--gold);padding:20px;font-weight:bold}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid #333;border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+#block-screen{display:none;position:fixed;inset:0;background:#000;z-index:9999;justify-content:center;align-items:center;flex-direction:column;color:var(--red);text-align:center;gap:14px}
+
+@media(max-width:480px){
+  .item-top{grid-template-columns:1.2fr 1fr 1fr;gap:5px;padding:10px}
+  .filter-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="block-screen">
+  <div style="font-size:80px">🚫</div>
+  <h2>ACCESS DENIED</h2>
+  <p>Aapka account block kar diya gaya hai.</p>
+</div>
+
+<div class="wrap" id="auth-page">
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo">CT PRO</div>
+      <div class="auth-sub" id="auth-heading">Login Karein</div>
+      <input class="inp" type="email" id="em" placeholder="📧 Email Address">
+      <input class="inp" type="password" id="pw" placeholder="🔒 Password">
+      <div class="msg-box" id="msg"></div>
+      <button class="big-btn" id="submit-btn">ENTER SYSTEM</button>
+      <div class="toggle-row">
+        <span id="toggle-text">Naye user hain?</span>
+        <button class="toggle-link" id="toggle-btn">Register Karein</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="main-app" style="display:none">
+  <div class="top-nav">
+    <div>
+      <div style="font-size:11px;color:#666">Logged in:</div>
+      <div id="disp-email" style="font-weight:bold;font-size:13px"></div>
+      <div style="margin-top:4px">
+        <span style="font-size:11px;color:#666">Limit: </span>
+        <span class="limit-pill" id="disp-limit">0</span>
+      </div>
+    </div>
+    <button class="logout-btn" id="logout-btn">LOGOUT</button>
+  </div>
+
+  <div class="admin-row" id="admin-row">
+    <div>
+      <div style="color:var(--gold);font-weight:900;font-size:14px">👑 Admin Panel</div>
+      <div style="color:#555;font-size:12px;margin-top:3px">Users, Logs, Pending IDs manage karo</div>
+    </div>
+    <button class="admin-open-btn" id="admin-btn">🔐 Open Admin Panel</button>
+  </div>
+
+  <div class="hdr">
+    <div class="logo-sm">CT</div>
+    <h2 style="font-size:20px">ContractTrack Pro</h2>
+  </div>
+
+  <div class="in-card">
+    <textarea id="contracts-input" rows="4" placeholder="Contract numbers daalo (ek line mein ek)&#10;MFL123456&#10;MFL789012"></textarea>
+    <button class="big-btn" id="fetch-btn">FETCH ALL RECEIPTS</button>
+  </div>
+
+  <div class="loader" id="loader"><span class="spin"></span>DATA FETCH HO RAHA HAI...</div>
+
+  <div class="report" id="report">
+    <div class="report-hdr">📊 Fetch Report</div>
+    <div class="rep-row">
+      <span>Total: <b id="rep-total">0</b></span>
+      <span>✅ <b id="rep-ok" style="color:var(--ok)">0</b></span>
+      <span>❌ <b id="rep-fail" style="color:#f55">0</b></span>
+    </div>
+    <div id="failed-box" style="display:none;margin-top:6px;padding-top:7px;border-top:1px solid #222">
+      <div style="color:#666;font-size:11px;margin-bottom:4px">Ye IDs nahi mile:</div>
+      <div id="failed-list"></div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><small>Records</small><div class="stat-val" id="t-count">0</div></div>
+    <div class="stat-card"><small>Total Amount</small><div class="stat-val" id="t-amt" style="color:var(--ok)">₹0</div></div>
+  </div>
+
+  <div class="filter-row">
+    <input class="fin" type="text" id="search-inp" placeholder="🔍 Name ya Contract...">
+    <input class="fin" type="date" id="date-filter">
+  </div>
+
+  <div id="today-sec" style="display:none">
+    <div class="sec-title">⭐ Aaj ke Payments</div>
+    <div id="today-res"></div>
+  </div>
+  <div id="other-sec" style="display:none">
+    <div class="sec-title">📂 Purane Records</div>
+    <div id="other-res"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+var ADMIN  = 'agurjeet768@gmail.com';
+var SB_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
+var SB_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
+var HF_API = 'https://gauravkumar80500-loandataapi.hf.space/scrape_custom';
+
+var sb, loginMode = true, fpId = 'fp-' + Math.random().toString(36).slice(2);
+window._records = [];
+
+function g(id){ return document.getElementById(id); }
+
+function showMsg(type, txt){
+  var el = g('msg');
+  el.className = 'msg-box ' + type;
+  el.textContent = txt;
+  el.style.display = 'block';
+}
+function hideMsg(){ var el=g('msg'); if(el){el.style.display='none';el.textContent='';} }
+
+function toggleMode(){
+  loginMode = !loginMode;
+  hideMsg();
+  g('auth-heading').textContent = loginMode ? 'Login Karein' : 'Naya Account Banayein';
+  g('submit-btn').textContent   = loginMode ? 'ENTER SYSTEM' : 'REGISTER KAREIN';
+  g('toggle-text').textContent  = loginMode ? 'Naye user hain?' : 'Pehle se account hai?';
+  g('toggle-btn').textContent   = loginMode ? 'Register Karein' : 'Login Karein';
+}
+
+async function doAuth(){
+  var email = g('em').value.trim();
+  var pass  = g('pw').value.trim();
+  var btn   = g('submit-btn');
+  if(!email){ showMsg('err','⚠️ Email daalo!'); return; }
+  if(!pass) { showMsg('err','⚠️ Password daalo!'); return; }
+  if(pass.length < 6){ showMsg('err','⚠️ Password 6+ characters ka hona chahiye!'); return; }
+  hideMsg();
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Wait...';
+  try {
+    if(loginMode){
+      var r = await sb.auth.signInWithPassword({ email:email, password:pass });
+      if(r.error) throw r.error;
+      var ip = await getIP();
+      await sb.from('ContractTrack').update({ device_id:fpId, last_ip:ip }).eq('email', email);
+      showMsg('ok','✅ Login ho gaya!');
+      setTimeout(checkSession, 500);
+    } else {
+      var r2 = await sb.auth.signUp({ email:email, password:pass });
+      if(r2.error) throw r2.error;
+      var ip2 = await getIP();
+      await sb.from('ContractTrack').upsert(
+        { email:email, device_id:fpId, last_ip:ip2, limit_left:10, is_blocked:false },
+        { onConflict:'email' }
+      );
+      showMsg('ok','✅ Account ban gaya! Ab login karein.');
+      loginMode = true;
+      g('auth-heading').textContent = 'Login Karein';
+      g('submit-btn').textContent   = 'ENTER SYSTEM';
+      g('toggle-text').textContent  = 'Naye user hain?';
+      g('toggle-btn').textContent   = 'Register Karein';
+    }
+  } catch(err){
+    var m = (err && err.message) ? err.message : 'Kuch error aaya!';
+    if(m.includes('Invalid login') || m.includes('invalid credentials')) m = '❌ Email ya Password galat hai!';
+    else if(m.includes('already registered')) m = '⚠️ Ye email pehle se registered hai!';
+    else if(m.includes('valid email')) m = '⚠️ Sahi email format likho!';
+    showMsg('err', m);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = loginMode ? 'ENTER SYSTEM' : 'REGISTER KAREIN';
+  }
+}
+
+async function checkSession(){
+  try {
+    var res = await sb.auth.getSession();
+    if(res.data && res.data.session){
+      var uEmail = res.data.session.user.email;
+      g('auth-page').style.display = 'none';
+      g('main-app').style.display  = 'block';
+      g('disp-email').textContent  = uEmail;
+      if(uEmail === ADMIN) g('admin-row').style.display = 'flex';
+      var db = await sb.from('ContractTrack').select('*').eq('email', uEmail).single();
+      if(db.data){
+        g('disp-limit').textContent = db.data.limit_left !== null ? db.data.limit_left : 0;
+        if(db.data.is_blocked) g('block-screen').style.display = 'flex';
+      }
+    } else {
+      g('auth-page').style.display = 'block';
+      g('main-app').style.display  = 'none';
+    }
+  } catch(e){ console.log('Session err:',e); }
+}
+
+function doLogout(){ sb.auth.signOut().then(function(){ location.reload(); }); }
+
+function getIP(){
+  return fetch('https://api.ipify.org?format=json')
+    .then(function(r){ return r.json(); })
+    .then(function(d){ return d.ip; })
+    .catch(function(){ return 'N/A'; });
+}
+
+function gv(obj, key){
+  if(!obj) return 'N/A';
+  var k = Object.keys(obj).find(function(x){ return x.toLowerCase()===key.toLowerCase(); });
+  return (k!==undefined && obj[k]!==null && obj[k]!==undefined) ? obj[k] : 'N/A';
+}
+function cv(v){ var s=String(v).toLowerCase(); return (!v||s==='null'||s==='undefined'||s==='n/a')?'N/A':v; }
+function fmtDate(s){
+  if(!s) return '';
+  var mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var p=s.split('-');
+  return p.length<3?'':p[2]+'-'+mo[parseInt(p[1])-1]+'-'+p[0];
+}
+
+window.toggleCard = function(i){
+  var d=g('det-'+i), ic=g('ic-'+i);
+  if(!d) return;
+  var open = d.style.display !== 'none';
+  d.style.display = open ? 'none' : 'block';
+  if(ic) ic.textContent = open ? '▼' : '▲';
+};
+
+window.shareCard = function(i){
+  var item = window._records[i];
+  if(!item) return;
+  var txt =
+    '*ContractTrack Pro*\n'+
+    '👤 Name: '+gv(item,'name')+'\n'+
+    '📝 Contract: '+gv(item,'contract')+'\n'+
+    '📱 Mobile: '+gv(item,'mobile')+'\n'+
+    '💰 Amount: ₹'+gv(item,'amount')+'\n'+
+    '📅 Date: '+gv(item,'date')+'\n'+
+    '🧾 Receipt: '+gv(item,'receipt_no');
+  if(navigator.share){ navigator.share({title:'CT Pro',text:txt}).catch(function(){}); }
+  else { navigator.clipboard.writeText(txt).then(function(){ alert('Copied!'); }); }
+};
+
+function applyFilters(){
+  var term = g('search-inp').value.toLowerCase();
+  var selD = fmtDate(g('date-filter').value);
+  var cnt=0, amt=0;
+  window._records.forEach(function(item,i){
+    var card = g('card-'+i);
+    if(!card) return;
+    var ok = card.textContent.toLowerCase().indexOf(term) !== -1;
+    var dOk = !selD || gv(item,'date')===selD;
+    if(ok && dOk){ card.style.display='block'; cnt++; amt+=parseFloat(String(gv(item,'amount')).replace(/,/g,''))||0; }
+    else { card.style.display='none'; }
+  });
+  g('t-count').textContent = cnt;
+  g('t-amt').textContent   = '₹'+amt.toLocaleString('en-IN');
+}
+
+async function doFetch(){
+  var raw = g('contracts-input').value.trim();
+  if(!raw){ alert('Contract numbers daalo!'); return; }
+  var btn = g('fetch-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>FETCHING...';
+  g('loader').style.display='block'; g('report').style.display='none';
+  g('today-sec').style.display='none'; g('other-sec').style.display='none';
+  g('today-res').innerHTML=''; g('other-res').innerHTML='';
+  try {
+    var arr  = raw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    var uniq = arr.filter(function(v,i,a){ return a.indexOf(v)===i; });
+    var need = uniq.length;
+    var sess = await sb.auth.getSession();
+    if(!sess.data || !sess.data.session) throw new Error('Login karein pehle!');
+    var email = sess.data.session.user.email;
+    var uDb = await sb.from('ContractTrack').select('*').eq('email',email).single();
+    if(uDb.error || !uDb.data) throw new Error('Database error!');
+    if(uDb.data.is_blocked){ g('block-screen').style.display='flex'; return; }
+    var lim = uDb.data.limit_left!==null ? parseInt(uDb.data.limit_left) : 0;
+    if(lim < need) throw new Error('Limit khatam! Chahiye: '+need+', Bachi: '+lim);
+    var apiR = await fetch(HF_API+'?contracts='+uniq.join(','));
+    if(!apiR.ok) throw new Error('API Down! Status: '+apiR.status);
+    var data = await apiR.json();
+    window._records = Array.isArray(data) ? data : [];
+    var newLim = lim - need;
+    g('disp-limit').textContent = newLim;
+    try {
+      var logs = uniq.map(function(id){ return {email:email,search_query:id,device_id:fpId}; });
+      await sb.from('search_logs').insert(logs);
+      await sb.from('ContractTrack').update({limit_left:newLim}).eq('email',email);
+    } catch(e){ console.log('Log err:',e); }
+    var fetched = window._records.map(function(x){ return String(gv(x,'contract')).trim(); });
+    var failed  = uniq.filter(function(id){ return fetched.indexOf(String(id).trim())===-1; });
+    g('rep-total').textContent=uniq.length; g('rep-ok').textContent=window._records.length; g('rep-fail').textContent=failed.length;
+    if(failed.length>0){
+      g('failed-box').style.display='block';
+      g('failed-list').innerHTML=failed.map(function(id){ return '<span class="fbadge">'+id+'</span>'; }).join('');
+    } else { g('failed-box').style.display='none'; }
+    g('report').style.display='block';
+    var todayStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace(/ /g,'-');
+    var tH='', oH='';
+    window._records.forEach(function(item,i){
+      var nm=gv(item,'name'),ct=gv(item,'contract'),dt=gv(item,'date'),am=gv(item,'amount'),
+          mo=gv(item,'mobile'),em=gv(item,'emi_amount'),ov=gv(item,'overdue'),
+          gn=gv(item,'gu_name'),gm=gv(item,'gu_mobile'),cn=gv(item,'co_name'),
+          cm=gv(item,'co_mobile'),rc=gv(item,'receipt_no'),ins=gv(item,'instr');
+      var isT=(dt===todayStr);
+      var emiT=em!=='N/A'?'₹'+em:'N/A';
+      var ovT=cv(ov)!=='N/A'?'₹'+ov:'₹0';
+      var dD=isT
+        ? '<span class="today-tag">TODAY ✅</span>'
+        : '<div class="date-lbl" style="font-size:11px;">'+(dt!=='N/A'?dt:'-')+'</div>';
+      var card=
+        '<div class="item" id="card-'+i+'">' +
+          '<div class="item-top" onclick="toggleCard('+i+')">' +
+            '<div><div style="font-weight:bold;font-size:15px;">'+nm+'</div>' +
+            '<div style="color:var(--gold);font-size:12px;margin-top:3px;font-weight:bold;">'+ct+'</div></div>' +
+            '<div style="text-align:center;padding:0 6px;">'+dD+'</div>' +
+            '<div style="text-align:right;">' +
+              '<div style="color:var(--gold);font-weight:bold;font-size:17px;">₹'+am+'</div>' +
+              '<div style="font-size:11px;color:#666;margin-top:4px;">Details <span id="ic-'+i+'">▼</span></div>' +
+            '</div></div>' +
+          '<div id="det-'+i+'" class="detail-box" style="display:none;">' +
+            '<div class="drow"><span>📱 Mobile</span><b>'+mo+'</b></div>' +
+            '<div class="drow"><span>💳 EMI</span><b style="color:var(--ok)">'+emiT+'</b></div>' +
+            '<div class="drow"><span>⚠️ Overdue</span><b style="color:#f55">'+ovT+'</b></div>' +
+            '<div class="drow"><span>👤 Guarantor</span><b>'+gn+'</b></div>' +
+            '<div class="drow"><span>📱 GU Mobile</span><b>'+gm+'</b></div>' +
+            '<div class="drow"><span>👥 Co-App</span><b>'+cn+'</b></div>' +
+            '<div class="drow"><span>📱 Co Mobile</span><b>'+cm+'</b></div>' +
+            '<div class="drow"><span>🧾 Receipt</span><b style="color:#aaa">'+rc+'</b></div>' +
+            '<div class="drow"><span>📋 Type</span><b style="color:#aaa">'+ins+'</b></div>' +
+            '<button class="share-btn" onclick="shareCard('+i+')">🔗 Share Details</button>' +
+          '</div></div>';
+      if(isT) tH+=card; else oH+=card;
+    });
+    if(!tH) tH='<div style="text-align:center;padding:16px;color:#555;background:#111;border-radius:10px;border:1px dashed var(--gold);margin-bottom:12px">⏳ Aaj koi payment nahi aaya abhi tak.</div>';
+    g('today-res').innerHTML=tH; g('other-res').innerHTML=oH;
+    g('today-sec').style.display='block';
+    if(oH) g('other-sec').style.display='block';
+    applyFilters();
+  } catch(err){
+    console.error(err); alert('❌ Error: '+(err.message||err));
+  } finally {
+    g('loader').style.display='none'; btn.disabled=false; btn.textContent='FETCH ALL RECEIPTS';
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────
+window.addEventListener('load', function(){
+  sb = window.supabase.createClient(SB_URL, SB_KEY);
+  g('submit-btn').addEventListener('click', doAuth);
+  g('toggle-btn').addEventListener('click', toggleMode);
+  g('logout-btn').addEventListener('click', doLogout);
+  g('fetch-btn').addEventListener('click', doFetch);
+  g('admin-btn').addEventListener('click', function(){ window.location.href='admin.html'; });
+  g('search-inp').addEventListener('input', applyFilters);
+  g('date-filter').addEventListener('change', applyFilters);
+  g('pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
+  g('em').addEventListener('keydown', function(e){ if(e.key==='Enter') g('pw').focus(); });
+  checkSession();
+});
+</script>
+</body>
+</html>
