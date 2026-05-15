@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CT PRO - Admin Panel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--gold:#d4af37;--bg:#060608;--card:#0f0f12;--card2:#14141a;--border:#1e1e28;--ok:#22c55e;--red:#ef4444;--info:#3b82f6;--warn:#f59e0b;--muted:#666680}
+body{font-family:Arial,sans-serif;background:var(--bg);color:#e8e8f0;min-height:100vh;padding:14px;overflow-x:hidden}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo-box{background:var(--gold);color:#000;font-weight:900;font-size:13px;padding:5px 10px;border-radius:6px;letter-spacing:1px}
+.admin-badge{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.3);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.top-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+.top-btn:hover{border-color:var(--gold);color:var(--gold)}
+.top-btn.red{border-color:rgba(239,68,68,.3);color:var(--red)}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.stat-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.stat-val{font-size:26px;font-weight:700;margin-top:4px;color:var(--gold);font-family:monospace}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* TABS */
+.tabs{display:flex;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:18px;overflow-x:auto}
+.tab{flex:1;min-width:90px;padding:9px 12px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--gold);color:#000}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+
+/* SECTION TITLE */
+.sec-title{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.ref-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px}
+.ref-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* SEARCH */
+.search-bar{width:100%;background:var(--card);border:1px solid var(--border);color:#e8e8f0;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;outline:none}
+.search-bar:focus{border-color:var(--gold)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--card2);color:var(--gold);font-weight:700;padding:10px 12px;text-align:left;font-size:11px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--card2)}
+tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.b-green{background:rgba(34,197,94,.12);color:var(--ok);border:1px solid rgba(34,197,94,.3)}
+.b-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.b-gold{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.3)}
+
+/* ACTION BUTTONS */
+.act-btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid}
+.btn-block{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
+.btn-block:hover{background:var(--red);color:#fff}
+.btn-unblock{background:rgba(34,197,94,.1);color:var(--ok);border-color:rgba(34,197,94,.3)}
+.btn-unblock:hover{background:var(--ok);color:#000}
+.btn-gold{background:rgba(212,175,55,.1);color:var(--gold);border-color:rgba(212,175,55,.3)}
+.btn-gold:hover{background:var(--gold);color:#000}
+
+/* LIMIT INPUT */
+.lim-inp{background:var(--bg);border:1px solid var(--border);color:var(--gold);font-family:monospace;font-size:13px;padding:4px 8px;border-radius:6px;width:65px;text-align:center;outline:none}
+.lim-inp:focus{border-color:var(--gold)}
+
+/* LOG ITEM */
+.log-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;flex-wrap:wrap;gap:6px}
+.log-id{font-family:monospace;color:var(--gold);font-size:12px}
+.log-email{color:var(--muted);font-size:12px}
+.log-time{color:var(--muted);font-size:11px;font-family:monospace}
+
+/* PENDING */
+.pending-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;margin-bottom:14px}
+.pending-num{font-family:monospace;font-size:52px;font-weight:700;color:var(--warn)}
+.pending-lbl{color:var(--muted);font-size:13px;margin-top:4px}
+
+/* EXPORT */
+.export-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.exp-btn{background:var(--gold);color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer}
+
+/* LOADER */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--gold);color:var(--gold);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;z-index:9999;display:none}
+
+/* BLOCK */
+#block-screen{display:none;position:fixed;inset:0;background:#000;z-index:9999;justify-content:center;align-items:center;flex-direction:column;color:var(--red);text-align:center;gap:12px}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.ld-logo{font-size:30px;font-weight:900;color:var(--gold);font-family:monospace}
+.ld-bar{width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.ld-fill{height:100%;background:var(--gold);border-radius:2px;animation:fill 1.4s ease forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+.ld-txt{color:var(--muted);font-size:12px;letter-spacing:2px}
+
+@media(max-width:600px){
+  .stat-val{font-size:20px}
+  .tab{font-size:11px;padding:8px 8px}
+}
+</style>
+</head>
+<body>
+
+<div id="block-screen">
+  <div style="font-size:80px">🚫</div>
+  <h2>ACCESS DENIED</h2>
+  <p>Sirf Admin yahan aa sakta hai.</p>
+</div>
+
+<div id="loading">
+  <div class="ld-logo">CT PRO</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+  <div class="ld-txt">ADMIN PANEL LOADING...</div>
+</div>
+
+<div id="toast"></div>
+
+<div class="wrap" id="admin-app" style="display:none">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-box">CT PRO</div>
+      <span class="admin-badge">👑 ADMIN</span>
+      <span id="admin-email" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="top-btn" onclick="window.location.href='index.html'">← Main App</button>
+      <button class="top-btn red" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Total Users</div><div class="stat-val" id="s-users">--</div><div class="stat-sub">Registered</div></div>
+    <div class="stat-card"><div class="stat-lbl">Active</div><div class="stat-val" id="s-active" style="color:var(--ok)">--</div><div class="stat-sub">Not blocked</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total Searches</div><div class="stat-val" id="s-total" style="color:var(--info)">--</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card"><div class="stat-lbl">Today</div><div class="stat-val" id="s-today" style="color:var(--warn)">--</div><div class="stat-sub">Last 24h</div></div>
+    <div class="stat-card"><div class="stat-lbl">Pending IDs</div><div class="stat-val" id="s-pending" style="color:var(--warn)">--</div><div class="stat-sub">GitHub se</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('users',this)">👥 Users</button>
+    <button class="tab" onclick="switchTab('logs',this)">📋 Logs</button>
+    <button class="tab" onclick="switchTab('pending',this)">⏳ Pending</button>
+    <button class="tab" onclick="switchTab('export',this)">📥 Export</button>
+  </div>
+
+  <!-- USERS PANEL -->
+  <div class="panel active" id="panel-users">
+    <div class="sec-title">User Management <button class="ref-btn" onclick="loadUsers()">↺ Refresh</button></div>
+    <input class="search-bar" type="text" id="user-search" placeholder="🔍 Email se search karo..." oninput="filterUsers()">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Email</th><th>Limit</th><th>Status</th><th>Last IP</th><th>Edit Limit</th><th>Action</th>
+        </tr></thead>
+        <tbody id="user-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOGS PANEL -->
+  <div class="panel" id="panel-logs">
+    <div class="sec-title">Live Search Logs <button class="ref-btn" onclick="loadLogs()">↺ Refresh</button></div>
+    <input class="search-bar" type="text" id="log-search" placeholder="🔍 Email ya Contract ID..." oninput="filterLogs()">
+    <div id="log-list"><div style="text-align:center;padding:30px;color:var(--muted)"><span class="spin"></span>Loading...</div></div>
+  </div>
+
+  <!-- PENDING PANEL -->
+  <div class="panel" id="panel-pending">
+    <div class="sec-title">Pending IDs (GitHub) <button class="ref-btn" onclick="loadPending()">↺ Refresh</button></div>
+    <div class="pending-box">
+      <div class="pending-num" id="pending-count">--</div>
+      <div class="pending-lbl">IDs abhi bhi pending hain</div>
+    </div>
+    <div id="pending-list" style="max-height:400px;overflow-y:auto"></div>
+  </div>
+
+  <!-- EXPORT PANEL -->
+  <div class="panel" id="panel-export">
+    <div class="sec-title">Data Export</div>
+    <div class="export-card">
+      <div><div style="font-weight:700;margin-bottom:4px">Search Logs</div><div style="font-size:12px;color:var(--muted)">Poori search history CSV mein</div></div>
+      <button class="exp-btn" onclick="exportLogs()">📥 Download CSV</button>
+    </div>
+    <div class="export-card">
+      <div><div style="font-weight:700;margin-bottom:4px">Users List</div><div style="font-size:12px;color:var(--muted)">Sab users ki list CSV mein</div></div>
+      <button class="exp-btn" onclick="exportUsers()">📥 Download CSV</button>
+    </div>
+    <div class="export-card">
+      <div><div style="font-weight:700;margin-bottom:4px">Pending IDs</div><div style="font-size:12px;color:var(--muted)">GitHub se pending IDs</div></div>
+      <button class="exp-btn" onclick="exportPending()">📥 Download CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+var ADMIN  = 'agurjeet768@gmail.com';
+var SB_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
+var SB_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
+var GH_RAW = 'https://raw.githubusercontent.com/agurjeet768-tech/loan-dashboard/main/src/pages/pending_ids.json';
+
+var sb, allUsers=[], allLogs=[], allPending={};
+
+function g(id){ return document.getElementById(id); }
+
+function toast(msg){
+  var t=g('toast'); t.textContent=msg; t.style.display='block';
+  setTimeout(function(){ t.style.display='none'; }, 2500);
+}
+
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  g('panel-'+name).classList.add('active');
+  if(name==='logs') loadLogs();
+  if(name==='pending') loadPending();
+}
+
+async function loadStats(){
+  var u = await sb.from('ContractTrack').select('*');
+  var l = await sb.from('search_logs').select('created_at');
+  if(u.data){
+    g('s-users').textContent  = u.data.length;
+    g('s-active').textContent = u.data.filter(function(x){ return !x.is_blocked; }).length;
+  }
+  if(l.data){
+    g('s-total').textContent = l.data.length;
+    var today = new Date(); today.setHours(0,0,0,0);
+    g('s-today').textContent = l.data.filter(function(x){ return new Date(x.created_at)>=today; }).length;
+  }
+  try {
+    var r = await fetch(GH_RAW+'?t='+Date.now());
+    allPending = await r.json();
+    g('s-pending').textContent = Object.keys(allPending).length;
+  } catch(e){ g('s-pending').textContent = 'N/A'; }
+}
+
+// ── USERS ─────────────────────────────────────────────────
+async function loadUsers(){
+  g('user-tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>Loading...</td></tr>';
+  var res = await sb.from('ContractTrack').select('*').order('limit_left',{ascending:true});
+  if(res.data){ allUsers=res.data; renderUsers(allUsers); }
+}
+
+function renderUsers(users){
+  if(!users.length){
+    g('user-tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Koi user nahi mila</td></tr>';
+    return;
+  }
+  g('user-tbody').innerHTML = users.map(function(u,i){
+    var lim = u.limit_left !== null ? u.limit_left : 0;
+    var limClass = lim>5 ? 'b-green' : lim>0 ? 'b-gold' : 'b-red';
+    return '<tr>'+
+      '<td style="color:var(--muted)">'+(i+1)+'</td>'+
+      '<td style="font-weight:700">'+(u.email||'N/A')+'</td>'+
+      '<td><span class="badge '+limClass+'">'+lim+'</span></td>'+
+      '<td><span class="badge '+(u.is_blocked?'b-red':'b-green')+'">'+(u.is_blocked?'BLOCKED':'ACTIVE')+'</span></td>'+
+      '<td style="font-size:11px;color:var(--muted)">'+(u.last_ip||'N/A')+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:6px">'+
+        '<input class="lim-inp" id="lim-'+u.email+'" value="'+lim+'" type="number" min="0" max="9999">'+
+        '<button class="act-btn btn-gold" onclick="updateLimit(\''+u.email+'\')">Set</button>'+
+      '</div></td>'+
+      '<td>'+(u.is_blocked
+        ? '<button class="act-btn btn-unblock" onclick="toggleBlock(\''+u.email+'\',false)">Unblock</button>'
+        : '<button class="act-btn btn-block" onclick="toggleBlock(\''+u.email+'\',true)">Block</button>'
+      )+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function filterUsers(){
+  var term = g('user-search').value.toLowerCase();
+  renderUsers(allUsers.filter(function(u){ return (u.email||'').toLowerCase().includes(term); }));
+}
+
+async function updateLimit(email){
+  var el = g('lim-'+email);
+  var val = parseInt(el.value);
+  if(isNaN(val)||val<0){ toast('❌ Valid number daalo!'); return; }
+  var res = await sb.from('ContractTrack').update({limit_left:val}).eq('email',email);
+  if(!res.error){
+    toast('✅ Limit update: '+val);
+    allUsers = allUsers.map(function(u){ return u.email===email ? Object.assign({},u,{limit_left:val}) : u; });
+    renderUsers(allUsers);
+    loadStats();
+  } else { toast('❌ Error: '+res.error.message); }
+}
+
+async function toggleBlock(email, block){
+  var res = await sb.from('ContractTrack').update({is_blocked:block}).eq('email',email);
+  if(!res.error){
+    toast(block ? '🚫 User block ho gaya!' : '✅ User unblock ho gaya!');
+    allUsers = allUsers.map(function(u){ return u.email===email ? Object.assign({},u,{is_blocked:block}) : u; });
+    renderUsers(allUsers);
+    loadStats();
+  } else { toast('❌ Error: '+res.error.message); }
+}
+
+// ── LOGS ──────────────────────────────────────────────────
+async function loadLogs(){
+  g('log-list').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)"><span class="spin"></span>Loading...</div>';
+  var res = await sb.from('search_logs').select('*').order('created_at',{ascending:false}).limit(200);
+  if(res.data){ allLogs=res.data; renderLogs(allLogs); }
+}
+
+function renderLogs(logs){
+  if(!logs.length){
+    g('log-list').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Koi log nahi mila</div>';
+    return;
+  }
+  g('log-list').innerHTML = logs.map(function(l){
+    var d = new Date(l.created_at);
+    var t = d.toLocaleDateString('en-IN')+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    return '<div class="log-item">'+
+      '<div><div class="log-id">📄 '+(l.search_query||'N/A')+'</div>'+
+      '<div class="log-email">'+(l.email||'N/A')+'</div></div>'+
+      '<div class="log-time">'+t+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function filterLogs(){
+  var term = g('log-search').value.toLowerCase();
+  renderLogs(allLogs.filter(function(l){
+    return (l.email||'').toLowerCase().includes(term) || (l.search_query||'').toLowerCase().includes(term);
+  }));
+}
+
+// ── PENDING ───────────────────────────────────────────────
+async function loadPending(){
+  g('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>GitHub se load ho raha hai...</div>';
+  try {
+    var r = await fetch(GH_RAW+'?t='+Date.now());
+    allPending = await r.json();
+    var keys = Object.keys(allPending);
+    g('pending-count').textContent = keys.length;
+    g('s-pending').textContent = keys.length;
+    if(!keys.length){
+      g('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--ok);font-weight:700">✅ Koi ID pending nahi hai!</div>';
+      return;
+    }
+    g('pending-list').innerHTML = keys.map(function(id){
+      return '<div class="log-item">'+
+        '<div class="log-id">⏳ '+id+'</div>'+
+        '<span class="badge b-gold">'+allPending[id]+'</span>'+
+      '</div>';
+    }).join('');
+  } catch(e){
+    g('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ GitHub se data load nahi hua</div>';
+  }
+}
+
+// ── EXPORT ────────────────────────────────────────────────
+function downloadCSV(filename, rows, headers){
+  var csv = [headers.join(',')].concat(rows.map(function(r){
+    return headers.map(function(h){ return '"'+(r[h]||'').toString().replace(/"/g,'""')+'"'; }).join(',');
+  })).join('\n');
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  toast('✅ '+filename+' download ho gaya!');
+}
+
+async function exportLogs(){
+  var res = await sb.from('search_logs').select('*').order('created_at',{ascending:false});
+  if(res.data && res.data.length) downloadCSV('search_logs_'+new Date().toISOString().slice(0,10)+'.csv',res.data,['email','search_query','device_id','created_at']);
+  else toast('❌ Koi log nahi mila!');
+}
+
+async function exportUsers(){
+  var res = await sb.from('ContractTrack').select('*');
+  if(res.data && res.data.length) downloadCSV('users_'+new Date().toISOString().slice(0,10)+'.csv',res.data,['email','limit_left','is_blocked','device_id','last_ip']);
+  else toast('❌ Koi user nahi mila!');
+}
+
+function exportPending(){
+  var keys = Object.keys(allPending);
+  if(!keys.length){ toast('❌ Koi pending ID nahi hai!'); return; }
+  downloadCSV('pending_ids_'+new Date().toISOString().slice(0,10)+'.csv',
+    keys.map(function(k){ return {contract_id:k,status:allPending[k]}; }),
+    ['contract_id','status']
+  );
+}
+
+function doLogout(){ sb.auth.signOut().then(function(){ window.location.href='index.html'; }); }
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('load', async function(){
+  sb = window.supabase.createClient(SB_URL, SB_KEY);
+  var res = await sb.auth.getSession();
+  if(!res.data || !res.data.session || res.data.session.user.email !== ADMIN){
+    g('loading').style.display='none';
+    g('block-screen').style.display='flex';
+    return;
+  }
+  g('admin-email').textContent = res.data.session.user.email;
+  await loadStats();
+  await loadUsers();
+  setTimeout(function(){
+    g('loading').style.display='none';
+    g('admin-app').style.display='block';
+  }, 1000);
+});
+</script>
+</body>
+</html>
