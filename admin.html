@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CT PRO - Admin Panel</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#d4af37;--bg:#060608;--card:#0f0f12;--card2:#14141a;--border:#1e1e28;--ok:#22c55e;--red:#ef4444;--info:#3b82f6;--warn:#f59e0b;--muted:#666680}
 body{font-family:Arial,sans-serif;background:var(--bg);color:#e8e8f0;min-height:100vh;padding:14px;overflow-x:hidden}
 .wrap{max-width:1100px;margin:0 auto}
@@ -13,18 +13,64 @@ body{font-family:Arial,sans-serif;background:var(--bg);color:#e8e8f0;min-height:
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:18px;flex-wrap:wrap;gap:10px}
 .topbar-left{display:flex;align-items:center;gap:10px}
-.logo-box{background:var(--gold);color:#000;font-weight:900;font-size:13px;padding:5px 10px;border-radius:6px;letter-spacing:1px}
+.logo-box{background:var(--gold);color:#000;font-weight:900;font-size:13px;padding:5px 10px;border-radius:6px}
 .admin-badge{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.3);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 .top-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
 .top-btn:hover{border-color:var(--gold);color:var(--gold)}
 .top-btn.red{border-color:rgba(239,68,68,.3);color:var(--red)}
 
-/* STAT CARDS */
+/* NIGHT RUN CARD */
+.night-card{background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:18px;margin-bottom:18px}
+.night-card-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.night-title{font-size:15px;font-weight:900;color:var(--gold)}
+.night-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* NIGHT RUN BUTTON */
+.run-btn{background:var(--gold);color:#000;border:none;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.5px;transition:all .2s;display:flex;align-items:center;gap:8px}
+.run-btn:disabled{background:#3a3300;color:#665500;cursor:not-allowed;opacity:.6}
+.run-btn:hover:not(:disabled){background:#f0d060;transform:scale(1.02)}
+
+/* PROGRESS BAR */
+.progress-wrap{margin-bottom:12px;display:none}
+.progress-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--gold);border-radius:3px;width:0%;transition:width .5s ease}
+.progress-text{font-size:11px;color:var(--muted);margin-top:5px;text-align:right}
+
+/* LIVE LOG BOX */
+.log-box{background:#000;border:1px solid var(--border);border-radius:10px;padding:12px;height:220px;overflow-y:auto;font-family:monospace;font-size:12px;line-height:1.7}
+.log-box:empty::before{content:"Night Run chalane ke baad yahan live logs dikhenge...";color:var(--muted)}
+.log-line{margin:1px 0}
+.log-line.ok{color:var(--ok)}
+.log-line.err{color:var(--red)}
+.log-line.info{color:var(--gold)}
+.log-line.muted{color:var(--muted)}
+.log-line.bingo{color:#ff9900;font-weight:bold}
+
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.status-idle{background:rgba(102,102,128,.15);color:var(--muted);border:1px solid var(--border)}
+.status-running{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.4)}
+.status-done{background:rgba(34,197,94,.12);color:var(--ok);border:1px solid rgba(34,197,94,.3)}
+.status-error{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dot-idle{background:var(--muted)}
+.dot-run{background:var(--gold);animation:blink .8s infinite}
+.dot-ok{background:var(--ok)}
+.dot-err{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* STATS GRID */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
 .stat-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
-.stat-val{font-size:26px;font-weight:700;margin-top:4px;color:var(--gold);font-family:monospace}
+.stat-val{font-size:24px;font-weight:700;margin-top:4px;color:var(--gold);font-family:monospace}
 .stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* TODAY STATS */
+.today-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.today-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.today-num{font-size:20px;font-weight:900;font-family:monospace}
+.today-lbl{font-size:10px;color:var(--muted);margin-top:3px}
 
 /* TABS */
 .tabs{display:flex;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:18px;overflow-x:auto}
@@ -73,7 +119,7 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
 .lim-inp:focus{border-color:var(--gold)}
 
 /* LOG ITEM */
-.log-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;flex-wrap:wrap;gap:6px}
+.log-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px}
 .log-id{font-family:monospace;color:var(--gold);font-size:12px}
 .log-email{color:var(--muted);font-size:12px}
 .log-time{color:var(--muted);font-size:11px;font-family:monospace}
@@ -87,8 +133,8 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
 .export-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
 .exp-btn{background:var(--gold);color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer}
 
-/* LOADER */
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
+/* SPINNER */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 
 /* TOAST */
@@ -108,6 +154,7 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
 @media(max-width:600px){
   .stat-val{font-size:20px}
   .tab{font-size:11px;padding:8px 8px}
+  .today-stats{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -129,6 +176,7 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
 
 <div class="wrap" id="admin-app" style="display:none">
 
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
       <div class="logo-box">CT PRO</div>
@@ -138,6 +186,58 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="top-btn" onclick="window.location.href='index.html'">← Main App</button>
       <button class="top-btn red" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- NIGHT RUN CARD -->
+  <div class="night-card">
+    <div class="night-card-top">
+      <div>
+        <div class="night-title">🌙 Night Bot Control</div>
+        <div class="night-sub">Manually night run chalao aur live progress dekho</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="status-badge status-idle" id="run-status">
+          <span class="dot dot-idle"></span>
+          <span id="run-status-text">Idle</span>
+        </span>
+        <button class="run-btn" id="run-btn" onclick="startNightRun()">
+          ▶ Night Run Chalao
+        </button>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-text" id="progress-text">0 / 0 batches complete</div>
+    </div>
+
+    <!-- TODAY STATS -->
+    <div class="today-stats">
+      <div class="today-card">
+        <div class="today-num" id="today-processed" style="color:var(--gold)">0</div>
+        <div class="today-lbl">Aaj Process Hue</div>
+      </div>
+      <div class="today-card">
+        <div class="today-num" id="today-deleted" style="color:var(--ok)">0</div>
+        <div class="today-lbl">Pending Se Hate</div>
+      </div>
+      <div class="today-card">
+        <div class="today-num" id="today-bingo" style="color:#ff9900">0</div>
+        <div class="today-lbl">Numbers Mile</div>
+      </div>
+    </div>
+
+    <!-- LIVE LOG -->
+    <div style="margin-top:14px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;font-weight:700">
+        📋 Live Logs
+        <button class="ref-btn" style="margin-left:8px" onclick="clearLogs()">Clear</button>
+      </div>
+      <div class="log-box" id="live-log"></div>
     </div>
   </div>
 
@@ -167,7 +267,7 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
         <thead><tr>
           <th>#</th><th>Email</th><th>Limit</th><th>Status</th><th>Last IP</th><th>Edit Limit</th><th>Action</th>
         </tr></thead>
-        <tbody id="user-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>Loading...</td></tr></tbody>
+        <tbody id="user-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -176,7 +276,7 @@ tbody td{padding:10px 12px;font-size:13px;white-space:nowrap}
   <div class="panel" id="panel-logs">
     <div class="sec-title">Live Search Logs <button class="ref-btn" onclick="loadLogs()">↺ Refresh</button></div>
     <input class="search-bar" type="text" id="log-search" placeholder="🔍 Email ya Contract ID..." oninput="filterLogs()">
-    <div id="log-list"><div style="text-align:center;padding:30px;color:var(--muted)"><span class="spin"></span>Loading...</div></div>
+    <div id="log-list"><div style="text-align:center;padding:30px;color:var(--muted)">Loading...</div></div>
   </div>
 
   <!-- PENDING PANEL -->
@@ -214,8 +314,11 @@ var ADMIN  = 'agurjeet768@gmail.com';
 var SB_URL = 'https://ihcmbsvsfwakmmmymtxq.supabase.co';
 var SB_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
 var GH_RAW = 'https://raw.githubusercontent.com/agurjeet768-tech/loan-dashboard/main/src/pages/pending_ids.json';
+var HF_URL = 'https://gauravkumar80500-loandataapi.hf.space';
 
 var sb, allUsers=[], allLogs=[], allPending={};
+var isRunning = false;
+var todayProcessed = 0, todayDeleted = 0, todayBingo = 0;
 
 function g(id){ return document.getElementById(id); }
 
@@ -233,6 +336,172 @@ function switchTab(name, btn){
   if(name==='pending') loadPending();
 }
 
+// ── LIVE LOG ──────────────────────────────────────────────
+function addLog(msg, type) {
+  var box = g('live-log');
+  var line = document.createElement('div');
+  line.className = 'log-line ' + (type || 'muted');
+  var time = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  line.textContent = '[' + time + '] ' + msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearLogs(){
+  g('live-log').innerHTML = '';
+  todayProcessed = 0; todayDeleted = 0; todayBingo = 0;
+  g('today-processed').textContent = '0';
+  g('today-deleted').textContent = '0';
+  g('today-bingo').textContent = '0';
+}
+
+// ── SET STATUS ────────────────────────────────────────────
+function setStatus(state) {
+  var badge = g('run-status');
+  var dot = badge.querySelector('.dot');
+  var text = g('run-status-text');
+  badge.className = 'status-badge';
+  dot.className = 'dot';
+  if(state === 'running') {
+    badge.classList.add('status-running');
+    dot.classList.add('dot-run');
+    text.textContent = 'Chal raha hai...';
+  } else if(state === 'done') {
+    badge.classList.add('status-done');
+    dot.classList.add('dot-ok');
+    text.textContent = 'Complete!';
+  } else if(state === 'error') {
+    badge.classList.add('status-error');
+    dot.classList.add('dot-err');
+    text.textContent = 'Error aaya!';
+  } else {
+    badge.classList.add('status-idle');
+    dot.classList.add('dot-idle');
+    text.textContent = 'Idle';
+  }
+}
+
+// ── NIGHT RUN ─────────────────────────────────────────────
+async function startNightRun() {
+  if(isRunning) { toast('⚠️ Pehle wala run abhi chal raha hai!'); return; }
+
+  isRunning = true;
+  var btn = g('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Chal raha hai...';
+  setStatus('running');
+  clearLogs();
+
+  addLog('🚀 Night Run shuru ho raha hai...', 'info');
+  addLog('📋 GitHub se pending IDs fetch ho rahi hain...', 'muted');
+
+  try {
+    // Step 1: Pending IDs fetch karo
+    var pendRes = await fetch(GH_RAW + '?t=' + Date.now());
+    var pendData = await pendRes.json();
+    var allIds = Object.keys(pendData);
+    var total = Math.min(allIds.length, 50);
+
+    if(total === 0) {
+      addLog('😴 Koi pending ID nahi hai! Sab clear hai.', 'ok');
+      setStatus('done');
+      toast('✅ Koi pending ID nahi!');
+      resetBtn();
+      return;
+    }
+
+    addLog('📋 Total pending: ' + allIds.length + ' IDs, Is round mein: ' + total + ' process hongi', 'info');
+    g('progress-wrap').style.display = 'block';
+
+    var batchSize = 5;
+    var batches = Math.ceil(total / batchSize);
+    var completed = 0;
+
+    // Step 2: Batches process karo
+    for(var i = 0; i < total; i += batchSize) {
+      var batch = allIds.slice(i, i + batchSize);
+      addLog('📦 Batch ' + (completed+1) + '/' + batches + ': ' + batch.join(', '), 'muted');
+
+      try {
+        var apiRes = await fetch(HF_URL + '/scrape_custom?contracts=' + batch.join(','));
+        var apiData = await apiRes.json();
+
+        todayProcessed += apiData.length;
+        g('today-processed').textContent = todayProcessed;
+
+        // Check results
+        apiData.forEach(function(item) {
+          var guOk = item.gu_mobile && item.gu_mobile !== 'N/A' && !item.gu_mobile.startsWith('000');
+          var coOk = item.co_mobile && item.co_mobile !== 'N/A' && !item.co_mobile.startsWith('000');
+
+          if(guOk || coOk) {
+            todayBingo++;
+            g('today-bingo').textContent = todayBingo;
+            var nums = [];
+            if(guOk) nums.push('GU: ' + item.gu_mobile);
+            if(coOk) nums.push('CO: ' + item.co_mobile);
+            addLog('🎯 [' + item.contract + '] Number mila! ' + nums.join(' | '), 'bingo');
+          }
+        });
+
+        // Check deleted from pending
+        var newPendRes = await fetch(GH_RAW + '?t=' + Date.now());
+        var newPendData = await newPendRes.json();
+        var newCount = Object.keys(newPendData).length;
+        var deleted = allIds.length - newCount;
+        if(deleted > todayDeleted) {
+          var diff = deleted - todayDeleted;
+          todayDeleted = deleted;
+          g('today-deleted').textContent = todayDeleted;
+          if(diff > 0) addLog('✅ ' + diff + ' ID(s) pending se hat gayi!', 'ok');
+        }
+
+        addLog('✅ Batch ' + (completed+1) + ' complete - ' + apiData.length + ' IDs processed', 'ok');
+
+      } catch(batchErr) {
+        addLog('❌ Batch error: ' + batchErr.message, 'err');
+      }
+
+      completed++;
+      var pct = Math.round((completed / batches) * 100);
+      g('progress-fill').style.width = pct + '%';
+      g('progress-text').textContent = completed + ' / ' + batches + ' batches complete (' + pct + '%)';
+
+      // 3 sec wait between batches (last batch ke baad nahi)
+      if(i + batchSize < total) {
+        addLog('⏳ 3 sec rest...', 'muted');
+        await sleep(3000);
+      }
+    }
+
+    // Final pending count refresh
+    loadStats();
+    loadPending();
+
+    addLog('🛑 ROUND COMPLETE! Aaj ka kaam ho gaya.', 'info');
+    addLog('📊 Summary: Processed=' + todayProcessed + ' | Numbers Mile=' + todayBingo + ' | Pending Se Hate=' + todayDeleted, 'info');
+    setStatus('done');
+    toast('✅ Night Run Complete!');
+
+  } catch(err) {
+    addLog('❌ Error: ' + err.message, 'err');
+    setStatus('error');
+    toast('❌ Error aaya: ' + err.message);
+  }
+
+  resetBtn();
+}
+
+function resetBtn() {
+  isRunning = false;
+  var btn = g('run-btn');
+  btn.disabled = false;
+  btn.innerHTML = '▶ Night Run Chalao';
+}
+
+function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+// ── STATS ─────────────────────────────────────────────────
 async function loadStats(){
   var u = await sb.from('ContractTrack').select('*');
   var l = await sb.from('search_logs').select('created_at');
@@ -254,7 +523,7 @@ async function loadStats(){
 
 // ── USERS ─────────────────────────────────────────────────
 async function loadUsers(){
-  g('user-tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>Loading...</td></tr>';
+  g('user-tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
   var res = await sb.from('ContractTrack').select('*').order('limit_left',{ascending:true});
   if(res.data){ allUsers=res.data; renderUsers(allUsers); }
 }
@@ -315,7 +584,7 @@ async function toggleBlock(email, block){
 
 // ── LOGS ──────────────────────────────────────────────────
 async function loadLogs(){
-  g('log-list').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)"><span class="spin"></span>Loading...</div>';
+  g('log-list').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Loading...</div>';
   var res = await sb.from('search_logs').select('*').order('created_at',{ascending:false}).limit(200);
   if(res.data){ allLogs=res.data; renderLogs(allLogs); }
 }
@@ -345,7 +614,7 @@ function filterLogs(){
 
 // ── PENDING ───────────────────────────────────────────────
 async function loadPending(){
-  g('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)"><span class="spin"></span>GitHub se load ho raha hai...</div>';
+  g('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">GitHub se load ho raha hai...</div>';
   try {
     var r = await fetch(GH_RAW+'?t='+Date.now());
     allPending = await r.json();
