@@ -20,7 +20,7 @@ body{font-family:Arial,sans-serif;background:#000;color:#fff;padding:12px;overfl
 .msg-box{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:14px;display:none;text-align:left}
 .msg-box.err{background:#200;color:#f88;border:1px solid #f33}
 .msg-box.ok{background:#020;color:#0f9;border:1px solid #0f9}
-.big-btn{width:100%;background:var(--gold);color:#000;border:none;padding:14px;border-radius:8px;font-weight:900;cursor:pointer;margin-top:14px;text-transform:uppercase;font-size:15px;letter-spacing:.5px}
+.big-btn{width:100%;background:var(--gold);color:#000;border:none;padding:14px;border-radius:8px;font-weight:900;cursor:pointer;margin-top:14px;text-transform:uppercase;font-size:15px}
 .big-btn:disabled{opacity:.5;cursor:not-allowed}
 .toggle-row{margin-top:16px;font-size:14px;color:#666}
 .toggle-link{color:var(--gold);cursor:pointer;font-weight:bold;text-decoration:underline;background:none;border:none;font-size:14px;margin-left:4px}
@@ -33,6 +33,25 @@ body{font-family:Arial,sans-serif;background:#000;color:#fff;padding:12px;overfl
 /* ADMIN BOX */
 .admin-row{display:none;margin-bottom:14px;padding:13px 16px;border:1px solid rgba(212,175,55,.4);border-radius:12px;background:#0d0b00;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .admin-open-btn{background:var(--gold);color:#000;border:none;padding:9px 16px;border-radius:7px;font-weight:900;font-size:13px;cursor:pointer}
+
+/* SAVED IDs MANAGER */
+.saved-manager{background:#0a0a00;border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:14px;margin-bottom:14px}
+.saved-manager-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.saved-title{color:var(--gold);font-weight:900;font-size:14px}
+.saved-count{background:rgba(212,175,55,.15);color:var(--gold);border:1px solid rgba(212,175,55,.3);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.saved-btns{display:flex;gap:8px;flex-wrap:wrap}
+.s-btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid}
+.s-btn-refresh{background:rgba(34,197,94,.1);color:var(--ok);border-color:rgba(34,197,94,.3)}
+.s-btn-refresh:hover{background:var(--ok);color:#000}
+.s-btn-clear{background:rgba(255,68,68,.1);color:var(--red);border-color:rgba(255,68,68,.3)}
+.s-btn-clear:hover{background:var(--red);color:#fff}
+.s-btn-refresh:disabled{opacity:.5;cursor:not-allowed}
+
+/* SAVED ID CHIPS */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:20px}
+.chip{background:#1a1a00;border:1px solid rgba(212,175,55,.4);border-radius:6px;padding:4px 10px;font-size:12px;font-family:monospace;color:var(--gold);display:flex;align-items:center;gap:6px}
+.chip-del{background:none;border:none;color:#666;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.chip-del:hover{color:var(--red)}
 
 /* HEADER */
 .hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -74,17 +93,26 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
 .drow:last-child{border-bottom:none}
 .drow b{color:var(--gold);text-align:right}
 .share-btn{width:100%;margin-top:11px;background:var(--gold);color:#000;font-weight:900;border:none;padding:11px;border-radius:6px;cursor:pointer;text-transform:uppercase;font-size:13px}
+.remove-btn{width:100%;margin-top:8px;background:rgba(255,68,68,.1);color:var(--red);font-weight:900;border:1px solid rgba(255,68,68,.3);padding:9px;border-radius:6px;cursor:pointer;font-size:12px}
+.remove-btn:hover{background:var(--red);color:#fff}
 
 /* LOADER */
 .loader{display:none;text-align:center;color:var(--gold);padding:20px;font-weight:bold}
 .spin{display:inline-block;width:18px;height:18px;border:3px solid #333;border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+/* AUTO FETCH BANNER */
+.auto-banner{background:#001a0a;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px;font-size:13px}
+.auto-banner-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:blink .8s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
 #block-screen{display:none;position:fixed;inset:0;background:#000;z-index:9999;justify-content:center;align-items:center;flex-direction:column;color:var(--red);text-align:center;gap:14px}
 
 @media(max-width:480px){
   .item-top{grid-template-columns:1.2fr 1fr 1fr;gap:5px;padding:10px}
   .filter-row{grid-template-columns:1fr}
+  .saved-btns{width:100%}
+  .s-btn{flex:1;text-align:center}
 }
 </style>
 </head>
@@ -96,6 +124,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
   <p>Aapka account block kar diya gaya hai.</p>
 </div>
 
+<!-- AUTH -->
 <div class="wrap" id="auth-page">
   <div class="auth-page">
     <div class="auth-box">
@@ -113,7 +142,10 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
   </div>
 </div>
 
+<!-- MAIN APP -->
 <div class="wrap" id="main-app" style="display:none">
+
+  <!-- TOP NAV -->
   <div class="top-nav">
     <div>
       <div style="font-size:11px;color:#666">Logged in:</div>
@@ -126,6 +158,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
     <button class="logout-btn" id="logout-btn">LOGOUT</button>
   </div>
 
+  <!-- ADMIN BOX -->
   <div class="admin-row" id="admin-row">
     <div>
       <div style="color:var(--gold);font-weight:900;font-size:14px">👑 Admin Panel</div>
@@ -134,18 +167,45 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
     <button class="admin-open-btn" id="admin-btn">🔐 Open Admin Panel</button>
   </div>
 
+  <!-- HEADER -->
   <div class="hdr">
     <div class="logo-sm">CT</div>
     <h2 style="font-size:20px">ContractTrack Pro</h2>
   </div>
 
+  <!-- AUTO FETCH BANNER -->
+  <div class="auto-banner" id="auto-banner">
+    <div class="auto-banner-dot"></div>
+    <div>
+      <span style="color:var(--ok);font-weight:700">Auto Fetch Ho Raha Hai...</span>
+      <span style="color:#555;font-size:12px;margin-left:6px" id="auto-banner-text"></span>
+    </div>
+  </div>
+
+  <!-- SAVED IDs MANAGER -->
+  <div class="saved-manager" id="saved-manager" style="display:none">
+    <div class="saved-manager-top">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="saved-title">💾 Saved Contracts</div>
+        <span class="saved-count" id="saved-count">0 IDs</span>
+      </div>
+      <div class="saved-btns">
+        <button class="s-btn s-btn-refresh" id="refresh-all-btn" onclick="refreshAllSaved()">🔄 Refresh All</button>
+        <button class="s-btn s-btn-clear" onclick="clearAllSaved()">🗑️ Clear All</button>
+      </div>
+    </div>
+    <div class="chips-wrap" id="chips-wrap"></div>
+  </div>
+
+  <!-- INPUT CARD -->
   <div class="in-card">
-    <textarea id="contracts-input" rows="4" placeholder="Contract numbers daalo (ek line mein ek)&#10;MFL123456&#10;MFL789012"></textarea>
-    <button class="big-btn" id="fetch-btn">FETCH ALL RECEIPTS</button>
+    <textarea id="contracts-input" rows="3" placeholder="Naye Contract numbers daalo (ek line mein ek)&#10;MFL123456&#10;MFL789012"></textarea>
+    <button class="big-btn" id="fetch-btn" onclick="doFetch()">FETCH & SAVE</button>
   </div>
 
   <div class="loader" id="loader"><span class="spin"></span>DATA FETCH HO RAHA HAI...</div>
 
+  <!-- REPORT -->
   <div class="report" id="report">
     <div class="report-hdr">📊 Fetch Report</div>
     <div class="rep-row">
@@ -159,16 +219,19 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
     </div>
   </div>
 
+  <!-- STATS -->
   <div class="stat-grid">
     <div class="stat-card"><small>Records</small><div class="stat-val" id="t-count">0</div></div>
     <div class="stat-card"><small>Total Amount</small><div class="stat-val" id="t-amt" style="color:var(--ok)">₹0</div></div>
   </div>
 
+  <!-- FILTERS -->
   <div class="filter-row">
-    <input class="fin" type="text" id="search-inp" placeholder="🔍 Name ya Contract...">
-    <input class="fin" type="date" id="date-filter">
+    <input class="fin" type="text" id="search-inp" placeholder="🔍 Name ya Contract..." oninput="applyFilters()">
+    <input class="fin" type="date" id="date-filter" onchange="applyFilters()">
   </div>
 
+  <!-- RESULTS -->
   <div id="today-sec" style="display:none">
     <div class="sec-title">⭐ Aaj ke Payments</div>
     <div id="today-res"></div>
@@ -177,6 +240,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:poin
     <div class="sec-title">📂 Purane Records</div>
     <div id="other-res"></div>
   </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -187,6 +251,8 @@ var SB_KEY = 'sb_publishable_vtYwuPiGKz3fVql9532PmA_oy_JhxkE';
 var HF_API = 'https://gauravkumar80500-loandataapi.hf.space/scrape_custom';
 
 var sb, loginMode = true, fpId = 'fp-' + Math.random().toString(36).slice(2);
+var currentEmail = '';
+var savedContracts = []; // User ki saved IDs
 window._records = [];
 
 function g(id){ return document.getElementById(id); }
@@ -208,6 +274,7 @@ function toggleMode(){
   g('toggle-btn').textContent   = loginMode ? 'Register Karein' : 'Login Karein';
 }
 
+// ── AUTH ──────────────────────────────────────────────────
 async function doAuth(){
   var email = g('em').value.trim();
   var pass  = g('pw').value.trim();
@@ -231,7 +298,7 @@ async function doAuth(){
       if(r2.error) throw r2.error;
       var ip2 = await getIP();
       await sb.from('ContractTrack').upsert(
-        { email:email, device_id:fpId, last_ip:ip2, limit_left:10, is_blocked:false },
+        { email:email, device_id:fpId, last_ip:ip2, limit_left:10, is_blocked:false, saved_contracts:'[]' },
         { onConflict:'email' }
       );
       showMsg('ok','✅ Account ban gaya! Ab login karein.');
@@ -245,7 +312,6 @@ async function doAuth(){
     var m = (err && err.message) ? err.message : 'Kuch error aaya!';
     if(m.includes('Invalid login') || m.includes('invalid credentials')) m = '❌ Email ya Password galat hai!';
     else if(m.includes('already registered')) m = '⚠️ Ye email pehle se registered hai!';
-    else if(m.includes('valid email')) m = '⚠️ Sahi email format likho!';
     showMsg('err', m);
   } finally {
     btn.disabled = false;
@@ -253,36 +319,265 @@ async function doAuth(){
   }
 }
 
+// ── SESSION CHECK ─────────────────────────────────────────
 async function checkSession(){
   try {
     var res = await sb.auth.getSession();
     if(res.data && res.data.session){
-      var uEmail = res.data.session.user.email;
-      g('auth-page').style.display = 'none';
-      g('main-app').style.display  = 'block';
-      g('disp-email').textContent  = uEmail;
-      if(uEmail === ADMIN) g('admin-row').style.display = 'flex';
-      var db = await sb.from('ContractTrack').select('*').eq('email', uEmail).single();
+      currentEmail = res.data.session.user.email;
+      g('auth-page').style.display  = 'none';
+      g('main-app').style.display   = 'block';
+      g('disp-email').textContent   = currentEmail;
+      if(currentEmail === ADMIN) g('admin-row').style.display = 'flex';
+
+      var db = await sb.from('ContractTrack').select('*').eq('email', currentEmail).single();
       if(db.data){
         g('disp-limit').textContent = db.data.limit_left !== null ? db.data.limit_left : 0;
-        if(db.data.is_blocked) g('block-screen').style.display = 'flex';
+        if(db.data.is_blocked){ g('block-screen').style.display='flex'; return; }
+
+        // ✅ Saved contracts load karo aur auto fetch karo
+        try {
+          savedContracts = JSON.parse(db.data.saved_contracts || '[]');
+        } catch(e) { savedContracts = []; }
+
+        renderChips();
+
+        // Agar saved IDs hain to auto fetch karo
+        if(savedContracts.length > 0){
+          autoFetchSaved();
+        }
       }
     } else {
       g('auth-page').style.display = 'block';
       g('main-app').style.display  = 'none';
     }
-  } catch(e){ console.log('Session err:',e); }
+  } catch(e){ console.log('Session err:', e); }
 }
 
-function doLogout(){ sb.auth.signOut().then(function(){ location.reload(); }); }
+// ── SAVED CONTRACTS UI ────────────────────────────────────
+function renderChips(){
+  var wrap = g('chips-wrap');
+  var manager = g('saved-manager');
 
-function getIP(){
-  return fetch('https://api.ipify.org?format=json')
-    .then(function(r){ return r.json(); })
-    .then(function(d){ return d.ip; })
-    .catch(function(){ return 'N/A'; });
+  if(savedContracts.length === 0){
+    manager.style.display = 'none';
+    return;
+  }
+
+  manager.style.display = 'block';
+  g('saved-count').textContent = savedContracts.length + ' IDs';
+
+  wrap.innerHTML = savedContracts.map(function(id){
+    return '<div class="chip">' +
+      '<span>' + id + '</span>' +
+      '<button class="chip-del" onclick="removeSingleContract(\'' + id + '\')" title="Hatao">✕</button>' +
+    '</div>';
+  }).join('');
 }
 
+// ── SINGLE ID REMOVE ──────────────────────────────────────
+async function removeSingleContract(id){
+  savedContracts = savedContracts.filter(function(c){ return c !== id; });
+  await saveToDB();
+  renderChips();
+
+  // Results mein se bhi hatao
+  window._records = window._records.filter(function(r){ return gv(r,'contract') !== id; });
+  rebuildResults();
+  applyFilters();
+}
+
+// ── CLEAR ALL ─────────────────────────────────────────────
+async function clearAllSaved(){
+  if(!confirm('Sab saved IDs hata dein?')) return;
+  savedContracts = [];
+  await saveToDB();
+  renderChips();
+  window._records = [];
+  g('today-res').innerHTML = '';
+  g('other-res').innerHTML = '';
+  g('today-sec').style.display = 'none';
+  g('other-sec').style.display = 'none';
+  g('t-count').textContent = '0';
+  g('t-amt').textContent = '₹0';
+  g('report').style.display = 'none';
+}
+
+// ── REFRESH ALL SAVED ─────────────────────────────────────
+async function refreshAllSaved(){
+  if(savedContracts.length === 0){ alert('Koi saved ID nahi hai!'); return; }
+  var btn = g('refresh-all-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>';
+  await fetchContracts(savedContracts, false); // false = limit mat katao
+  btn.disabled = false;
+  btn.innerHTML = '🔄 Refresh All';
+}
+
+// ── AUTO FETCH ON LOGIN ───────────────────────────────────
+async function autoFetchSaved(){
+  g('auto-banner').style.display = 'flex';
+  g('auto-banner-text').textContent = savedContracts.length + ' IDs fetch ho rahi hain...';
+  await fetchContracts(savedContracts, false); // false = limit mat katao
+  g('auto-banner').style.display = 'none';
+}
+
+// ── SAVE TO DB ────────────────────────────────────────────
+async function saveToDB(){
+  try {
+    await sb.from('ContractTrack')
+      .update({ saved_contracts: JSON.stringify(savedContracts) })
+      .eq('email', currentEmail);
+  } catch(e){ console.log('Save err:', e); }
+}
+
+// ── MAIN FETCH BUTTON ─────────────────────────────────────
+async function doFetch(){
+  var raw = g('contracts-input').value.trim();
+  if(!raw){ alert('Contract numbers daalo!'); return; }
+
+  var arr  = raw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  var uniq = arr.filter(function(v,i,a){ return a.indexOf(v)===i; });
+
+  // Nayi IDs saved mein add karo (duplicates hatao)
+  uniq.forEach(function(id){
+    if(savedContracts.indexOf(id) === -1){
+      savedContracts.push(id);
+    }
+  });
+
+  g('contracts-input').value = ''; // Clear textarea
+  await fetchContracts(uniq, true); // true = limit katao
+}
+
+// ── CORE FETCH FUNCTION ───────────────────────────────────
+async function fetchContracts(contractList, deductLimit){
+  var btn = g('fetch-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>FETCHING...';
+  g('loader').style.display = 'block';
+  g('report').style.display = 'none';
+
+  try {
+    var need = contractList.length;
+
+    if(deductLimit){
+      // Limit check
+      var sess = await sb.auth.getSession();
+      if(!sess.data || !sess.data.session) throw new Error('Login karein pehle!');
+      var uDb = await sb.from('ContractTrack').select('*').eq('email', currentEmail).single();
+      if(uDb.error || !uDb.data) throw new Error('Database error!');
+      if(uDb.data.is_blocked){ g('block-screen').style.display='flex'; return; }
+      var lim = uDb.data.limit_left !== null ? parseInt(uDb.data.limit_left) : 0;
+      if(lim < need) throw new Error('Limit khatam! Chahiye: '+need+', Bachi: '+lim);
+    }
+
+    var apiR = await fetch(HF_API + '?contracts=' + contractList.join(','));
+    if(!apiR.ok) throw new Error('API Down! Status: '+apiR.status);
+    var data = await apiR.json();
+
+    // Existing records mein merge karo
+    data.forEach(function(newItem){
+      var idx = window._records.findIndex(function(r){ return gv(r,'contract') === gv(newItem,'contract'); });
+      if(idx >= 0) window._records[idx] = newItem; // Update
+      else window._records.push(newItem); // Add
+    });
+
+    if(deductLimit){
+      var newLim = parseInt(g('disp-limit').textContent) - need;
+      g('disp-limit').textContent = newLim;
+      try {
+        var logs = contractList.map(function(id){ return {email:currentEmail, search_query:id, device_id:fpId}; });
+        await sb.from('search_logs').insert(logs);
+        await sb.from('ContractTrack').update({ limit_left:newLim, saved_contracts:JSON.stringify(savedContracts) }).eq('email',currentEmail);
+      } catch(e){ console.log('Log err:',e); }
+    } else {
+      // Sirf saved_contracts update karo
+      await saveToDB();
+    }
+
+    // Report
+    var fetched = data.map(function(x){ return String(gv(x,'contract')).trim(); });
+    var failed  = contractList.filter(function(id){ return fetched.indexOf(String(id).trim())===-1; });
+
+    g('rep-total').textContent = contractList.length;
+    g('rep-ok').textContent    = data.length;
+    g('rep-fail').textContent  = failed.length;
+
+    if(failed.length>0){
+      g('failed-box').style.display='block';
+      g('failed-list').innerHTML = failed.map(function(id){ return '<span class="fbadge">'+id+'</span>'; }).join('');
+    } else { g('failed-box').style.display='none'; }
+    g('report').style.display = 'block';
+
+    renderChips();
+    rebuildResults();
+    applyFilters();
+
+  } catch(err){
+    console.error(err);
+    alert('❌ Error: '+(err.message||err));
+  } finally {
+    g('loader').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'FETCH & SAVE';
+  }
+}
+
+// ── BUILD RESULT CARDS ────────────────────────────────────
+function rebuildResults(){
+  var todayStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace(/ /g,'-');
+  var tH='', oH='';
+
+  window._records.forEach(function(item,i){
+    var nm=gv(item,'name'), ct=gv(item,'contract'), dt=gv(item,'date'),
+        am=gv(item,'amount'), mo=gv(item,'mobile'), em=gv(item,'emi_amount'),
+        ov=gv(item,'overdue'), gn=gv(item,'gu_name'), gm=gv(item,'gu_mobile'),
+        cn=gv(item,'co_name'), cm=gv(item,'co_mobile'),
+        rc=gv(item,'receipt_no'), ins=gv(item,'instr');
+    var isT=(dt===todayStr);
+    var emiT=em!=='N/A'?'₹'+em:'N/A';
+    var ovT=cv(ov)!=='N/A'?'₹'+ov:'₹0';
+    var dD=isT
+      ? '<span class="today-tag">TODAY ✅</span>'
+      : '<div class="date-lbl" style="font-size:11px;">'+(dt!=='N/A'?dt:'-')+'</div>';
+
+    var card=
+      '<div class="item" id="card-'+i+'">' +
+        '<div class="item-top" onclick="toggleCard('+i+')">' +
+          '<div><div style="font-weight:bold;font-size:15px;">'+nm+'</div>' +
+          '<div style="color:var(--gold);font-size:12px;margin-top:3px;font-weight:bold;">'+ct+'</div></div>' +
+          '<div style="text-align:center;padding:0 6px;">'+dD+'</div>' +
+          '<div style="text-align:right;">' +
+            '<div style="color:var(--gold);font-weight:bold;font-size:17px;">₹'+am+'</div>' +
+            '<div style="font-size:11px;color:#666;margin-top:4px;">Details <span id="ic-'+i+'">▼</span></div>' +
+          '</div></div>' +
+        '<div id="det-'+i+'" class="detail-box" style="display:none;">' +
+          '<div class="drow"><span>📱 Mobile</span><b>'+mo+'</b></div>' +
+          '<div class="drow"><span>💳 EMI</span><b style="color:var(--ok)">'+emiT+'</b></div>' +
+          '<div class="drow"><span>⚠️ Overdue</span><b style="color:#f55">'+ovT+'</b></div>' +
+          '<div class="drow"><span>👤 Guarantor</span><b>'+gn+'</b></div>' +
+          '<div class="drow"><span>📱 GU Mobile</span><b>'+gm+'</b></div>' +
+          '<div class="drow"><span>👥 Co-App</span><b>'+cn+'</b></div>' +
+          '<div class="drow"><span>📱 Co Mobile</span><b>'+cm+'</b></div>' +
+          '<div class="drow"><span>🧾 Receipt</span><b style="color:#aaa">'+rc+'</b></div>' +
+          '<div class="drow"><span>📋 Type</span><b style="color:#aaa">'+ins+'</b></div>' +
+          '<button class="share-btn" onclick="shareCard('+i+')">🔗 Share Details</button>' +
+          '<button class="remove-btn" onclick="removeSingleContract(\''+ct+'\')">❌ Is ID Ko Hatao</button>' +
+        '</div></div>';
+
+    if(isT) tH+=card; else oH+=card;
+  });
+
+  if(!tH) tH='<div style="text-align:center;padding:16px;color:#555;background:#111;border-radius:10px;border:1px dashed var(--gold);margin-bottom:12px">⏳ Aaj koi payment nahi aaya abhi tak.</div>';
+
+  g('today-res').innerHTML = tH;
+  g('other-res').innerHTML = oH;
+  g('today-sec').style.display = 'block';
+  if(oH) g('other-sec').style.display = 'block';
+}
+
+// ── HELPERS ───────────────────────────────────────────────
 function gv(obj, key){
   if(!obj) return 'N/A';
   var k = Object.keys(obj).find(function(x){ return x.toLowerCase()===key.toLowerCase(); });
@@ -335,104 +630,22 @@ function applyFilters(){
   g('t-amt').textContent   = '₹'+amt.toLocaleString('en-IN');
 }
 
-async function doFetch(){
-  var raw = g('contracts-input').value.trim();
-  if(!raw){ alert('Contract numbers daalo!'); return; }
-  var btn = g('fetch-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spin"></span>FETCHING...';
-  g('loader').style.display='block'; g('report').style.display='none';
-  g('today-sec').style.display='none'; g('other-sec').style.display='none';
-  g('today-res').innerHTML=''; g('other-res').innerHTML='';
-  try {
-    var arr  = raw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
-    var uniq = arr.filter(function(v,i,a){ return a.indexOf(v)===i; });
-    var need = uniq.length;
-    var sess = await sb.auth.getSession();
-    if(!sess.data || !sess.data.session) throw new Error('Login karein pehle!');
-    var email = sess.data.session.user.email;
-    var uDb = await sb.from('ContractTrack').select('*').eq('email',email).single();
-    if(uDb.error || !uDb.data) throw new Error('Database error!');
-    if(uDb.data.is_blocked){ g('block-screen').style.display='flex'; return; }
-    var lim = uDb.data.limit_left!==null ? parseInt(uDb.data.limit_left) : 0;
-    if(lim < need) throw new Error('Limit khatam! Chahiye: '+need+', Bachi: '+lim);
-    var apiR = await fetch(HF_API+'?contracts='+uniq.join(','));
-    if(!apiR.ok) throw new Error('API Down! Status: '+apiR.status);
-    var data = await apiR.json();
-    window._records = Array.isArray(data) ? data : [];
-    var newLim = lim - need;
-    g('disp-limit').textContent = newLim;
-    try {
-      var logs = uniq.map(function(id){ return {email:email,search_query:id,device_id:fpId}; });
-      await sb.from('search_logs').insert(logs);
-      await sb.from('ContractTrack').update({limit_left:newLim}).eq('email',email);
-    } catch(e){ console.log('Log err:',e); }
-    var fetched = window._records.map(function(x){ return String(gv(x,'contract')).trim(); });
-    var failed  = uniq.filter(function(id){ return fetched.indexOf(String(id).trim())===-1; });
-    g('rep-total').textContent=uniq.length; g('rep-ok').textContent=window._records.length; g('rep-fail').textContent=failed.length;
-    if(failed.length>0){
-      g('failed-box').style.display='block';
-      g('failed-list').innerHTML=failed.map(function(id){ return '<span class="fbadge">'+id+'</span>'; }).join('');
-    } else { g('failed-box').style.display='none'; }
-    g('report').style.display='block';
-    var todayStr = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace(/ /g,'-');
-    var tH='', oH='';
-    window._records.forEach(function(item,i){
-      var nm=gv(item,'name'),ct=gv(item,'contract'),dt=gv(item,'date'),am=gv(item,'amount'),
-          mo=gv(item,'mobile'),em=gv(item,'emi_amount'),ov=gv(item,'overdue'),
-          gn=gv(item,'gu_name'),gm=gv(item,'gu_mobile'),cn=gv(item,'co_name'),
-          cm=gv(item,'co_mobile'),rc=gv(item,'receipt_no'),ins=gv(item,'instr');
-      var isT=(dt===todayStr);
-      var emiT=em!=='N/A'?'₹'+em:'N/A';
-      var ovT=cv(ov)!=='N/A'?'₹'+ov:'₹0';
-      var dD=isT
-        ? '<span class="today-tag">TODAY ✅</span>'
-        : '<div class="date-lbl" style="font-size:11px;">'+(dt!=='N/A'?dt:'-')+'</div>';
-      var card=
-        '<div class="item" id="card-'+i+'">' +
-          '<div class="item-top" onclick="toggleCard('+i+')">' +
-            '<div><div style="font-weight:bold;font-size:15px;">'+nm+'</div>' +
-            '<div style="color:var(--gold);font-size:12px;margin-top:3px;font-weight:bold;">'+ct+'</div></div>' +
-            '<div style="text-align:center;padding:0 6px;">'+dD+'</div>' +
-            '<div style="text-align:right;">' +
-              '<div style="color:var(--gold);font-weight:bold;font-size:17px;">₹'+am+'</div>' +
-              '<div style="font-size:11px;color:#666;margin-top:4px;">Details <span id="ic-'+i+'">▼</span></div>' +
-            '</div></div>' +
-          '<div id="det-'+i+'" class="detail-box" style="display:none;">' +
-            '<div class="drow"><span>📱 Mobile</span><b>'+mo+'</b></div>' +
-            '<div class="drow"><span>💳 EMI</span><b style="color:var(--ok)">'+emiT+'</b></div>' +
-            '<div class="drow"><span>⚠️ Overdue</span><b style="color:#f55">'+ovT+'</b></div>' +
-            '<div class="drow"><span>👤 Guarantor</span><b>'+gn+'</b></div>' +
-            '<div class="drow"><span>📱 GU Mobile</span><b>'+gm+'</b></div>' +
-            '<div class="drow"><span>👥 Co-App</span><b>'+cn+'</b></div>' +
-            '<div class="drow"><span>📱 Co Mobile</span><b>'+cm+'</b></div>' +
-            '<div class="drow"><span>🧾 Receipt</span><b style="color:#aaa">'+rc+'</b></div>' +
-            '<div class="drow"><span>📋 Type</span><b style="color:#aaa">'+ins+'</b></div>' +
-            '<button class="share-btn" onclick="shareCard('+i+')">🔗 Share Details</button>' +
-          '</div></div>';
-      if(isT) tH+=card; else oH+=card;
-    });
-    if(!tH) tH='<div style="text-align:center;padding:16px;color:#555;background:#111;border-radius:10px;border:1px dashed var(--gold);margin-bottom:12px">⏳ Aaj koi payment nahi aaya abhi tak.</div>';
-    g('today-res').innerHTML=tH; g('other-res').innerHTML=oH;
-    g('today-sec').style.display='block';
-    if(oH) g('other-sec').style.display='block';
-    applyFilters();
-  } catch(err){
-    console.error(err); alert('❌ Error: '+(err.message||err));
-  } finally {
-    g('loader').style.display='none'; btn.disabled=false; btn.textContent='FETCH ALL RECEIPTS';
-  }
+function doLogout(){ sb.auth.signOut().then(function(){ location.reload(); }); }
+
+function getIP(){
+  return fetch('https://api.ipify.org?format=json')
+    .then(function(r){ return r.json(); })
+    .then(function(d){ return d.ip; })
+    .catch(function(){ return 'N/A'; });
 }
 
-// ── INIT ─────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────
 window.addEventListener('load', function(){
   sb = window.supabase.createClient(SB_URL, SB_KEY);
   g('submit-btn').addEventListener('click', doAuth);
   g('toggle-btn').addEventListener('click', toggleMode);
   g('logout-btn').addEventListener('click', doLogout);
-  g('fetch-btn').addEventListener('click', doFetch);
   g('admin-btn').addEventListener('click', function(){ window.location.href='admin.html'; });
-  g('search-inp').addEventListener('input', applyFilters);
-  g('date-filter').addEventListener('change', applyFilters);
   g('pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   g('em').addEventListener('keydown', function(e){ if(e.key==='Enter') g('pw').focus(); });
   checkSession();
